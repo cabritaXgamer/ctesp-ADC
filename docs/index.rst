@@ -19,3 +19,11 @@ organizado o código e o que faz cada módulo.
    instalacao
    arquitetura
    testes
+   referencia
+
+Índices
+-------
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
