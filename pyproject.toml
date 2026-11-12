@@ -26,3 +26,9 @@ version = { attr = "gestor_campanhas.__version__" }
 
 [tool.setuptools.packages.find]
 include = ["gestor_campanhas*"]
+
+[tool.pytest.ini_options]
+# Pasta onde estão os testes.
+testpaths = ["tests"]
+# Permite importar o pacote gestor_campanhas sem o instalar.
+pythonpath = ["."]
