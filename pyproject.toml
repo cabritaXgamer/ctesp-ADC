@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gestor-campanhas"
+description = "Aplicação de linha de comandos para gestão de campanhas de marketing."
+readme = "README.md"
+requires-python = ">=3.10"
+# A aplicação usa apenas a biblioteca padrão do Python.
+dependencies = []
+# A versão é lida de gestor_campanhas/__init__.py (ver [tool.setuptools.dynamic]).
+dynamic = ["version"]
+authors = [
+    { name = "Fabio Felgueiras" },
+    { name = "Tomas Paulo" },
+    { name = "Ricardo Cabrita" },
+]
+
+[project.scripts]
+# Depois de "pip install -e ." a aplicação também arranca com o comando "gestor-campanhas".
+gestor-campanhas = "gestor_campanhas.__main__:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "gestor_campanhas.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["gestor_campanhas*"]
