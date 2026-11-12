@@ -17,3 +17,5 @@ organizado o código e o que faz cada módulo.
    :caption: Conteúdo
 
    instalacao
+   arquitetura
+   testes
