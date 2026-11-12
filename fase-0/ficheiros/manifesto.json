@@ -1,0 +1,323 @@
+{
+  "fase": 0,
+  "repo_oficial": "ADC-TrabGrupo",
+  "unidades": [
+    {
+      "id": "0.1",
+      "titulo": "Estrutura do pacote Python",
+      "ramo": "feature/0.1-estrutura-pacote",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "chore: adicionar .gitignore e .gitattributes",
+          "ficheiros": [
+            ".gitattributes",
+            ".gitignore"
+          ],
+          "apagar": [],
+          "tree_antes": "0fc4f53cab61912727d2c9d87b03d43f6f442cad",
+          "tree_depois": "b3f81de65a53ce5846e2a5a4cdf22ec23d63160a"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(nucleo): criar pacote gestor_campanhas com ponto de entrada",
+          "ficheiros": [
+            "gestor_campanhas/__init__.py",
+            "gestor_campanhas/__main__.py"
+          ],
+          "apagar": [],
+          "tree_antes": "b3f81de65a53ce5846e2a5a4cdf22ec23d63160a",
+          "tree_depois": "88846ddeee89b2de925fa7e46c1e8fb008e59157"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(config): adicionar configuração dos caminhos de dados",
+          "ficheiros": [
+            "gestor_campanhas/config.py"
+          ],
+          "apagar": [],
+          "tree_antes": "88846ddeee89b2de925fa7e46c1e8fb008e59157",
+          "tree_depois": "f471d3030c7d74adb0316cecedca1d99290d2098"
+        },
+        {
+          "numero": 4,
+          "mensagem": "chore: adicionar pyproject.toml",
+          "ficheiros": [
+            "pyproject.toml"
+          ],
+          "apagar": [],
+          "tree_antes": "f471d3030c7d74adb0316cecedca1d99290d2098",
+          "tree_depois": "955ca2568cd7cb1edba7d921f2a29f1fd4b16b27"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "README.md": "2c19d0116f74e832ad4bb479a79e468a56714c86",
+        "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
+        "gestor_campanhas/__main__.py": "8b9fbf53b3a7d188816f82f7db5be2a7b77ccd74",
+        "gestor_campanhas/config.py": "29531dc732da331435fdfac8899dfdd8bef97723",
+        "pyproject.toml": "663959d595229cdf3bf1db71b377f16c3c94cb90"
+      }
+    },
+    {
+      "id": "0.2",
+      "titulo": "Base de dados e menu inicial",
+      "ramo": "feature/0.2-base-dados-menu",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(bd): adicionar ligação SQLite e criação de tabelas",
+          "ficheiros": [
+            "gestor_campanhas/bd.py"
+          ],
+          "apagar": [],
+          "tree_antes": "955ca2568cd7cb1edba7d921f2a29f1fd4b16b27",
+          "tree_depois": "b6eb91c31da8039a079d759402165d121d649f22"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(cli): adicionar funções comuns dos menus",
+          "ficheiros": [
+            "gestor_campanhas/cli/__init__.py",
+            "gestor_campanhas/cli/comum.py"
+          ],
+          "apagar": [],
+          "tree_antes": "b6eb91c31da8039a079d759402165d121d649f22",
+          "tree_depois": "e5e8d15d8b152e20da5857be136b5e47fb772dd1"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(cli): adicionar menu inicial",
+          "ficheiros": [
+            "gestor_campanhas/cli/principal.py"
+          ],
+          "apagar": [],
+          "tree_antes": "e5e8d15d8b152e20da5857be136b5e47fb772dd1",
+          "tree_depois": "9f28f9c9b14dd3369e59a5f5246fc2baaa0e364f"
+        },
+        {
+          "numero": 4,
+          "mensagem": "feat(nucleo): ligar o ponto de entrada à base de dados e ao menu inicial",
+          "ficheiros": [
+            "gestor_campanhas/__main__.py"
+          ],
+          "apagar": [],
+          "tree_antes": "9f28f9c9b14dd3369e59a5f5246fc2baaa0e364f",
+          "tree_depois": "61cdf299028d013f5fa3684770178816c32e4995"
+        },
+        {
+          "numero": 5,
+          "mensagem": "fix(cli): ler e escrever acentos em UTF-8 em qualquer terminal",
+          "ficheiros": [
+            "gestor_campanhas/__main__.py",
+            "gestor_campanhas/cli/comum.py"
+          ],
+          "apagar": [],
+          "tree_antes": "61cdf299028d013f5fa3684770178816c32e4995",
+          "tree_depois": "4f28acc2ce658d1946144f2d796d28520f08f760"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "README.md": "2c19d0116f74e832ad4bb479a79e468a56714c86",
+        "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "9ad389c5ab20c3308ff66723fa7b2c7c8bfb9152",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/comum.py": "4f0f6cfd4a858e21bf8424a4e680a2da4853e73b",
+        "gestor_campanhas/cli/principal.py": "3dff24227574efb06ab5b03720b15ef219496583",
+        "gestor_campanhas/config.py": "29531dc732da331435fdfac8899dfdd8bef97723",
+        "pyproject.toml": "663959d595229cdf3bf1db71b377f16c3c94cb90"
+      }
+    },
+    {
+      "id": "0.3",
+      "titulo": "Testes automáticos e integração contínua",
+      "ramo": "feature/0.3-testes-ci",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "test: configurar o pytest e as fixtures comuns",
+          "ficheiros": [
+            "pyproject.toml",
+            "requirements-dev.txt",
+            "tests/conftest.py"
+          ],
+          "apagar": [],
+          "tree_antes": "4f28acc2ce658d1946144f2d796d28520f08f760",
+          "tree_depois": "1b334e4fde473edc048edf489384f3769f284619"
+        },
+        {
+          "numero": 2,
+          "mensagem": "test(bd): testar a ligação, as tabelas e os caminhos de dados",
+          "ficheiros": [
+            "tests/test_bd.py"
+          ],
+          "apagar": [],
+          "tree_antes": "1b334e4fde473edc048edf489384f3769f284619",
+          "tree_depois": "9b00eee19d6f75316e62406dedb3105e287374e3"
+        },
+        {
+          "numero": 3,
+          "mensagem": "test(cli): testar os menus e o ponto de entrada",
+          "ficheiros": [
+            "tests/test_cli.py"
+          ],
+          "apagar": [],
+          "tree_antes": "9b00eee19d6f75316e62406dedb3105e287374e3",
+          "tree_depois": "6a8cb4925ad524031ebfae56277e256e23dac4c0"
+        },
+        {
+          "numero": 4,
+          "mensagem": "ci: correr os testes no GitHub Actions",
+          "ficheiros": [
+            ".github/workflows/testes.yml"
+          ],
+          "apagar": [],
+          "tree_antes": "6a8cb4925ad524031ebfae56277e256e23dac4c0",
+          "tree_depois": "ed0a7a1c6025c34cff54ecd11670dc36cd10c27f"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "README.md": "2c19d0116f74e832ad4bb479a79e468a56714c86",
+        "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "9ad389c5ab20c3308ff66723fa7b2c7c8bfb9152",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/comum.py": "4f0f6cfd4a858e21bf8424a4e680a2da4853e73b",
+        "gestor_campanhas/cli/principal.py": "3dff24227574efb06ab5b03720b15ef219496583",
+        "gestor_campanhas/config.py": "29531dc732da331435fdfac8899dfdd8bef97723",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "e9bbafe24062e28f7424ed974cbd5672748d45a2",
+        "tests/conftest.py": "85e2b4c8f1f850802ee2193180803835fa9438db",
+        "tests/test_bd.py": "0f89b4a4e4ab783c4ecbdbd58b914cc0be818c7f",
+        "tests/test_cli.py": "05169cf24d476f127f9d25190b454cb79ea7eed0"
+      }
+    },
+    {
+      "id": "0.4",
+      "titulo": "Documentação base",
+      "ramo": "feature/0.4-documentacao-base",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "docs: configurar o Sphinx e documentar a instalação",
+          "ficheiros": [
+            "docs/Makefile",
+            "docs/conf.py",
+            "docs/index.rst",
+            "docs/instalacao.rst",
+            "docs/make.bat",
+            "requirements-dev.txt"
+          ],
+          "apagar": [],
+          "tree_antes": "ed0a7a1c6025c34cff54ecd11670dc36cd10c27f",
+          "tree_depois": "921d37329c0f4584dce975c7176f700b8319b2db"
+        },
+        {
+          "numero": 2,
+          "mensagem": "docs: descrever a arquitetura e os testes",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/index.rst",
+            "docs/testes.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "921d37329c0f4584dce975c7176f700b8319b2db",
+          "tree_depois": "7d7205727ca8b7f4a830e11b257d086ca0b08739"
+        },
+        {
+          "numero": 3,
+          "mensagem": "docs: gerar a referência do código a partir dos docstrings",
+          "ficheiros": [
+            "docs/index.rst",
+            "docs/referencia.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "7d7205727ca8b7f4a830e11b257d086ca0b08739",
+          "tree_depois": "e46f6aea1394e3d58e51cf5fc02caed38d268bc7"
+        },
+        {
+          "numero": 4,
+          "mensagem": "ci: gerar a documentação no GitHub Actions",
+          "ficheiros": [
+            ".github/workflows/docs.yml"
+          ],
+          "apagar": [],
+          "tree_antes": "e46f6aea1394e3d58e51cf5fc02caed38d268bc7",
+          "tree_depois": "9d3a1e30e469a518171d66dd61e1bf85b565c7f7"
+        },
+        {
+          "numero": 5,
+          "mensagem": "docs: escrever o README",
+          "ficheiros": [
+            "README.md"
+          ],
+          "apagar": [],
+          "tree_antes": "9d3a1e30e469a518171d66dd61e1bf85b565c7f7",
+          "tree_depois": "bc5e1f51ed8b872d337f719dacccb4309a2ac682"
+        },
+        {
+          "numero": 6,
+          "mensagem": "docs: adicionar o guia de contribuição",
+          "ficheiros": [
+            "CONTRIBUTING.md"
+          ],
+          "apagar": [],
+          "tree_antes": "bc5e1f51ed8b872d337f719dacccb4309a2ac682",
+          "tree_depois": "4dd857a02eeff178169ebbb9e37ea036dee1686e"
+        },
+        {
+          "numero": 7,
+          "mensagem": "chore: adicionar modelos de issue e de pull request",
+          "ficheiros": [
+            ".github/ISSUE_TEMPLATE/bug.md",
+            ".github/ISSUE_TEMPLATE/tarefa.md",
+            ".github/ISSUE_TEMPLATE/user_story.md",
+            ".github/pull_request_template.md"
+          ],
+          "apagar": [],
+          "tree_antes": "4dd857a02eeff178169ebbb9e37ea036dee1686e",
+          "tree_depois": "e23ce33a02ee1b09f716387a450d50aaf413f3ce"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "64ec9518d72f72c8d5e42d4c7acab35363e895b2",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "1e1d2344ea4dd2301fc14a04f8375c2591a47322",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "f0fc6e5b901dcadadeb1df35b3426649012d29c6",
+        "docs/instalacao.rst": "193dde3fae0b8c4f23f0e783fe5beac34290cec3",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "89d1c3329216e891b609f47a28ebc7675bc6262a",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "9ad389c5ab20c3308ff66723fa7b2c7c8bfb9152",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/comum.py": "4f0f6cfd4a858e21bf8424a4e680a2da4853e73b",
+        "gestor_campanhas/cli/principal.py": "3dff24227574efb06ab5b03720b15ef219496583",
+        "gestor_campanhas/config.py": "29531dc732da331435fdfac8899dfdd8bef97723",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "85e2b4c8f1f850802ee2193180803835fa9438db",
+        "tests/test_bd.py": "0f89b4a4e4ab783c4ecbdbd58b914cc0be818c7f",
+        "tests/test_cli.py": "05169cf24d476f127f9d25190b454cb79ea7eed0"
+      }
+    }
+  ]
+}

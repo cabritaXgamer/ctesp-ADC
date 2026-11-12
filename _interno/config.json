@@ -1,0 +1,11 @@
+{
+  "repo_a": "https://github.com/cabritaXgamer/ctesp-ADC",
+  "repo_b": "https://github.com/Blive77/ADC-TrabGrupo",
+  "dono": "Fabio",
+  "membros": ["Fabio", "Tomas", "Ricardo"],
+  "utilizadores": {
+    "Fabio": "blive77",
+    "Tomas": "GLKIIRA",
+    "Ricardo": "CabritaXgamer"
+  }
+}

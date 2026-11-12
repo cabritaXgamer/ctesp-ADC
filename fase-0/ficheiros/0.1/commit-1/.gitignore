@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Ambiente virtual
+.venv/
+venv/
+
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Documentação gerada pelo Sphinx
+docs/_build/
+
+# Dados da aplicação (base de dados, ficheiros anexados, emails simulados)
+dados/
+
+# Editores
+.vscode/
+.idea/

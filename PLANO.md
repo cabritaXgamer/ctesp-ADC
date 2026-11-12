@@ -4,7 +4,8 @@ Aplicação de linha de comandos, em Python, para gerir campanhas de marketing c
 
 - **Grupo:** Fabio Felgueiras (@blive77), Tomas Paulo (@GLKIIRA), Ricardo Cabrita (@CabritaXgamer)
 - **Entrega:** domingo, 22 de novembro de 2026
-- **Repo A (trabalho):** https://github.com/cabritaXgamer/ctesp-ADC. O projeto está no ramo `develop`. O ramo `main` guarda um exercício antigo e não é usado.
+- **Repo A (trabalho):** https://github.com/cabritaXgamer/ctesp-ADC, ramo `guias`. O ramo `main` guarda um exercício antigo e não é usado.
+- **Repo B (oficial):** https://github.com/Blive77/ADC-TrabGrupo
 - **Documentação do código:** Sphinx
 
 ## 1. Como funciona o trabalho com dois repositórios
@@ -13,7 +14,7 @@ Aplicação de linha de comandos, em Python, para gerir campanhas de marketing c
 |---|---|---|
 | Quem escreve | Claude | Os três membros do grupo |
 | Para que serve | Desenvolver e testar cada fase | É o que é entregue e avaliado |
-| Ramos | Os mesmos nomes que o Repo B, mais o ramo `guias` | `main`, `develop`, `feature/*`, `fix/*`, `release/*` |
+| Ramos | `guias`, com as páginas e os ficheiros de cada commit | `main`, `develop`, `feature/*`, `fix/*`, `release/*` |
 | Issues, PR, wiki | Não usa | Tudo aqui |
 
 Regras fixas:
@@ -25,39 +26,24 @@ Regras fixas:
 
 ### O que recebem no fim de cada fase
 
-No ramo `guias` do Repo A, um ficheiro `fase-N.md` com, para cada unidade de trabalho:
+No ramo `guias` do Repo A, uma pasta `fase-N` com:
 
-1. A issue a criar (título, descrição, critérios de aceitação, labels, milestone).
-2. O nome do ramo.
-3. A lista ordenada de commits: mensagem, ficheiros tocados e o SHA no Repo A.
-4. O texto do pull request (com `Closes #n`) e quem deve rever.
-5. As páginas da wiki a criar ou atualizar (texto pronto a colar).
-6. Como testar à mão e uma explicação curta do código, para quem faz o commit o conseguir defender.
+1. A página da fase: o que entrega, quem faz o quê e por que ordem.
+2. Uma página passo a passo por pessoa, com cada comando explicado e o resultado esperado.
+3. Os ficheiros de cada commit, numa pasta por unidade e por commit.
+4. As páginas da wiki a criar ou atualizar (texto pronto a colar).
 
-### Como copiar um commit do Repo A para o Repo B
+### Como o trabalho passa do Repo A para o Repo B
 
-Cada membro, uma única vez, no seu clone do Repo B:
+Cada pessoa tem duas pastas lado a lado: `ADC-TrabGrupo` (Repo B, onde faz commits) e `ctesp-ADC` (Repo A, só para ler e copiar). Para cada commit, dentro da pasta `ADC-TrabGrupo`:
 
 ```bash
-git remote add trabalho https://github.com/cabritaXgamer/ctesp-ADC
+python ../ctesp-ADC/copiar.py 0.1 1     # copia os ficheiros desse commit
+git add -A
+git commit -m "..."                     # commit do próprio membro
 ```
 
-Depois, para cada unidade:
-
-```bash
-git fetch trabalho
-git switch develop
-git pull
-git switch -c feature/A01-login
-git cherry-pick -n <sha>          # aplica as alterações, sem criar commit
-git diff --staged                 # ler o que entrou
-git commit -m "feat(auth): ..."   # commit do próprio membro
-git push -u origin feature/A01-login
-```
-
-Repete-se `cherry-pick -n` + `commit` para cada commit da unidade, pela ordem do guia. Depois abre-se o PR para `develop` no GitHub, outro membro revê e faz o merge. Se um `cherry-pick` der conflito, é sinal de que os repositórios divergiram: param e avisam-me.
-
-Alternativa sem remote: copiar à mão os ficheiros indicados no guia. Funciona, mas é mais lento e mais sujeito a erros.
+No fim da unidade, `python ../ctesp-ADC/verificar.py 0.1` confirma que ficou igual ao original. Depois envia-se o ramo, abre-se o pull request para `develop`, outro membro revê e faz o merge.
 
 ## 2. Ciclo de cada fase
 
@@ -65,7 +51,7 @@ Alternativa sem remote: copiar à mão os ficheiros indicados no guia. Funciona,
 |---|---|---|
 | 1. Aviso | Grupo | "Avança para a Fase N", com o feedback da fase anterior |
 | 2. Desenvolvimento | Claude | Implemento as unidades no Repo A, com testes e docstrings |
-| 3. Entrega | Claude | Publico `guias/fase-N.md` e paro |
+| 3. Entrega | Claude | Publico a pasta `fase-N` no ramo `guias` e paro |
 | 4. Replicação | Grupo | Issue → ramo → commits → PR → revisão → merge, unidade a unidade |
 | 5. Verificação | Grupo | Correr a aplicação e os testes no Repo B; bugs viram issues com label `bug` |
 | 6. Correções | Claude + grupo | Corrijo no Repo A, replicam num ramo `fix/*` |
@@ -74,7 +60,7 @@ Alternativa sem remote: copiar à mão os ficheiros indicados no guia. Funciona,
 
 Dentro de cada fase, as unidades são replicadas pela ordem do guia: só se começa uma unidade depois de o pull request da anterior estar fundido. As unidades partilham ficheiros (o esquema da base de dados, os menus, a referência da documentação), por isso fora de ordem os commits não encaixam.
 
-Verificação do passo 8: `git rev-parse develop^{tree}` tem de dar o mesmo valor nos dois repositórios. O guia de cada fase traz o valor esperado.
+Verificação do passo 8: `python ../ctesp-ADC/verificar.py <última unidade>`, corrido no `develop` do Repo B, tem de responder `Tudo certo`.
 
 Correspondência com as listas do Trello: no início da fase os cards vão para *Sprint Backlog*; ao começar a replicar uma unidade, *Work In Progress*; PR aberto, *Ready to Verify*; bug encontrado, *Debug in Progress*; PR fundido, *Ready*.
 

@@ -1,6 +1,13 @@
-# Guias passo a passo
+# Repositório de trabalho — começa aqui
 
-Este ramo (`guias`) explica como levar cada fase do repositório de trabalho para o repositório oficial. Não tem código da aplicação.
+Este é o repositório onde o trabalho de cada fase é preparado. Tem duas coisas:
+
+- **os ficheiros de cada commit**, prontos a copiar para o repositório oficial;
+- **as páginas passo a passo**, que dizem a cada pessoa o que fazer.
+
+O repositório oficial, onde vocês fazem os commits, é https://github.com/Blive77/ADC-TrabGrupo.
+
+Aqui nunca se altera nada: só se lê e se copia.
 
 ## Por onde começar
 
@@ -24,14 +31,32 @@ Este ramo (`guias`) explica como levar cada fase do repositório de trabalho par
 | 6 — Comentários, notificações, monitorização, relatórios | — | — | — | — | |
 | 7 — Fecho e entrega | — | — | — | — | |
 
-Cada fase nova traz uma página da fase e uma página de passos por pessoa, no mesmo formato.
+Cada fase nova traz uma pasta `fase-N` com o mesmo conteúdo.
 
-## Outros ficheiros
+## O que está em cada pasta
 
-| Ficheiro | Conteúdo |
+```text
+ctesp-ADC/
+  README.md          esta página
+  conceitos.md       as palavras do Git e do GitHub, explicadas
+  preparacao.md      o que se faz uma só vez, antes da Fase 0
+  copiar.py          copia os ficheiros de um commit para o repositório oficial
+  verificar.py       confirma que o repositório oficial ficou igual ao original
+  fase-0/
+    README.md        a fase: o que entrega, quem faz o quê e por que ordem
+    fabio.md         passo a passo de Fabio
+    tomas.md         passo a passo de Tomas
+    ricardo.md       passo a passo de Ricardo
+    ficheiros/       os ficheiros de cada commit, por unidade
+  issues/            texto das 57 issues das user stories
+  wiki/              páginas da wiki, prontas a colar
+  PLANO.md           plano geral: fases, calendário, distribuição
+  _interno/          o que gera estas páginas; não é preciso abrir
+```
+
+## Ramos deste repositório
+
+| Ramo | O que tem |
 |---|---|
-| [PLANO.md](PLANO.md) | Plano de execução: fases, unidades, calendário, distribuição pelos membros |
-| [issues/issues.md](issues/issues.md) | Texto das 57 issues das user stories |
-| [issues/criar_issues.py](issues/criar_issues.py) | Script opcional para criar as issues com o GitHub CLI |
-| [wiki/](wiki/) | Páginas da wiki, prontas a colar |
-| `fases/`, `modelos/`, `ferramentas/`, `config.json` | Usados para gerar as páginas; não é preciso mexer |
+| `guias` | Tudo o que está descrito nesta página. É o único ramo que vocês usam |
+| `main` | Um exercício antigo. Não faz parte deste trabalho |

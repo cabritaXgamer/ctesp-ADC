@@ -1,8 +1,17 @@
 # Fase 0 — Passo a passo de Fabio
 
-> **Atenção:** ainda não sei o endereço do vosso repositório oficial. Onde aparecer `https://github.com/DONO/REPOSITORIO-OFICIAL`, usa o endereço verdadeiro.
-
 Esta página tem tudo o que **Fabio** faz na Fase 0 (Arranque), por ordem. Cada passo diz o que fazer, onde, e o que deves ver no fim. Não saltes passos e não avances se o resultado não for o esperado.
+
+## Antes de começares
+
+Tens duas pastas lado a lado no teu computador, criadas na [Preparação](../preparacao.md):
+
+| Pasta | O que é | O que fazes lá |
+|---|---|---|
+| `ADC-TrabGrupo` | O repositório oficial, o que é avaliado | **Tudo.** Todos os comandos desta página são corridos dentro desta pasta |
+| `ctesp-ADC` | O repositório de trabalho, com os ficheiros preparados e estas páginas | Nada. Só se lê e se copia de lá |
+
+Abre o terminal dentro da pasta `ADC-TrabGrupo` e deixa-o lá até ao fim. Os comandos funcionam no terminal do VS Code, no PowerShell e no Git Bash.
 
 Se algum termo não for claro, vê [O que é o quê](../conceitos.md). A ordem geral da fase está na [página da fase](README.md).
 
@@ -15,8 +24,6 @@ Se algum termo não for claro, vê [O que é o quê](../conceitos.md). A ordem g
 | 18 a 27 | Fazer a unidade 0.4 — Documentação base | A seguir ao teu passo anterior |
 | 28 | Cria as 19 issues do perfil Administrador | Em qualquer altura depois da Preparação |
 
-Os comandos são para colar no terminal, dentro da pasta do repositório oficial. Funcionam no terminal do VS Code, no PowerShell e no Git Bash.
-
 ---
 
 ## Fazer a unidade 0.1 — Estrutura do pacote Python
@@ -25,13 +32,13 @@ Cria a estrutura base do projeto: a pasta do código, o ficheiro que arranca a a
 
 ### Passo 1 — Confirma que podes começar
 
-Antes do primeiro passo tens de ter feito a [Preparação](../preparacao.md), e o repositório oficial já tem de ter o ramo `develop` (Parte B da Preparação).
+Antes do primeiro passo tens de ter feito a [Preparação](../preparacao.md), e o repositório oficial já tem de ter o ramo `develop` (passo B1 da Preparação, feito por Fabio).
 
 ### Passo 2 — Cria a issue da unidade 0.1
 
 A issue é o registo, no GitHub, do trabalho que vai ser feito. O pull request que vais abrir mais à frente fecha-a sozinho.
 
-**a)** Abre https://github.com/DONO/REPOSITORIO-OFICIAL/issues e clica no botão verde **New issue**. Se aparecer uma lista de modelos, escolhe **Blank issue**.
+**a)** Abre https://github.com/Blive77/ADC-TrabGrupo/issues e clica no botão verde **New issue**. Se aparecer uma lista de modelos, escolhe **Blank issue**.
 
 **b)** No campo do título, cola:
 
@@ -64,13 +71,12 @@ Criar a estrutura base do projeto, para que a aplicação possa ser arrancada co
 
 **f)** Repara no número que aparece a seguir ao título, por exemplo `#3`. Aponta-o: vais precisar dele quando abrires o pull request.
 
-### Passo 3 — Atualiza o teu computador e cria o ramo
+### Passo 3 — Atualiza as duas pastas e cria o ramo
 
-Abre o terminal na pasta do repositório oficial e corre:
+No terminal, dentro da pasta `ADC-TrabGrupo`:
 
 ```bash
-git fetch origin
-git fetch trabalho
+git -C ../ctesp-ADC pull
 git switch develop
 git pull
 git switch -c feature/0.1-estrutura-pacote
@@ -78,78 +84,101 @@ git switch -c feature/0.1-estrutura-pacote
 
 | Comando | O que faz |
 |---|---|
-| `git fetch origin` | Vai ver o que há de novo no repositório oficial. Não mexe nos teus ficheiros |
-| `git fetch trabalho` | Vai buscar ao repositório de trabalho os commits que lá estão. Também não mexe nos teus ficheiros |
-| `git switch develop` | Muda para o ramo `develop` |
+| `git -C ../ctesp-ADC pull` | Atualiza a pasta do repositório de trabalho, sem saíres da pasta onde estás. É de lá que vais copiar os ficheiros |
+| `git switch develop` | Muda para o ramo `develop` do repositório oficial |
 | `git pull` | Atualiza o teu `develop` com o que o grupo já juntou no GitHub |
 | `git switch -c feature/0.1-estrutura-pacote` | Cria um ramo novo a partir do `develop` e muda para ele. É neste ramo que vais trabalhar |
 
 **Deves ver**, na última linha: `Switched to a new branch 'feature/0.1-estrutura-pacote'`.
 
-### Passo 4 — Copia os 4 commits
+### Passo 4 — Copia e grava os 4 commits
 
-São 4 commits. Para cada um há dois comandos:
+São 4 commits. Cada um faz-se em dois tempos: primeiro copias os ficheiros, depois gravas.
 
 | Comando | O que faz |
 |---|---|
-| `git cherry-pick -n <código>` | Copia para a tua pasta as alterações de um commit do repositório de trabalho, sem as gravar. O `-n` quer dizer "ainda não faças commit". Se correr bem, não mostra nada |
+| `python ../ctesp-ADC/copiar.py 0.1 1` | Copia para esta pasta os ficheiros do commit 1 da unidade 0.1. Eles estão na pasta `ctesp-ADC/fase-0/ficheiros/0.1/commit-1`. Antes de copiar, confirma que estás no ramo certo e que não saltaste nenhum commit |
+| `git add -A` | Diz ao Git que as alterações que estão na pasta são para entrar no próximo commit |
 | `git commit -m "mensagem"` | Grava essas alterações num commit **teu**, com o teu nome e a mensagem entre aspas |
 
-Faz um commit de cada vez, pela ordem em que estão aqui. Cola as duas linhas, carrega em Enter e confirma o que aparece antes de passares ao seguinte.
+Faz um commit de cada vez, pela ordem em que estão aqui. Se o primeiro comando responder com `ERRO`, para e lê a mensagem: ela diz o que está mal e o que fazer. Não corras os comandos seguintes.
 
-**Commit 1 de 4** — `.gitattributes`, `.gitignore`
+Se aparecerem linhas começadas por `warning:` a falar de `LF` e `CRLF`, podes ignorá-las. São avisos sobre o tipo de fim de linha dos ficheiros e não afetam nada.
+
+**Commit 1 de 4**
 
 ```bash
-git cherry-pick -n 32635df
+python ../ctesp-ADC/copiar.py 0.1 1
+```
+
+**Deves ver** `Copiados 2 ficheiros`: `.gitattributes`, `.gitignore`.
+
+```bash
+git add -A
 git commit -m "chore: adicionar .gitignore e .gitattributes"
 ```
 
 **Deves ver** uma linha a terminar em `2 files changed, 31 insertions(+)`.
 
-**Commit 2 de 4** — `gestor_campanhas/__init__.py`, `gestor_campanhas/__main__.py`
+**Commit 2 de 4**
 
 ```bash
-git cherry-pick -n 39511bf
+python ../ctesp-ADC/copiar.py 0.1 2
+```
+
+**Deves ver** `Copiados 2 ficheiros`: `gestor_campanhas/__init__.py`, `gestor_campanhas/__main__.py`.
+
+```bash
+git add -A
 git commit -m "feat(nucleo): criar pacote gestor_campanhas com ponto de entrada"
 ```
 
 **Deves ver** uma linha a terminar em `2 files changed, 29 insertions(+)`.
 
-**Commit 3 de 4** — `gestor_campanhas/config.py`
+**Commit 3 de 4**
 
 ```bash
-git cherry-pick -n 30fb481
+python ../ctesp-ADC/copiar.py 0.1 3
+```
+
+**Deves ver** `Copiados 1 ficheiro`: `gestor_campanhas/config.py`.
+
+```bash
+git add -A
 git commit -m "feat(config): adicionar configuração dos caminhos de dados"
 ```
 
 **Deves ver** uma linha a terminar em `1 file changed, 43 insertions(+)`.
 
-**Commit 4 de 4** — `pyproject.toml`
+**Commit 4 de 4**
 
 ```bash
-git cherry-pick -n eb954a1
+python ../ctesp-ADC/copiar.py 0.1 4
+```
+
+**Deves ver** `Copiados 1 ficheiro`: `pyproject.toml`.
+
+```bash
+git add -A
 git commit -m "chore: adicionar pyproject.toml"
 ```
 
 **Deves ver** uma linha a terminar em `1 file changed, 28 insertions(+)`.
 
-Se o `git cherry-pick` mostrar a palavra `CONFLICT`, para. Vê a secção "Se algo correr mal" na [página da fase](README.md).
 
 ### Passo 5 — Confirma que ficou igual ao original
 
 ```bash
-git status
-git diff --stat trabalho/feature/0.1-estrutura-pacote
+python ../ctesp-ADC/verificar.py 0.1
 git log --oneline -4
 ```
 
 | Comando | O que deves ver |
 |---|---|
-| `git status` | `nothing to commit, working tree clean`: não ficou nada por gravar |
-| `git diff --stat trabalho/feature/0.1-estrutura-pacote` | Nada. Este comando compara o teu ramo com o do repositório de trabalho; se não mostra nada, estão iguais |
+| `python ../ctesp-ADC/verificar.py 0.1` | `Tudo certo: o ramo 'feature/0.1-estrutura-pacote' está igual ao original no fim da unidade 0.1.` Este comando compara o que gravaste com o que está no repositório de trabalho. Não altera nada |
 | `git log --oneline -4` | Os teus 4 commits, do mais recente para o mais antigo |
 
-A lista do `git log` deve ser esta. Os códigos à esquerda vão ser diferentes dos do repositório de trabalho, porque os commits agora são teus:
+A lista do `git log` deve ser esta. No lugar de `xxxxxxx` aparece um código diferente em cada commit, que é a identificação que o Git lhe deu:
 
 ```text
 xxxxxxx chore: adicionar pyproject.toml
@@ -158,7 +187,7 @@ xxxxxxx feat(nucleo): criar pacote gestor_campanhas com ponto de entrada
 xxxxxxx chore: adicionar .gitignore e .gitattributes
 ```
 
-### Passo 6 — Experimenta o que copiaste
+### Passo 6 — Experimenta o que gravaste
 
 ```bash
 python -m gestor_campanhas
@@ -172,7 +201,7 @@ python -m gestor_campanhas
 git push -u origin feature/0.1-estrutura-pacote
 ```
 
-O `push` envia o teu ramo e os teus commits para o repositório oficial. O `-u` liga o ramo do teu computador ao do GitHub, para os próximos `push` e `pull` não precisarem de mais nada.
+O `push` envia o teu ramo e os teus commits para o repositório oficial no GitHub. O `-u` liga o ramo do teu computador ao do GitHub.
 
 Na primeira vez pode abrir-se uma janela a pedir para entrares na tua conta do GitHub. Entra e volta ao terminal.
 
@@ -182,7 +211,7 @@ Na primeira vez pode abrir-se uma janela a pedir para entrares na tua conta do G
 
 O pull request é o pedido para juntar o teu ramo ao `develop`. É nele que Tomas vai rever o teu trabalho.
 
-**a)** Abre https://github.com/DONO/REPOSITORIO-OFICIAL/pulls. Normalmente aparece uma faixa amarela com o nome do teu ramo e o botão **Compare & pull request**: clica nele. Se a faixa não aparecer, clica em **New pull request** e, em *compare*, escolhe `feature/0.1-estrutura-pacote`.
+**a)** Abre https://github.com/Blive77/ADC-TrabGrupo/pulls. Normalmente aparece uma faixa amarela com o nome do teu ramo e o botão **Compare & pull request**: clica nele. Se a faixa não aparecer, clica em **New pull request** e, em *compare*, escolhe `feature/0.1-estrutura-pacote`.
 
 **b)** Confirma, no topo, que está **base: develop** e **compare: feature/0.1-estrutura-pacote**. Se a base for `main`, muda para `develop`.
 
@@ -246,7 +275,7 @@ Quem fez: Ricardo. Tu confirmas que funciona e juntas o trabalho ao `develop`.
 
 Faz este passo quando Ricardo te avisar que o pull request da unidade 0.3 está pronto.
 
-Abre https://github.com/DONO/REPOSITORIO-OFICIAL/pulls e clica em **Testes automáticos e integração contínua**.
+Abre https://github.com/Blive77/ADC-TrabGrupo/pulls e clica em **Testes automáticos e integração contínua**.
 
 ### Passo 12 — Lê as alterações
 
@@ -256,17 +285,19 @@ Não precisas de perceber todas as linhas. Percorre os ficheiros e confirma que 
 
 ### Passo 13 — Experimenta no teu computador
 
-Traz para o teu computador o ramo de Ricardo:
+No terminal, dentro da pasta `ADC-TrabGrupo`, traz o ramo de Ricardo:
 
 ```bash
 git fetch origin
-git switch --track origin/feature/0.3-testes-ci
+git switch feature/0.3-testes-ci
 ```
 
 | Comando | O que faz |
 |---|---|
-| `git fetch origin` | Vai buscar ao repositório oficial os ramos novos, incluindo o de Ricardo |
-| `git switch --track origin/feature/0.3-testes-ci` | Cria no teu computador uma cópia desse ramo e muda para ela |
+| `git fetch origin` | Vai ver o que há de novo no GitHub, incluindo o ramo de Ricardo. Não mexe nos teus ficheiros |
+| `git switch feature/0.3-testes-ci` | Cria no teu computador uma cópia desse ramo e muda para ela |
+
+**Deves ver** `Switched to a new branch 'feature/0.3-testes-ci'`.
 
 Agora experimenta:
 
@@ -316,8 +347,7 @@ Se encontraste um problema, escolhe **Request changes** em vez de **Approve**, d
 git switch develop
 git pull
 git branch -d feature/0.3-testes-ci
-git fetch trabalho
-git diff --stat 200a279 develop
+python ../ctesp-ADC/verificar.py 0.3
 ```
 
 | Comando | O que faz |
@@ -325,10 +355,11 @@ git diff --stat 200a279 develop
 | `git switch develop` | Volta ao ramo `develop` |
 | `git pull` | Traz do GitHub o `develop` com o pull request já junto |
 | `git branch -d feature/0.3-testes-ci` | Apaga a cópia do ramo que criaste para experimentar |
-| `git fetch trabalho` | Atualiza a informação do repositório de trabalho |
-| `git diff --stat 200a279 develop` | Compara o vosso `develop` com o do repositório de trabalho neste mesmo ponto |
+| `python ../ctesp-ADC/verificar.py 0.3` | Confirma que o `develop` do repositório oficial ficou igual ao original no fim da unidade 0.3 |
 
-**Deves ver:** o último comando não mostra nada. Se mostrar nomes de ficheiros, os dois repositórios ficaram diferentes: não avancem e digam-me que ficheiros aparecem.
+**Deves ver** `Tudo certo: o ramo 'develop' está igual ao original no fim da unidade 0.3.`
+
+Se aparecer `ERRO`, não avancem: copia a mensagem e envia-ma.
 
 ### Passo 17 — Avisa o grupo
 
@@ -346,13 +377,13 @@ Configura o Sphinx, que gera a documentação do código, e acrescenta o README 
 
 Esta unidade assenta na anterior. O pull request **Testes automáticos e integração contínua** (unidade 0.3) tem de estar junto ao `develop`.
 
-Abre https://github.com/DONO/REPOSITORIO-OFICIAL/pulls?q=is%3Apr+is%3Amerged e confirma que ele está na lista, com o símbolo roxo **Merged**. Se não estiver, espera: ainda não podes começar.
+Abre https://github.com/Blive77/ADC-TrabGrupo/pulls?q=is%3Apr+is%3Amerged e confirma que ele está na lista, com o símbolo roxo **Merged**. Se não estiver, espera: ainda não podes começar.
 
 ### Passo 19 — Cria a issue da unidade 0.4
 
 A issue é o registo, no GitHub, do trabalho que vai ser feito. O pull request que vais abrir mais à frente fecha-a sozinho.
 
-**a)** Abre https://github.com/DONO/REPOSITORIO-OFICIAL/issues e clica no botão verde **New issue**. Se aparecer uma lista de modelos, escolhe **Blank issue**.
+**a)** Abre https://github.com/Blive77/ADC-TrabGrupo/issues e clica no botão verde **New issue**. Se aparecer uma lista de modelos, escolhe **Blank issue**.
 
 **b)** No campo do título, cola:
 
@@ -388,13 +419,12 @@ Ter a documentação do código gerada com o Sphinx e as regras de trabalho do r
 
 **f)** Repara no número que aparece a seguir ao título, por exemplo `#3`. Aponta-o: vais precisar dele quando abrires o pull request.
 
-### Passo 20 — Atualiza o teu computador e cria o ramo
+### Passo 20 — Atualiza as duas pastas e cria o ramo
 
-Abre o terminal na pasta do repositório oficial e corre:
+No terminal, dentro da pasta `ADC-TrabGrupo`:
 
 ```bash
-git fetch origin
-git fetch trabalho
+git -C ../ctesp-ADC pull
 git switch develop
 git pull
 git switch -c feature/0.4-documentacao-base
@@ -402,105 +432,146 @@ git switch -c feature/0.4-documentacao-base
 
 | Comando | O que faz |
 |---|---|
-| `git fetch origin` | Vai ver o que há de novo no repositório oficial. Não mexe nos teus ficheiros |
-| `git fetch trabalho` | Vai buscar ao repositório de trabalho os commits que lá estão. Também não mexe nos teus ficheiros |
-| `git switch develop` | Muda para o ramo `develop` |
+| `git -C ../ctesp-ADC pull` | Atualiza a pasta do repositório de trabalho, sem saíres da pasta onde estás. É de lá que vais copiar os ficheiros |
+| `git switch develop` | Muda para o ramo `develop` do repositório oficial |
 | `git pull` | Atualiza o teu `develop` com o que o grupo já juntou no GitHub |
 | `git switch -c feature/0.4-documentacao-base` | Cria um ramo novo a partir do `develop` e muda para ele. É neste ramo que vais trabalhar |
 
 **Deves ver**, na última linha: `Switched to a new branch 'feature/0.4-documentacao-base'`.
 
-### Passo 21 — Copia os 7 commits
+### Passo 21 — Copia e grava os 7 commits
 
-São 7 commits. Para cada um há dois comandos:
+São 7 commits. Cada um faz-se em dois tempos: primeiro copias os ficheiros, depois gravas.
 
 | Comando | O que faz |
 |---|---|
-| `git cherry-pick -n <código>` | Copia para a tua pasta as alterações de um commit do repositório de trabalho, sem as gravar. O `-n` quer dizer "ainda não faças commit". Se correr bem, não mostra nada |
+| `python ../ctesp-ADC/copiar.py 0.4 1` | Copia para esta pasta os ficheiros do commit 1 da unidade 0.4. Eles estão na pasta `ctesp-ADC/fase-0/ficheiros/0.4/commit-1`. Antes de copiar, confirma que estás no ramo certo e que não saltaste nenhum commit |
+| `git add -A` | Diz ao Git que as alterações que estão na pasta são para entrar no próximo commit |
 | `git commit -m "mensagem"` | Grava essas alterações num commit **teu**, com o teu nome e a mensagem entre aspas |
 
-Faz um commit de cada vez, pela ordem em que estão aqui. Cola as duas linhas, carrega em Enter e confirma o que aparece antes de passares ao seguinte.
+Faz um commit de cada vez, pela ordem em que estão aqui. Se o primeiro comando responder com `ERRO`, para e lê a mensagem: ela diz o que está mal e o que fazer. Não corras os comandos seguintes.
 
-**Commit 1 de 7** — `docs/Makefile`, `docs/conf.py`, `docs/index.rst`, `docs/instalacao.rst`, `docs/make.bat`, `requirements-dev.txt`
+Se aparecerem linhas começadas por `warning:` a falar de `LF` e `CRLF`, podes ignorá-las. São avisos sobre o tipo de fim de linha dos ficheiros e não afetam nada.
+
+**Commit 1 de 7**
 
 ```bash
-git cherry-pick -n 67b6bb0
+python ../ctesp-ADC/copiar.py 0.4 1
+```
+
+**Deves ver** `Copiados 6 ficheiros`: `docs/Makefile`, `docs/conf.py`, `docs/index.rst`, `docs/instalacao.rst`, `docs/make.bat`, `requirements-dev.txt`.
+
+```bash
+git add -A
 git commit -m "docs: configurar o Sphinx e documentar a instalação"
 ```
 
 **Deves ver** uma linha a terminar em `6 files changed, 235 insertions(+)`.
 
-**Commit 2 de 7** — `docs/arquitetura.rst`, `docs/index.rst`, `docs/testes.rst`
+**Commit 2 de 7**
 
 ```bash
-git cherry-pick -n b5dd4ad
+python ../ctesp-ADC/copiar.py 0.4 2
+```
+
+**Deves ver** `Copiados 3 ficheiros`: `docs/arquitetura.rst`, `docs/index.rst`, `docs/testes.rst`.
+
+```bash
+git add -A
 git commit -m "docs: descrever a arquitetura e os testes"
 ```
 
 **Deves ver** uma linha a terminar em `3 files changed, 148 insertions(+)`.
 
-**Commit 3 de 7** — `docs/index.rst`, `docs/referencia.rst`
+**Commit 3 de 7**
 
 ```bash
-git cherry-pick -n 08e1cc0
+python ../ctesp-ADC/copiar.py 0.4 3
+```
+
+**Deves ver** `Copiados 2 ficheiros`: `docs/index.rst`, `docs/referencia.rst`.
+
+```bash
+git add -A
 git commit -m "docs: gerar a referência do código a partir dos docstrings"
 ```
 
 **Deves ver** uma linha a terminar em `2 files changed, 48 insertions(+)`.
 
-**Commit 4 de 7** — `.github/workflows/docs.yml`
+**Commit 4 de 7**
 
 ```bash
-git cherry-pick -n 6d2e427
+python ../ctesp-ADC/copiar.py 0.4 4
+```
+
+**Deves ver** `Copiados 1 ficheiro`: `.github/workflows/docs.yml`.
+
+```bash
+git add -A
 git commit -m "ci: gerar a documentação no GitHub Actions"
 ```
 
 **Deves ver** uma linha a terminar em `1 file changed, 34 insertions(+)`.
 
-**Commit 5 de 7** — `README.md`
+**Commit 5 de 7**
 
 ```bash
-git cherry-pick -n 64458cc
+python ../ctesp-ADC/copiar.py 0.4 5
+```
+
+**Deves ver** `Copiados 1 ficheiro`: `README.md`.
+
+```bash
+git add -A
 git commit -m "docs: escrever o README"
 ```
 
-**Deves ver** uma linha a terminar em `1 file changed, 120 insertions(+), 1 deletion(-)`.
+**Deves ver** uma linha a terminar em `1 file changed, 124 insertions(+), 2 deletions(-)`.
 
-**Commit 6 de 7** — `CONTRIBUTING.md`
+**Commit 6 de 7**
 
 ```bash
-git cherry-pick -n ad311fd
+python ../ctesp-ADC/copiar.py 0.4 6
+```
+
+**Deves ver** `Copiados 1 ficheiro`: `CONTRIBUTING.md`.
+
+```bash
+git add -A
 git commit -m "docs: adicionar o guia de contribuição"
 ```
 
 **Deves ver** uma linha a terminar em `1 file changed, 148 insertions(+)`.
 
-**Commit 7 de 7** — `.github/ISSUE_TEMPLATE/bug.md`, `.github/ISSUE_TEMPLATE/tarefa.md`, `.github/ISSUE_TEMPLATE/user_story.md`, `.github/pull_request_template.md`
+**Commit 7 de 7**
 
 ```bash
-git cherry-pick -n 50f15da
+python ../ctesp-ADC/copiar.py 0.4 7
+```
+
+**Deves ver** `Copiados 4 ficheiros`: `.github/ISSUE_TEMPLATE/bug.md`, `.github/ISSUE_TEMPLATE/tarefa.md`, `.github/ISSUE_TEMPLATE/user_story.md`, `.github/pull_request_template.md`.
+
+```bash
+git add -A
 git commit -m "chore: adicionar modelos de issue e de pull request"
 ```
 
 **Deves ver** uma linha a terminar em `4 files changed, 94 insertions(+)`.
 
-Se o `git cherry-pick` mostrar a palavra `CONFLICT`, para. Vê a secção "Se algo correr mal" na [página da fase](README.md).
 
 ### Passo 22 — Confirma que ficou igual ao original
 
 ```bash
-git status
-git diff --stat trabalho/feature/0.4-documentacao-base
+python ../ctesp-ADC/verificar.py 0.4
 git log --oneline -7
 ```
 
 | Comando | O que deves ver |
 |---|---|
-| `git status` | `nothing to commit, working tree clean`: não ficou nada por gravar |
-| `git diff --stat trabalho/feature/0.4-documentacao-base` | Nada. Este comando compara o teu ramo com o do repositório de trabalho; se não mostra nada, estão iguais |
+| `python ../ctesp-ADC/verificar.py 0.4` | `Tudo certo: o ramo 'feature/0.4-documentacao-base' está igual ao original no fim da unidade 0.4.` Este comando compara o que gravaste com o que está no repositório de trabalho. Não altera nada |
 | `git log --oneline -7` | Os teus 7 commits, do mais recente para o mais antigo |
 
-A lista do `git log` deve ser esta. Os códigos à esquerda vão ser diferentes dos do repositório de trabalho, porque os commits agora são teus:
+A lista do `git log` deve ser esta. No lugar de `xxxxxxx` aparece um código diferente em cada commit, que é a identificação que o Git lhe deu:
 
 ```text
 xxxxxxx chore: adicionar modelos de issue e de pull request
@@ -512,7 +583,7 @@ xxxxxxx docs: descrever a arquitetura e os testes
 xxxxxxx docs: configurar o Sphinx e documentar a instalação
 ```
 
-### Passo 23 — Experimenta o que copiaste
+### Passo 23 — Experimenta o que gravaste
 
 Gera a documentação:
 
@@ -544,7 +615,7 @@ python -m pytest
 git push -u origin feature/0.4-documentacao-base
 ```
 
-O `push` envia o teu ramo e os teus commits para o repositório oficial. O `-u` liga o ramo do teu computador ao do GitHub, para os próximos `push` e `pull` não precisarem de mais nada.
+O `push` envia o teu ramo e os teus commits para o repositório oficial no GitHub. O `-u` liga o ramo do teu computador ao do GitHub.
 
 Na primeira vez pode abrir-se uma janela a pedir para entrares na tua conta do GitHub. Entra e volta ao terminal.
 
@@ -554,7 +625,7 @@ Na primeira vez pode abrir-se uma janela a pedir para entrares na tua conta do G
 
 O pull request é o pedido para juntar o teu ramo ao `develop`. É nele que Tomas vai rever o teu trabalho.
 
-**a)** Abre https://github.com/DONO/REPOSITORIO-OFICIAL/pulls. Normalmente aparece uma faixa amarela com o nome do teu ramo e o botão **Compare & pull request**: clica nele. Se a faixa não aparecer, clica em **New pull request** e, em *compare*, escolhe `feature/0.4-documentacao-base`.
+**a)** Abre https://github.com/Blive77/ADC-TrabGrupo/pulls. Normalmente aparece uma faixa amarela com o nome do teu ramo e o botão **Compare & pull request**: clica nele. Se a faixa não aparecer, clica em **New pull request** e, em *compare*, escolhe `feature/0.4-documentacao-base`.
 
 **b)** Confirma, no topo, que está **base: develop** e **compare: feature/0.4-documentacao-base**. Se a base for `main`, muda para `develop`.
 
@@ -625,7 +696,7 @@ Os textos estão em https://github.com/cabritaXgamer/ctesp-ADC/blob/guias/issues
 
 Para cada issue, de A01 a A19:
 
-**a)** Abre https://github.com/DONO/REPOSITORIO-OFICIAL/issues e clica em **New issue**. Se aparecer uma lista de modelos, escolhe **Blank issue**.
+**a)** Abre https://github.com/Blive77/ADC-TrabGrupo/issues e clica em **New issue**. Se aparecer uma lista de modelos, escolhe **Blank issue**.
 
 **b)** No título, cola o bloco **Título** dessa issue. Cada bloco tem um botão de copiar no canto superior direito.
 
@@ -635,37 +706,7 @@ Para cada issue, de A01 a A19:
 
 **e)** Clica em **Create**.
 
-**Deves ver**, no fim, 19 issues em https://github.com/DONO/REPOSITORIO-OFICIAL/issues?q=is%3Aissue+label%3AAdministrador
-
-**Atalho opcional.** Há um script que cria as 19 de uma vez. Precisa do GitHub CLI, um programa que deixa usar o GitHub pelo terminal. Só foi testado em modo de simulação, por isso corre primeiro com `--simular` e confirma a lista antes de o correr a sério. Numa pasta **fora** do repositório oficial:
-
-```bash
-winget install GitHub.cli
-```
-
-Fecha o terminal, abre outro, e inicia sessão (escolhe *GitHub.com*, *HTTPS* e *Login with a web browser*):
-
-```bash
-gh auth login
-```
-
-```bash
-git clone -b guias https://github.com/cabritaXgamer/ctesp-ADC guias-adc
-```
-
-```bash
-cd guias-adc/issues
-```
-
-```bash
-python criar_issues.py --repo DONO/NOME --perfil Administrador --simular
-```
-
-```bash
-python criar_issues.py --repo DONO/NOME --perfil Administrador
-```
-
-Troca `DONO/NOME` pela parte final do endereço do repositório oficial. Se o script parar com um erro, as issues anteriores já ficaram criadas: cria as restantes à mão.
+**Deves ver**, no fim, 19 issues em https://github.com/Blive77/ADC-TrabGrupo/issues?q=is%3Aissue+label%3AAdministrador
 
 ---
 

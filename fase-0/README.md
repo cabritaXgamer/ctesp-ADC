@@ -1,7 +1,5 @@
 # Fase 0 — Arranque
 
-> **Atenção:** ainda não sei o endereço do vosso repositório oficial. Onde aparecer `https://github.com/DONO/REPOSITORIO-OFICIAL`, usa o endereço verdadeiro.
-
 A Fase 0 monta a base do projeto, ainda sem user stories. No fim, a aplicação arranca, cria a base de dados e mostra o menu inicial. Ficam também os testes automáticos, a documentação Sphinx e as regras de trabalho do repositório.
 
 ```
@@ -54,30 +52,51 @@ Tarefas que não dependem da ordem. Podem ser feitas enquanto se espera pela vez
 | Tomas | Cria as 18 issues do perfil Marketeer; Cria a página "Fluxo Git" da wiki | [tomas.md](tomas.md), passos 25 a 26 |
 | Ricardo | Cria as 20 issues do perfil Cliente; Cria a página inicial da wiki | [ricardo.md](ricardo.md), passos 18 a 19 |
 
+## Onde estão os ficheiros
+
+Os ficheiros de cada commit estão na pasta [`ficheiros`](ficheiros/), uma subpasta por unidade e, dentro dela, uma por commit:
+
+```text
+ctesp-ADC/fase-0/ficheiros/
+  0.1/    Estrutura do pacote Python
+    commit-1/    chore: adicionar .gitignore e .gitattributes
+    commit-2/    feat(nucleo): criar pacote gestor_campanhas com ponto de entrada
+    commit-3/    feat(config): adicionar configuração dos caminhos de dados
+    commit-4/    chore: adicionar pyproject.toml
+  0.2/    Base de dados e menu inicial
+    commit-1/    feat(bd): adicionar ligação SQLite e criação de tabelas
+    commit-2/    feat(cli): adicionar funções comuns dos menus
+    commit-3/    feat(cli): adicionar menu inicial
+    commit-4/    feat(nucleo): ligar o ponto de entrada à base de dados e ao menu inicial
+    commit-5/    fix(cli): ler e escrever acentos em UTF-8 em qualquer terminal
+  0.3/    Testes automáticos e integração contínua
+    commit-1/    test: configurar o pytest e as fixtures comuns
+    commit-2/    test(bd): testar a ligação, as tabelas e os caminhos de dados
+    commit-3/    test(cli): testar os menus e o ponto de entrada
+    commit-4/    ci: correr os testes no GitHub Actions
+  0.4/    Documentação base
+    commit-1/    docs: configurar o Sphinx e documentar a instalação
+    commit-2/    docs: descrever a arquitetura e os testes
+    commit-3/    docs: gerar a referência do código a partir dos docstrings
+    commit-4/    ci: gerar a documentação no GitHub Actions
+    commit-5/    docs: escrever o README
+    commit-6/    docs: adicionar o guia de contribuição
+    commit-7/    chore: adicionar modelos de issue e de pull request
+```
+
+O comando `python ../ctesp-ADC/copiar.py` copia uma dessas pastas para dentro do repositório oficial. Copiar a pasta à mão, com o Explorador de Ficheiros, dá o mesmo resultado.
+
 ## Fecho da fase
 
-Quando todas as vezes estiverem feitas, uma pessoa qualquer confirma que o repositório oficial ficou igual ao de trabalho.
+Quando todas as vezes estiverem feitas, uma pessoa qualquer confirma que o repositório oficial ficou igual ao original. No terminal, dentro da pasta `ADC-TrabGrupo`:
 
 ```bash
 git switch develop
 git pull
-git fetch trabalho
-git diff --stat trabalho/develop develop
+python ../ctesp-ADC/verificar.py 0.4
 ```
 
-O último comando não deve mostrar nada. Segunda confirmação:
-
-```bash
-git rev-parse "develop^{tree}"
-```
-
-O resultado tem de ser exatamente:
-
-```text
-e90209e7d8085e3d7d2be163df305ec58f9cdf82
-```
-
-Este código identifica o conteúdo de todos os ficheiros. Se for igual, os dois repositórios têm exatamente os mesmos ficheiros.
+Deve aparecer `Tudo certo: o ramo 'develop' está igual ao original no fim da unidade 0.4.`
 
 Depois, confirma que tudo funciona:
 
@@ -101,11 +120,11 @@ Deve aparecer o menu inicial.
 
 ### Lista de verificação
 
-- [ ] 4 issues de tarefa fechadas (ver https://github.com/DONO/REPOSITORIO-OFICIAL/issues?q=is%3Aissue+is%3Aclosed)
-- [ ] 4 pull requests juntos ao `develop`, cada um aprovado por outra pessoa do grupo (ver https://github.com/DONO/REPOSITORIO-OFICIAL/pulls?q=is%3Apr+is%3Amerged)
+- [ ] 4 issues de tarefa fechadas (ver https://github.com/Blive77/ADC-TrabGrupo/issues?q=is%3Aissue+is%3Aclosed)
+- [ ] 4 pull requests juntos ao `develop`, cada um aprovado por outra pessoa do grupo (ver https://github.com/Blive77/ADC-TrabGrupo/pulls?q=is%3Apr+is%3Amerged)
 - [ ] 57 issues de user stories criadas, com labels e milestone
 - [ ] Wiki com as páginas Home e Fluxo Git
-- [ ] `git diff --stat trabalho/develop develop` não mostra nada
+- [ ] `verificar.py 0.4` responde `Tudo certo`
 - [ ] Testes a passar e documentação gerada sem avisos
 
 Quando estiver tudo, digam-me **"avança para a Fase 1"** e contem-me os problemas que tiveram.
@@ -118,13 +137,13 @@ A Fase 0 não tem cards de user stories. No fim da fase, movam para **Sprint Bac
 
 | O que aconteceu | O que fazer |
 |---|---|
-| O `git cherry-pick -n` mostra `CONFLICT` | O teu ramo não está igual ao esperado, quase sempre porque a unidade anterior ainda não foi junta ou porque saltaste um commit. Corre `git reset --hard` para desfazer a tentativa e diz-me o que apareceu |
-| Enganei-me num commit e ainda não fiz `push` | Corre `git reset --hard develop` (o ramo volta a ficar igual ao `develop`) e recomeça no passo "Copia os commits" |
+| O `copiar.py` responde `ERRO` | Lê a mensagem: diz o que está mal e o que fazer. Os casos mais comuns são estar no ramo errado, ter um commit anterior por gravar, ou a unidade anterior ainda não estar junta ao `develop` |
+| `can't open file ... copiar.py` | As duas pastas não estão lado a lado, ou o terminal não está dentro de `ADC-TrabGrupo`. Vê o passo A4 da Preparação |
+| Enganei-me num commit e ainda não fiz `push` | Corre `git reset --hard develop` (o ramo volta a ficar igual ao `develop` e os commits que fizeste nele desaparecem) e recomeça no passo "Copia e grava os commits" |
 | O commit ficou com o nome ou o email errado e ainda não fiz `push` | Corrige o nome e o email (Preparação, passo A2) e corre `git commit --amend --reset-author --no-edit` |
 | `fatal: not a git repository` | O terminal não está na pasta do repositório. Usa `cd` para entrar nela |
-| `error: pathspec ... did not match` ou `bad revision` no `cherry-pick` | Falta ir buscar os commits: corre `git fetch trabalho` e repete |
-| O `git push` é recusado com `403` ou `Permission denied` | A tua conta ainda não é colaboradora do repositório oficial, ou não aceitaste o convite |
+| O `git push` é recusado com `403` ou `Permission denied` | A tua conta ainda não é colaboradora do repositório oficial, ou não aceitaste o convite (Preparação, passo A3) |
 | O `git push` é recusado por causa do email (`GH007`) | O GitHub está a proteger o teu email. Em GitHub → Settings → Emails copia o endereço que termina em `users.noreply.github.com`, usa-o no `git config --global user.email` e corre `git commit --amend --reset-author --no-edit` |
-| O `git diff --stat` de confirmação mostra ficheiros | Não avancem. Digam-me que ficheiros aparecem |
+| O `verificar.py` responde `ERRO` | Não avancem. Copiem a mensagem e enviem-ma |
 | Uma verificação automática fica com uma cruz vermelha | Clica em *Details* ao lado da verificação, copia o erro e envia-mo |
 | O `python` não é reconhecido | Experimenta `py` em vez de `python`. Se também não der, falta instalar o Python (Preparação, passo A1) |

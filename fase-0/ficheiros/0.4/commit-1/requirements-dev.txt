@@ -1,0 +1,10 @@
+# Ferramentas necessárias para desenvolver. A aplicação em si não precisa de
+# nenhuma biblioteca externa.
+#
+# Instalar com:  python -m pip install -r requirements-dev.txt
+
+# Testes automáticos
+pytest>=8
+
+# Documentação do código
+sphinx>=7

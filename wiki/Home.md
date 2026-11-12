@@ -1,6 +1,6 @@
 # Gestor de Campanhas
 
-Aplicação de linha de comandos, em Python, para gestão de campanhas de marketing. Trabalho prático 2 (TP2).
+Aplicação de linha de comandos, em Python, para gestão de campanhas de marketing. Trabalho de Grupo UAlg 2026.
 
 Uma agência usa-a para organizar o trabalho com os seus clientes: os clientes pedem campanhas, o administrador aprova-as e define o budget, e os marketeers produzem os criativos (anúncios) que o cliente acompanha e aprova.
 
@@ -57,8 +57,8 @@ O trabalho está dividido em fases. Cada fase corresponde a uma milestone do rep
 ## Como começar
 
 ```bash
-git clone <URL do repositório>
-cd <pasta do repositório>
+git clone https://github.com/Blive77/ADC-TrabGrupo
+cd ADC-TrabGrupo
 python -m gestor_campanhas
 ```
 
