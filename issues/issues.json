@@ -1,0 +1,743 @@
+[
+  {
+    "id": "A01",
+    "titulo": "[A01] Como Administrador, quero fazer login na plataforma, para que possa aceder às funcionalidades de gestão.",
+    "corpo": "## User story\n\nComo Administrador, quero fazer login na plataforma, para que possa aceder às funcionalidades de gestão.\n\n## Descrição\n\nAutenticação com email e password. Inclui logout e sessão com expiração por inatividade.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 1 (Autenticação e sessões)\n- Unidade de trabalho: 1.1\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 1 — Autenticação e sessões",
+    "perfil": "Administrador",
+    "fase": 1,
+    "unidade": "1.1"
+  },
+  {
+    "id": "A02",
+    "titulo": "[A02] Como Administrador, quero que os logins e logouts dos marketeers fiquem registados, para que haja histórico de acessos.",
+    "corpo": "## User story\n\nComo Administrador, quero que os logins e logouts dos marketeers fiquem registados, para que haja histórico de acessos.\n\n## Descrição\n\nGravar data/hora de entrada e saída de cada sessão, incluindo o logout automático por inatividade.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 1 (Autenticação e sessões)\n- Unidade de trabalho: 1.2\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 1 — Autenticação e sessões",
+    "perfil": "Administrador",
+    "fase": 1,
+    "unidade": "1.2"
+  },
+  {
+    "id": "A03",
+    "titulo": "[A03] Como Administrador, quero consultar os horários de entrada e saída de cada marketeer, para que possa controlar a assiduidade.",
+    "corpo": "## User story\n\nComo Administrador, quero consultar os horários de entrada e saída de cada marketeer, para que possa controlar a assiduidade.\n\n## Descrição\n\nTabela com o histórico de sessões por marketeer, com filtro por data.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 1 (Autenticação e sessões)\n- Unidade de trabalho: 1.3\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 1 — Autenticação e sessões",
+    "perfil": "Administrador",
+    "fase": 1,
+    "unidade": "1.3"
+  },
+  {
+    "id": "A04",
+    "titulo": "[A04] Como Administrador, quero ver a lista de todos os clientes, para que possa consultar rapidamente quem usa a plataforma.",
+    "corpo": "## User story\n\nComo Administrador, quero ver a lista de todos os clientes, para que possa consultar rapidamente quem usa a plataforma.\n\n## Descrição\n\nTabela com nome, empresa, contactos, estado da conta e n.º de campanhas ativas, com pesquisa por nome.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 2 (Clientes e marketeers)\n- Unidade de trabalho: 2.1\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 2 — Clientes e marketeers",
+    "perfil": "Administrador",
+    "fase": 2,
+    "unidade": "2.1"
+  },
+  {
+    "id": "A05",
+    "titulo": "[A05] Como Administrador, quero adicionar clientes, para que tenham acesso à plataforma.",
+    "corpo": "## User story\n\nComo Administrador, quero adicionar clientes, para que tenham acesso à plataforma.\n\n## Descrição\n\nFormulário com os dados do cliente; cria a conta e envia as credenciais de acesso por email.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 2 (Clientes e marketeers)\n- Unidade de trabalho: 2.2\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 2 — Clientes e marketeers",
+    "perfil": "Administrador",
+    "fase": 2,
+    "unidade": "2.2"
+  },
+  {
+    "id": "A06",
+    "titulo": "[A06] Como Administrador, quero editar os dados de um cliente, para que a informação se mantenha correta.",
+    "corpo": "## User story\n\nComo Administrador, quero editar os dados de um cliente, para que a informação se mantenha correta.\n\n## Descrição\n\nAlteração dos dados do cliente (contactos, empresa, NIF, estado da conta).\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 2 (Clientes e marketeers)\n- Unidade de trabalho: 2.2\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 2 — Clientes e marketeers",
+    "perfil": "Administrador",
+    "fase": 2,
+    "unidade": "2.2"
+  },
+  {
+    "id": "A07",
+    "titulo": "[A07] Como Administrador, quero remover clientes, para que deixem de ter acesso à plataforma.",
+    "corpo": "## User story\n\nComo Administrador, quero remover clientes, para que deixem de ter acesso à plataforma.\n\n## Descrição\n\nDesativação da conta com pedido de confirmação. O histórico de campanhas é mantido.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 2 (Clientes e marketeers)\n- Unidade de trabalho: 2.3\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 2 — Clientes e marketeers",
+    "perfil": "Administrador",
+    "fase": 2,
+    "unidade": "2.3"
+  },
+  {
+    "id": "A08",
+    "titulo": "[A08] Como Administrador, quero adicionar marketeers, para que possam aceder à plataforma.",
+    "corpo": "## User story\n\nComo Administrador, quero adicionar marketeers, para que possam aceder à plataforma.\n\n## Descrição\n\nFormulário com os dados do marketeer; cria a conta e envia as credenciais de acesso por email.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 2 (Clientes e marketeers)\n- Unidade de trabalho: 2.4\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 2 — Clientes e marketeers",
+    "perfil": "Administrador",
+    "fase": 2,
+    "unidade": "2.4"
+  },
+  {
+    "id": "A09",
+    "titulo": "[A09] Como Administrador, quero editar os dados de um marketeer, para que a informação se mantenha correta.",
+    "corpo": "## User story\n\nComo Administrador, quero editar os dados de um marketeer, para que a informação se mantenha correta.\n\n## Descrição\n\nAlteração do nome, contactos e estado da conta do marketeer.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 2 (Clientes e marketeers)\n- Unidade de trabalho: 2.4\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 2 — Clientes e marketeers",
+    "perfil": "Administrador",
+    "fase": 2,
+    "unidade": "2.4"
+  },
+  {
+    "id": "A10",
+    "titulo": "[A10] Como Administrador, quero remover marketeers, para que deixem de ter acesso à plataforma.",
+    "corpo": "## User story\n\nComo Administrador, quero remover marketeers, para que deixem de ter acesso à plataforma.\n\n## Descrição\n\nDesativação da conta com pedido de confirmação. As campanhas atribuídas a esse marketeer têm de ser reatribuídas antes da remoção.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 2 (Clientes e marketeers)\n- Unidade de trabalho: 2.5\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 2 — Clientes e marketeers",
+    "perfil": "Administrador",
+    "fase": 2,
+    "unidade": "2.5"
+  },
+  {
+    "id": "A11",
+    "titulo": "[A11] Como Administrador, quero aprovar ou rejeitar pedidos de nova campanha, para que só avancem os pedidos viáveis.",
+    "corpo": "## User story\n\nComo Administrador, quero aprovar ou rejeitar pedidos de nova campanha, para que só avancem os pedidos viáveis.\n\n## Descrição\n\nO Administrador vê os pedidos feitos pelos clientes e decide. Se aprovar, a campanha é criada. Se rejeitar, indica o motivo e o cliente é notificado.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.4\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Administrador",
+    "fase": 3,
+    "unidade": "3.4"
+  },
+  {
+    "id": "A12",
+    "titulo": "[A12] Como Administrador, quero definir o budget inicial de uma campanha, para que a equipa saiba o limite de investimento.",
+    "corpo": "## User story\n\nComo Administrador, quero definir o budget inicial de uma campanha, para que a equipa saiba o limite de investimento.\n\n## Descrição\n\nValor em € atribuído quando a campanha é aprovada. Pode ser alterado depois através de pedido de alteração de budget.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.4\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Administrador",
+    "fase": 3,
+    "unidade": "3.4"
+  },
+  {
+    "id": "A13",
+    "titulo": "[A13] Como Administrador, quero atribuir um marketeer a uma campanha, para que fique definido quem é o responsável.",
+    "corpo": "## User story\n\nComo Administrador, quero atribuir um marketeer a uma campanha, para que fique definido quem é o responsável.\n\n## Descrição\n\nSeleção de um marketeer ativo para a campanha. A atribuição pode ser alterada mais tarde e o marketeer é notificado.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.4\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Administrador",
+    "fase": 3,
+    "unidade": "3.4"
+  },
+  {
+    "id": "A14",
+    "titulo": "[A14] Como Administrador, quero ver a lista de pedidos de alteração de budget pendentes, com o parecer do marketeer, para que possa decidir.",
+    "corpo": "## User story\n\nComo Administrador, quero ver a lista de pedidos de alteração de budget pendentes, com o parecer do marketeer, para que possa decidir.\n\n## Descrição\n\nLista com cliente, campanha, valor atual, valor pedido, motivo e parecer do marketeer. A partir daqui o Administrador aprova ou rejeita.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 5 (Budget)\n- Unidade de trabalho: 5.3\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 5 — Budget",
+    "perfil": "Administrador",
+    "fase": 5,
+    "unidade": "5.3"
+  },
+  {
+    "id": "A15",
+    "titulo": "[A15] Como Administrador, quero alterar o budget das campanhas, para que fique ajustado aos pedidos aprovados dos clientes.",
+    "corpo": "## User story\n\nComo Administrador, quero alterar o budget das campanhas, para que fique ajustado aos pedidos aprovados dos clientes.\n\n## Descrição\n\nO Administrador altera o valor do budget de uma campanha depois de existir parecer do marketeer sobre o pedido do cliente. Fica registado o valor anterior, o novo valor e a data da alteração.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 5 (Budget)\n- Unidade de trabalho: 5.3\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 5 — Budget",
+    "perfil": "Administrador",
+    "fase": 5,
+    "unidade": "5.3"
+  },
+  {
+    "id": "A16",
+    "titulo": "[A16] Como Administrador, quero ver um resumo global do budget atribuído face ao gasto, por cliente, para que tenha visão financeira.",
+    "corpo": "## User story\n\nComo Administrador, quero ver um resumo global do budget atribuído face ao gasto, por cliente, para que tenha visão financeira.\n\n## Descrição\n\nVista com o budget total atribuído, o total gasto e o valor restante por cliente e por campanha. Destaca as campanhas acima do budget.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 5 (Budget)\n- Unidade de trabalho: 5.4\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 5 — Budget",
+    "perfil": "Administrador",
+    "fase": 5,
+    "unidade": "5.4"
+  },
+  {
+    "id": "A17",
+    "titulo": "[A17] Como Administrador, quero ver a lista de marketeers e as tarefas/criativos atribuídos a cada um, para que saiba em que estão a trabalhar.",
+    "corpo": "## User story\n\nComo Administrador, quero ver a lista de marketeers e as tarefas/criativos atribuídos a cada um, para que saiba em que estão a trabalhar.\n\n## Descrição\n\nVista com todos os marketeers e os criativos/campanhas em curso de cada um, com o respetivo estado.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 6 (Comentários, notificações e relatórios)\n- Unidade de trabalho: 6.3\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 6 — Comentários, notificações e relatórios",
+    "perfil": "Administrador",
+    "fase": 6,
+    "unidade": "6.3"
+  },
+  {
+    "id": "A18",
+    "titulo": "[A18] Como Administrador, quero comparar a carga de trabalho entre marketeers, para que possa distribuir melhor as tarefas.",
+    "corpo": "## User story\n\nComo Administrador, quero comparar a carga de trabalho entre marketeers, para que possa distribuir melhor as tarefas.\n\n## Descrição\n\nIndicadores por marketeer (n.º de criativos ativos, concluídos e em atraso) num período escolhido.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 6 (Comentários, notificações e relatórios)\n- Unidade de trabalho: 6.3\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 6 — Comentários, notificações e relatórios",
+    "perfil": "Administrador",
+    "fase": 6,
+    "unidade": "6.3"
+  },
+  {
+    "id": "A19",
+    "titulo": "[A19] Como Administrador, quero identificar marketeers sem atividade, para que possa agir quando alguém não tem trabalho atribuído ou está parado.",
+    "corpo": "## User story\n\nComo Administrador, quero identificar marketeers sem atividade, para que possa agir quando alguém não tem trabalho atribuído ou está parado.\n\n## Descrição\n\nDestaque dos marketeers sem criativos ativos ou sem alterações há 7 dias. O número de dias é configurável pelo Administrador.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Administrador\n- Fase: Fase 6 (Comentários, notificações e relatórios)\n- Unidade de trabalho: 6.3\n",
+    "labels": [
+      "user story",
+      "Administrador"
+    ],
+    "milestone": "Fase 6 — Comentários, notificações e relatórios",
+    "perfil": "Administrador",
+    "fase": 6,
+    "unidade": "6.3"
+  },
+  {
+    "id": "M01",
+    "titulo": "[M01] Como Marketeer, quero fazer login na plataforma, para que possa aceder ao meu trabalho.",
+    "corpo": "## User story\n\nComo Marketeer, quero fazer login na plataforma, para que possa aceder ao meu trabalho.\n\n## Descrição\n\nAutenticação com email e password. Cada sessão fica registada para o histórico de acessos do Administrador.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 1 (Autenticação e sessões)\n- Unidade de trabalho: 1.1\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 1 — Autenticação e sessões",
+    "perfil": "Marketeer",
+    "fase": 1,
+    "unidade": "1.1"
+  },
+  {
+    "id": "M02",
+    "titulo": "[M02] Como Marketeer, quero criar campanhas, para que possa organizar os criativos de cada cliente.",
+    "corpo": "## User story\n\nComo Marketeer, quero criar campanhas, para que possa organizar os criativos de cada cliente.\n\n## Descrição\n\nO Marketeer organiza os anúncios (criativos) em campanhas. Cada campanha pertence a um cliente e agrupa vários criativos.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.1\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Marketeer",
+    "fase": 3,
+    "unidade": "3.1"
+  },
+  {
+    "id": "M03",
+    "titulo": "[M03] Como Marketeer, quero editar uma campanha, para que a informação se mantenha atualizada.",
+    "corpo": "## User story\n\nComo Marketeer, quero editar uma campanha, para que a informação se mantenha atualizada.\n\n## Descrição\n\nAlteração do nome, objetivo e datas da campanha. O budget só é alterado pelo Administrador.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.1\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Marketeer",
+    "fase": 3,
+    "unidade": "3.1"
+  },
+  {
+    "id": "M04",
+    "titulo": "[M04] Como Marketeer, quero ver as campanhas que me estão atribuídas, para que saiba em que tenho de trabalhar.",
+    "corpo": "## User story\n\nComo Marketeer, quero ver as campanhas que me estão atribuídas, para que saiba em que tenho de trabalhar.\n\n## Descrição\n\nLista das campanhas atribuídas, com cliente, budget, budget restante e n.º de criativos por estado.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.2\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Marketeer",
+    "fase": 3,
+    "unidade": "3.2"
+  },
+  {
+    "id": "M05",
+    "titulo": "[M05] Como Marketeer, quero eliminar uma campanha sem criativos, para que não fiquem registos desnecessários.",
+    "corpo": "## User story\n\nComo Marketeer, quero eliminar uma campanha sem criativos, para que não fiquem registos desnecessários.\n\n## Descrição\n\nSó é possível se a campanha não tiver criativos associados, com pedido de confirmação.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.2\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Marketeer",
+    "fase": 3,
+    "unidade": "3.2"
+  },
+  {
+    "id": "M06",
+    "titulo": "[M06] Como Marketeer, quero criar um novo criativo, para que fique registado no projeto do cliente.",
+    "corpo": "## User story\n\nComo Marketeer, quero criar um novo criativo, para que fique registado no projeto do cliente.\n\n## Descrição\n\nO Marketeer pode criar um criativo através de um formulário, associando-o a um cliente/campanha.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.1\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Marketeer",
+    "fase": 4,
+    "unidade": "4.1"
+  },
+  {
+    "id": "M07",
+    "titulo": "[M07] Como Marketeer, quero editar um criativo existente, para que a informação se mantenha atualizada.",
+    "corpo": "## User story\n\nComo Marketeer, quero editar um criativo existente, para que a informação se mantenha atualizada.\n\n## Descrição\n\nO Marketeer pode alterar qualquer campo de um criativo já criado, sendo guardada a data da última alteração.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.1\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Marketeer",
+    "fase": 4,
+    "unidade": "4.1"
+  },
+  {
+    "id": "M08",
+    "titulo": "[M08] Como Marketeer, quero eliminar um criativo, para que não fiquem registos desnecessários.",
+    "corpo": "## User story\n\nComo Marketeer, quero eliminar um criativo, para que não fiquem registos desnecessários.\n\n## Descrição\n\nO Marketeer pode apagar um criativo, com pedido de confirmação antes da eliminação.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.1\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Marketeer",
+    "fase": 4,
+    "unidade": "4.1"
+  },
+  {
+    "id": "M09",
+    "titulo": "[M09] Como Marketeer, quero indicar o custo estimado de cada criativo, para que o cliente saiba quanto vai investir.",
+    "corpo": "## User story\n\nComo Marketeer, quero indicar o custo estimado de cada criativo, para que o cliente saiba quanto vai investir.\n\n## Descrição\n\nCampo numérico (em €) com o custo previsto de produção e/ou promoção do criativo.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.2\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Marketeer",
+    "fase": 4,
+    "unidade": "4.2"
+  },
+  {
+    "id": "M10",
+    "titulo": "[M10] Como Marketeer, quero definir prazos para cada criativo, para que o cliente saiba quando estará pronto.",
+    "corpo": "## User story\n\nComo Marketeer, quero definir prazos para cada criativo, para que o cliente saiba quando estará pronto.\n\n## Descrição\n\nO Marketeer define a data de entrega e a data prevista de publicação do criativo.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.2\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Marketeer",
+    "fase": 4,
+    "unidade": "4.2"
+  },
+  {
+    "id": "M11",
+    "titulo": "[M11] Como Marketeer, quero definir o público-alvo de cada criativo, para que o cliente perceba a quem se destina.",
+    "corpo": "## User story\n\nComo Marketeer, quero definir o público-alvo de cada criativo, para que o cliente perceba a quem se destina.\n\n## Descrição\n\nCampo para indicar faixa etária, localização, interesses e outras características do público.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.2\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Marketeer",
+    "fase": 4,
+    "unidade": "4.2"
+  },
+  {
+    "id": "M12",
+    "titulo": "[M12] Como Marketeer, quero escolher a plataforma alvo, para que o cliente saiba onde o criativo vai ser publicado.",
+    "corpo": "## User story\n\nComo Marketeer, quero escolher a plataforma alvo, para que o cliente saiba onde o criativo vai ser publicado.\n\n## Descrição\n\nSeleção de uma ou mais plataformas (Instagram, Facebook, TikTok, YouTube, etc.).\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.2\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Marketeer",
+    "fase": 4,
+    "unidade": "4.2"
+  },
+  {
+    "id": "M13",
+    "titulo": "[M13] Como Marketeer, quero anexar o ficheiro ou a pré-visualização do criativo, para que o cliente veja o conteúdo.",
+    "corpo": "## User story\n\nComo Marketeer, quero anexar o ficheiro ou a pré-visualização do criativo, para que o cliente veja o conteúdo.\n\n## Descrição\n\nUpload de imagem, vídeo ou documento associado ao criativo, com pré-visualização.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.3\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Marketeer",
+    "fase": 4,
+    "unidade": "4.3"
+  },
+  {
+    "id": "M14",
+    "titulo": "[M14] Como Marketeer, quero atualizar o estado do criativo, para que o cliente acompanhe o progresso.",
+    "corpo": "## User story\n\nComo Marketeer, quero atualizar o estado do criativo, para que o cliente acompanhe o progresso.\n\n## Descrição\n\nEstados possíveis: Em produção, Em revisão, Aprovado, Publicado. O Marketeer só muda de Em produção para Em revisão e de Aprovado para Publicado. A aprovação é feita pelo Cliente.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.4\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Marketeer",
+    "fase": 4,
+    "unidade": "4.4"
+  },
+  {
+    "id": "M15",
+    "titulo": "[M15] Como Marketeer, quero ser avisado quando o custo dos criativos ultrapassa o budget da campanha, para que não exceda o investimento aprovado.",
+    "corpo": "## User story\n\nComo Marketeer, quero ser avisado quando o custo dos criativos ultrapassa o budget da campanha, para que não exceda o investimento aprovado.\n\n## Descrição\n\nAviso ao criar ou editar um criativo quando a soma dos custos passa o budget da campanha.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.6\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Marketeer",
+    "fase": 4,
+    "unidade": "4.6"
+  },
+  {
+    "id": "M16",
+    "titulo": "[M16] Como Marketeer, quero dar parecer sobre os pedidos de alteração de budget, para que o Administrador saiba se são viáveis.",
+    "corpo": "## User story\n\nComo Marketeer, quero dar parecer sobre os pedidos de alteração de budget, para que o Administrador saiba se são viáveis.\n\n## Descrição\n\nO Marketeer analisa o pedido de alteração de budget e indica se é viável (sim/não) com justificação. O parecer fica visível para o Administrador.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 5 (Budget)\n- Unidade de trabalho: 5.2\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 5 — Budget",
+    "perfil": "Marketeer",
+    "fase": 5,
+    "unidade": "5.2"
+  },
+  {
+    "id": "M17",
+    "titulo": "[M17] Como Marketeer, quero ver os comentários do cliente sobre um criativo, para que saiba o que ajustar.",
+    "corpo": "## User story\n\nComo Marketeer, quero ver os comentários do cliente sobre um criativo, para que saiba o que ajustar.\n\n## Descrição\n\nHistórico de comentários no detalhe do criativo, com data e autor. O Marketeer pode responder a cada comentário.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 6 (Comentários, notificações e relatórios)\n- Unidade de trabalho: 6.1\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 6 — Comentários, notificações e relatórios",
+    "perfil": "Marketeer",
+    "fase": 6,
+    "unidade": "6.1"
+  },
+  {
+    "id": "M18",
+    "titulo": "[M18] Como Marketeer, quero ser notificado quando recebo uma nova campanha, um pedido de budget ou um comentário, para que possa responder a tempo.",
+    "corpo": "## User story\n\nComo Marketeer, quero ser notificado quando recebo uma nova campanha, um pedido de budget ou um comentário, para que possa responder a tempo.\n\n## Descrição\n\nNotificação na plataforma e/ou por email para cada um destes eventos, com ligação direta ao item.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Marketeer\n- Fase: Fase 6 (Comentários, notificações e relatórios)\n- Unidade de trabalho: 6.2\n",
+    "labels": [
+      "user story",
+      "Marketeer"
+    ],
+    "milestone": "Fase 6 — Comentários, notificações e relatórios",
+    "perfil": "Marketeer",
+    "fase": 6,
+    "unidade": "6.2"
+  },
+  {
+    "id": "C01",
+    "titulo": "[C01] Como Cliente, quero fazer login na plataforma, para que possa aceder às minhas campanhas de forma segura.",
+    "corpo": "## User story\n\nComo Cliente, quero fazer login na plataforma, para que possa aceder às minhas campanhas de forma segura.\n\n## Descrição\n\nAutenticação com email e password. Inclui logout e sessão com expiração por inatividade.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 1 (Autenticação e sessões)\n- Unidade de trabalho: 1.1\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 1 — Autenticação e sessões",
+    "perfil": "Cliente",
+    "fase": 1,
+    "unidade": "1.1"
+  },
+  {
+    "id": "C02",
+    "titulo": "[C02] Como Cliente, quero recuperar a minha password, para que possa voltar a aceder à conta se a esquecer.",
+    "corpo": "## User story\n\nComo Cliente, quero recuperar a minha password, para que possa voltar a aceder à conta se a esquecer.\n\n## Descrição\n\nO Cliente recebe por email um link de reposição com validade limitada.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 1 (Autenticação e sessões)\n- Unidade de trabalho: 1.5\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 1 — Autenticação e sessões",
+    "perfil": "Cliente",
+    "fase": 1,
+    "unidade": "1.5"
+  },
+  {
+    "id": "C03",
+    "titulo": "[C03] Como Cliente, quero alterar a minha password, para que possa manter a conta segura.",
+    "corpo": "## User story\n\nComo Cliente, quero alterar a minha password, para que possa manter a conta segura.\n\n## Descrição\n\nPede a password atual e a nova, com confirmação.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 1 (Autenticação e sessões)\n- Unidade de trabalho: 1.4\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 1 — Autenticação e sessões",
+    "perfil": "Cliente",
+    "fase": 1,
+    "unidade": "1.4"
+  },
+  {
+    "id": "C04",
+    "titulo": "[C04] Como Cliente, quero editar a minha informação, para que os meus dados estejam sempre atualizados.",
+    "corpo": "## User story\n\nComo Cliente, quero editar a minha informação, para que os meus dados estejam sempre atualizados.\n\n## Descrição\n\nO Cliente altera os seus contactos e dados da empresa no perfil.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 1 (Autenticação e sessões)\n- Unidade de trabalho: 1.4\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 1 — Autenticação e sessões",
+    "perfil": "Cliente",
+    "fase": 1,
+    "unidade": "1.4"
+  },
+  {
+    "id": "C05",
+    "titulo": "[C05] Como Cliente, quero pedir novas campanhas de marketing, para que a equipa comece a trabalhar nelas.",
+    "corpo": "## User story\n\nComo Cliente, quero pedir novas campanhas de marketing, para que a equipa comece a trabalhar nelas.\n\n## Descrição\n\nFormulário de pedido com objetivo, orçamento, prazo pretendido e plataformas.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.3\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Cliente",
+    "fase": 3,
+    "unidade": "3.3"
+  },
+  {
+    "id": "C06",
+    "titulo": "[C06] Como Cliente, quero acompanhar o estado dos meus pedidos, para que saiba em que fase estão.",
+    "corpo": "## User story\n\nComo Cliente, quero acompanhar o estado dos meus pedidos, para que saiba em que fase estão.\n\n## Descrição\n\nLista dos pedidos de nova campanha e de alteração de budget, com os estados Pendente, Em análise, Aprovado e Rejeitado.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.3\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Cliente",
+    "fase": 3,
+    "unidade": "3.3"
+  },
+  {
+    "id": "C07",
+    "titulo": "[C07] Como Cliente, quero cancelar um pedido ainda pendente, para que possa desistir antes de ser analisado.",
+    "corpo": "## User story\n\nComo Cliente, quero cancelar um pedido ainda pendente, para que possa desistir antes de ser analisado.\n\n## Descrição\n\nSó é possível enquanto o pedido estiver Pendente, com pedido de confirmação.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.3\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Cliente",
+    "fase": 3,
+    "unidade": "3.3"
+  },
+  {
+    "id": "C08",
+    "titulo": "[C08] Como Cliente, quero ver as minhas campanhas e o budget atribuído a cada uma, para que saiba o estado do meu investimento.",
+    "corpo": "## User story\n\nComo Cliente, quero ver as minhas campanhas e o budget atribuído a cada uma, para que saiba o estado do meu investimento.\n\n## Descrição\n\nO Cliente vê apenas as suas campanhas, incluindo as que ainda não têm budget atribuído. Para alterar o budget tem de fazer um pedido.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.5\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Cliente",
+    "fase": 3,
+    "unidade": "3.5"
+  },
+  {
+    "id": "C09",
+    "titulo": "[C09] Como Cliente, quero saber qual o marketeer responsável por cada campanha, para que saiba a quem me dirigir.",
+    "corpo": "## User story\n\nComo Cliente, quero saber qual o marketeer responsável por cada campanha, para que saiba a quem me dirigir.\n\n## Descrição\n\nMostra o nome e o contacto do marketeer associado à campanha.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 3 (Campanhas e pedidos)\n- Unidade de trabalho: 3.5\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 3 — Campanhas e pedidos",
+    "perfil": "Cliente",
+    "fase": 3,
+    "unidade": "3.5"
+  },
+  {
+    "id": "C10",
+    "titulo": "[C10] Como Cliente, quero ver a lista dos meus criativos com custo, prazo, público e plataforma, para que possa acompanhar o trabalho.",
+    "corpo": "## User story\n\nComo Cliente, quero ver a lista dos meus criativos com custo, prazo, público e plataforma, para que possa acompanhar o trabalho.\n\n## Descrição\n\nO Cliente tem acesso a uma vista (só de leitura) com todos os seus criativos e respetivos detalhes e estado.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.5\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Cliente",
+    "fase": 4,
+    "unidade": "4.5"
+  },
+  {
+    "id": "C11",
+    "titulo": "[C11] Como Cliente, quero filtrar e pesquisar os meus criativos, para que encontre rapidamente o que procuro.",
+    "corpo": "## User story\n\nComo Cliente, quero filtrar e pesquisar os meus criativos, para que encontre rapidamente o que procuro.\n\n## Descrição\n\nFiltros por campanha, estado, plataforma e intervalo de datas.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.5\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Cliente",
+    "fase": 4,
+    "unidade": "4.5"
+  },
+  {
+    "id": "C12",
+    "titulo": "[C12] Como Cliente, quero pré-visualizar e descarregar os ficheiros dos criativos, para que possa rever o conteúdo e usá-lo internamente.",
+    "corpo": "## User story\n\nComo Cliente, quero pré-visualizar e descarregar os ficheiros dos criativos, para que possa rever o conteúdo e usá-lo internamente.\n\n## Descrição\n\nPré-visualização de imagem e vídeo e download do ficheiro original.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.3\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Cliente",
+    "fase": 4,
+    "unidade": "4.3"
+  },
+  {
+    "id": "C13",
+    "titulo": "[C13] Como Cliente, quero aprovar ou rejeitar um criativo em revisão, para que o marketeer saiba se pode avançar com a publicação.",
+    "corpo": "## User story\n\nComo Cliente, quero aprovar ou rejeitar um criativo em revisão, para que o marketeer saiba se pode avançar com a publicação.\n\n## Descrição\n\nDisponível apenas para criativos no estado Em revisão. A aprovação muda o estado para Aprovado. A rejeição devolve o criativo para Em produção.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.4\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Cliente",
+    "fase": 4,
+    "unidade": "4.4"
+  },
+  {
+    "id": "C14",
+    "titulo": "[C14] Como Cliente, quero ver a despesa total de cada campanha face ao budget, para que possa controlar o investimento.",
+    "corpo": "## User story\n\nComo Cliente, quero ver a despesa total de cada campanha face ao budget, para que possa controlar o investimento.\n\n## Descrição\n\nMostra a soma dos custos dos criativos, o budget atribuído e o valor restante. Fica destacado quando o budget é ultrapassado.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 4 (Criativos)\n- Unidade de trabalho: 4.6\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 4 — Criativos",
+    "perfil": "Cliente",
+    "fase": 4,
+    "unidade": "4.6"
+  },
+  {
+    "id": "C15",
+    "titulo": "[C15] Como Cliente, quero pedir a alteração do budget de uma campanha, para que possa ajustar o investimento.",
+    "corpo": "## User story\n\nComo Cliente, quero pedir a alteração do budget de uma campanha, para que possa ajustar o investimento.\n\n## Descrição\n\nO Cliente indica o novo valor pretendido e o motivo. O pedido fica pendente até ser analisado.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 5 (Budget)\n- Unidade de trabalho: 5.1\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 5 — Budget",
+    "perfil": "Cliente",
+    "fase": 5,
+    "unidade": "5.1"
+  },
+  {
+    "id": "C16",
+    "titulo": "[C16] Como Cliente, quero ver o histórico de alterações de budget de cada campanha, para que tenha registo das mudanças feitas.",
+    "corpo": "## User story\n\nComo Cliente, quero ver o histórico de alterações de budget de cada campanha, para que tenha registo das mudanças feitas.\n\n## Descrição\n\nTabela com valor anterior, valor novo, data e motivo.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 5 (Budget)\n- Unidade de trabalho: 5.3\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 5 — Budget",
+    "perfil": "Cliente",
+    "fase": 5,
+    "unidade": "5.3"
+  },
+  {
+    "id": "C17",
+    "titulo": "[C17] Como Cliente, quero ser informado da decisão sobre o meu pedido de budget, para que saiba se foi aceite.",
+    "corpo": "## User story\n\nComo Cliente, quero ser informado da decisão sobre o meu pedido de budget, para que saiba se foi aceite.\n\n## Descrição\n\nNotificação ao cliente com o estado final do pedido (aprovado/rejeitado) e o novo budget, se aplicável.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 6 (Comentários, notificações e relatórios)\n- Unidade de trabalho: 6.2\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 6 — Comentários, notificações e relatórios",
+    "perfil": "Cliente",
+    "fase": 6,
+    "unidade": "6.2"
+  },
+  {
+    "id": "C18",
+    "titulo": "[C18] Como Cliente, quero comentar ou sugerir alterações a um criativo, para que o marketeer saiba o que ajustar.",
+    "corpo": "## User story\n\nComo Cliente, quero comentar ou sugerir alterações a um criativo, para que o marketeer saiba o que ajustar.\n\n## Descrição\n\nCampo de comentário associado ao criativo, com data e autor. O marketeer vê o histórico de comentários.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 6 (Comentários, notificações e relatórios)\n- Unidade de trabalho: 6.1\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 6 — Comentários, notificações e relatórios",
+    "perfil": "Cliente",
+    "fase": 6,
+    "unidade": "6.1"
+  },
+  {
+    "id": "C19",
+    "titulo": "[C19] Como Cliente, quero ser notificado quando um criativo é criado ou alterado, para que esteja sempre a par das mudanças.",
+    "corpo": "## User story\n\nComo Cliente, quero ser notificado quando um criativo é criado ou alterado, para que esteja sempre a par das mudanças.\n\n## Descrição\n\nO Cliente recebe uma notificação (na plataforma e/ou por email) sempre que há alterações aos seus criativos.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 6 (Comentários, notificações e relatórios)\n- Unidade de trabalho: 6.2\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 6 — Comentários, notificações e relatórios",
+    "perfil": "Cliente",
+    "fase": 6,
+    "unidade": "6.2"
+  },
+  {
+    "id": "C20",
+    "titulo": "[C20] Como Cliente, quero exportar um relatório das minhas campanhas, para que possa partilhá-lo internamente.",
+    "corpo": "## User story\n\nComo Cliente, quero exportar um relatório das minhas campanhas, para que possa partilhá-lo internamente.\n\n## Descrição\n\nExportação em PDF ou CSV com as campanhas, os criativos, os custos e o budget.\n\n## Critérios de aceitação\n\nA detalhar quando a story entrar no Sprint Backlog.\n\n## Planeamento\n\n- Perfil: Cliente\n- Fase: Fase 6 (Comentários, notificações e relatórios)\n- Unidade de trabalho: 6.4\n",
+    "labels": [
+      "user story",
+      "Cliente"
+    ],
+    "milestone": "Fase 6 — Comentários, notificações e relatórios",
+    "perfil": "Cliente",
+    "fase": 6,
+    "unidade": "6.4"
+  }
+]
