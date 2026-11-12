@@ -359,7 +359,7 @@ python ../ctesp-ADC/verificar.py 0.3
 
 **Deves ver** `Tudo certo: o ramo 'develop' está igual ao original no fim da unidade 0.3.`
 
-Se aparecer `ERRO`, não avancem: copia a mensagem e envia-ma.
+Se aparecer `ERRO`, não avancem. Copia a mensagem e passa-a a Fabio, para a enviar ao Claude.
 
 ### Passo 17 — Avisa o grupo
 

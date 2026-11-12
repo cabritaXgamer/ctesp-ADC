@@ -405,7 +405,7 @@ def passos_revisor(u: dict, config: dict, ref_autor: str, ref_seguinte: str) -> 
             f"| `{verificar} {u['id']}` | Confirma que o `develop` do repositório oficial ficou igual ao original "
             f"no fim da unidade {u['id']} |\n\n"
             f"**Deves ver** `Tudo certo: o ramo 'develop' está igual ao original no fim da unidade {u['id']}.`\n\n"
-            "Se aparecer `ERRO`, não avancem: copia a mensagem e envia-ma.",
+            "Se aparecer `ERRO`, não avancem. Copia a mensagem e passa-a a Fabio, para a enviar ao Claude.",
         )
     )
 
@@ -719,8 +719,8 @@ def gerar_pagina_fase(fase: dict, vezes: list[dict], config: dict) -> str:
     lista += [f"`verificar.py {ultima['id']}` responde `Tudo certo`", "Testes a passar e documentação gerada sem avisos"]
     partes.append("\n".join(f"- [ ] {item}" for item in lista) + "\n")
     partes.append(
-        f"Quando estiver tudo, digam-me **\"avança para a Fase {int(fase['numero']) + 1}\"** e contem-me os "
-        "problemas que tiveram.\n"
+        f"Quando estiver tudo, Fabio diz ao Claude **\"avança para a Fase {int(fase['numero']) + 1}\"** e conta os "
+        "problemas que o grupo teve.\n"
     )
     if fase.get("trello"):
         partes.append("## Trello\n\n" + fase["trello"] + "\n")
@@ -741,8 +741,9 @@ def gerar_pagina_fase(fase: dict, vezes: list[dict], config: dict) -> str:
         "| O `git push` é recusado por causa do email (`GH007`) | O GitHub está a proteger o teu email. Em GitHub → Settings → Emails "
         "copia o endereço que termina em `users.noreply.github.com`, usa-o no `git config --global user.email` e corre "
         "`git commit --amend --reset-author --no-edit` |\n"
-        "| O `verificar.py` responde `ERRO` | Não avancem. Copiem a mensagem e enviem-ma |\n"
-        "| Uma verificação automática fica com uma cruz vermelha | Clica em *Details* ao lado da verificação, copia o erro e envia-mo |\n"
+        "| O `verificar.py` responde `ERRO` | Não avancem. Copiem a mensagem e passem-na a Fabio, para a enviar ao Claude |\n"
+        "| Uma verificação automática fica com uma cruz vermelha | Clica em *Details* ao lado da verificação, copia o erro "
+        "e passa-o a Fabio, para o enviar ao Claude |\n"
         "| O `python` não é reconhecido | Experimenta `py` em vez de `python`. Se também não der, falta instalar o Python "
         "(Preparação, passo A1) |\n"
     )

@@ -127,7 +127,7 @@ Deve aparecer o menu inicial.
 - [ ] `verificar.py 0.4` responde `Tudo certo`
 - [ ] Testes a passar e documentação gerada sem avisos
 
-Quando estiver tudo, digam-me **"avança para a Fase 1"** e contem-me os problemas que tiveram.
+Quando estiver tudo, Fabio diz ao Claude **"avança para a Fase 1"** e conta os problemas que o grupo teve.
 
 ## Trello
 
@@ -144,6 +144,6 @@ A Fase 0 não tem cards de user stories. No fim da fase, movam para **Sprint Bac
 | `fatal: not a git repository` | O terminal não está na pasta do repositório. Usa `cd` para entrar nela |
 | O `git push` é recusado com `403` ou `Permission denied` | A tua conta ainda não é colaboradora do repositório oficial, ou não aceitaste o convite (Preparação, passo A3) |
 | O `git push` é recusado por causa do email (`GH007`) | O GitHub está a proteger o teu email. Em GitHub → Settings → Emails copia o endereço que termina em `users.noreply.github.com`, usa-o no `git config --global user.email` e corre `git commit --amend --reset-author --no-edit` |
-| O `verificar.py` responde `ERRO` | Não avancem. Copiem a mensagem e enviem-ma |
-| Uma verificação automática fica com uma cruz vermelha | Clica em *Details* ao lado da verificação, copia o erro e envia-mo |
+| O `verificar.py` responde `ERRO` | Não avancem. Copiem a mensagem e passem-na a Fabio, para a enviar ao Claude |
+| Uma verificação automática fica com uma cruz vermelha | Clica em *Details* ao lado da verificação, copia o erro e passa-o a Fabio, para o enviar ao Claude |
 | O `python` não é reconhecido | Experimenta `py` em vez de `python`. Se também não der, falta instalar o Python (Preparação, passo A1) |
