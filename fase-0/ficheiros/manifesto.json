@@ -48,12 +48,22 @@
           "apagar": [],
           "tree_antes": "f471d3030c7d74adb0316cecedca1d99290d2098",
           "tree_depois": "955ca2568cd7cb1edba7d921f2a29f1fd4b16b27"
+        },
+        {
+          "numero": 5,
+          "mensagem": "docs: atualizar introdução do README",
+          "ficheiros": [
+            "README.md"
+          ],
+          "apagar": [],
+          "tree_antes": "955ca2568cd7cb1edba7d921f2a29f1fd4b16b27",
+          "tree_depois": "e17a2b7bd62118f482167a8db46917621b1ce36a"
         }
       ],
       "ficheiros_finais": {
         ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
         ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
-        "README.md": "2c19d0116f74e832ad4bb479a79e468a56714c86",
+        "README.md": "b92cd6cb8db8533f866892c28ecd068582545ed8",
         "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
         "gestor_campanhas/__main__.py": "8b9fbf53b3a7d188816f82f7db5be2a7b77ccd74",
         "gestor_campanhas/config.py": "29531dc732da331435fdfac8899dfdd8bef97723",
@@ -72,8 +82,8 @@
             "gestor_campanhas/bd.py"
           ],
           "apagar": [],
-          "tree_antes": "955ca2568cd7cb1edba7d921f2a29f1fd4b16b27",
-          "tree_depois": "b6eb91c31da8039a079d759402165d121d649f22"
+          "tree_antes": "e17a2b7bd62118f482167a8db46917621b1ce36a",
+          "tree_depois": "28feadc486553dccbee78098c1b607842c4a6892"
         },
         {
           "numero": 2,
@@ -83,8 +93,8 @@
             "gestor_campanhas/cli/comum.py"
           ],
           "apagar": [],
-          "tree_antes": "b6eb91c31da8039a079d759402165d121d649f22",
-          "tree_depois": "e5e8d15d8b152e20da5857be136b5e47fb772dd1"
+          "tree_antes": "28feadc486553dccbee78098c1b607842c4a6892",
+          "tree_depois": "d63a506b6baac57531941042454f058feeb5a392"
         },
         {
           "numero": 3,
@@ -93,8 +103,8 @@
             "gestor_campanhas/cli/principal.py"
           ],
           "apagar": [],
-          "tree_antes": "e5e8d15d8b152e20da5857be136b5e47fb772dd1",
-          "tree_depois": "9f28f9c9b14dd3369e59a5f5246fc2baaa0e364f"
+          "tree_antes": "d63a506b6baac57531941042454f058feeb5a392",
+          "tree_depois": "8f61455b5fe8d73f96e4bd6496455aef8924a4e8"
         },
         {
           "numero": 4,
@@ -103,8 +113,8 @@
             "gestor_campanhas/__main__.py"
           ],
           "apagar": [],
-          "tree_antes": "9f28f9c9b14dd3369e59a5f5246fc2baaa0e364f",
-          "tree_depois": "61cdf299028d013f5fa3684770178816c32e4995"
+          "tree_antes": "8f61455b5fe8d73f96e4bd6496455aef8924a4e8",
+          "tree_depois": "5e8f0c47b4e545903f5633ef0398df1c9063aaea"
         },
         {
           "numero": 5,
@@ -114,14 +124,14 @@
             "gestor_campanhas/cli/comum.py"
           ],
           "apagar": [],
-          "tree_antes": "61cdf299028d013f5fa3684770178816c32e4995",
-          "tree_depois": "4f28acc2ce658d1946144f2d796d28520f08f760"
+          "tree_antes": "5e8f0c47b4e545903f5633ef0398df1c9063aaea",
+          "tree_depois": "caa0c9cff45088149a551b916717dde80c0619a2"
         }
       ],
       "ficheiros_finais": {
         ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
         ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
-        "README.md": "2c19d0116f74e832ad4bb479a79e468a56714c86",
+        "README.md": "b92cd6cb8db8533f866892c28ecd068582545ed8",
         "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
         "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
         "gestor_campanhas/bd.py": "9ad389c5ab20c3308ff66723fa7b2c7c8bfb9152",
@@ -146,8 +156,8 @@
             "tests/conftest.py"
           ],
           "apagar": [],
-          "tree_antes": "4f28acc2ce658d1946144f2d796d28520f08f760",
-          "tree_depois": "1b334e4fde473edc048edf489384f3769f284619"
+          "tree_antes": "caa0c9cff45088149a551b916717dde80c0619a2",
+          "tree_depois": "47e4d61a774e39b44e7a8a07641603730e52fc46"
         },
         {
           "numero": 2,
@@ -156,8 +166,8 @@
             "tests/test_bd.py"
           ],
           "apagar": [],
-          "tree_antes": "1b334e4fde473edc048edf489384f3769f284619",
-          "tree_depois": "9b00eee19d6f75316e62406dedb3105e287374e3"
+          "tree_antes": "47e4d61a774e39b44e7a8a07641603730e52fc46",
+          "tree_depois": "acfa82daa181c971c837e725efbca1d6bcf7d8d6"
         },
         {
           "numero": 3,
@@ -166,8 +176,8 @@
             "tests/test_cli.py"
           ],
           "apagar": [],
-          "tree_antes": "9b00eee19d6f75316e62406dedb3105e287374e3",
-          "tree_depois": "6a8cb4925ad524031ebfae56277e256e23dac4c0"
+          "tree_antes": "acfa82daa181c971c837e725efbca1d6bcf7d8d6",
+          "tree_depois": "7285d8c00630fd18b2a793a91598cad67ceaf97d"
         },
         {
           "numero": 4,
@@ -176,15 +186,15 @@
             ".github/workflows/testes.yml"
           ],
           "apagar": [],
-          "tree_antes": "6a8cb4925ad524031ebfae56277e256e23dac4c0",
-          "tree_depois": "ed0a7a1c6025c34cff54ecd11670dc36cd10c27f"
+          "tree_antes": "7285d8c00630fd18b2a793a91598cad67ceaf97d",
+          "tree_depois": "c3587d6d0fbbfb58672f9a3eebaa8294a3e9c665"
         }
       ],
       "ficheiros_finais": {
         ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
         ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
         ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
-        "README.md": "2c19d0116f74e832ad4bb479a79e468a56714c86",
+        "README.md": "b92cd6cb8db8533f866892c28ecd068582545ed8",
         "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
         "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
         "gestor_campanhas/bd.py": "9ad389c5ab20c3308ff66723fa7b2c7c8bfb9152",
@@ -216,8 +226,8 @@
             "requirements-dev.txt"
           ],
           "apagar": [],
-          "tree_antes": "ed0a7a1c6025c34cff54ecd11670dc36cd10c27f",
-          "tree_depois": "921d37329c0f4584dce975c7176f700b8319b2db"
+          "tree_antes": "c3587d6d0fbbfb58672f9a3eebaa8294a3e9c665",
+          "tree_depois": "619ba9705ea117afb462b1fb96a30e1fdac12578"
         },
         {
           "numero": 2,
@@ -228,8 +238,8 @@
             "docs/testes.rst"
           ],
           "apagar": [],
-          "tree_antes": "921d37329c0f4584dce975c7176f700b8319b2db",
-          "tree_depois": "7d7205727ca8b7f4a830e11b257d086ca0b08739"
+          "tree_antes": "619ba9705ea117afb462b1fb96a30e1fdac12578",
+          "tree_depois": "cbf26efaec3976625d8d9eaad342a8a1acfbf4f8"
         },
         {
           "numero": 3,
@@ -239,8 +249,8 @@
             "docs/referencia.rst"
           ],
           "apagar": [],
-          "tree_antes": "7d7205727ca8b7f4a830e11b257d086ca0b08739",
-          "tree_depois": "e46f6aea1394e3d58e51cf5fc02caed38d268bc7"
+          "tree_antes": "cbf26efaec3976625d8d9eaad342a8a1acfbf4f8",
+          "tree_depois": "097a06fe8d0fb9cda56519c1ba2254285987ad1c"
         },
         {
           "numero": 4,
@@ -249,8 +259,8 @@
             ".github/workflows/docs.yml"
           ],
           "apagar": [],
-          "tree_antes": "e46f6aea1394e3d58e51cf5fc02caed38d268bc7",
-          "tree_depois": "9d3a1e30e469a518171d66dd61e1bf85b565c7f7"
+          "tree_antes": "097a06fe8d0fb9cda56519c1ba2254285987ad1c",
+          "tree_depois": "cbad67935891e3ce1a2cad0ca1f1e48ba0d6c916"
         },
         {
           "numero": 5,
@@ -259,7 +269,7 @@
             "README.md"
           ],
           "apagar": [],
-          "tree_antes": "9d3a1e30e469a518171d66dd61e1bf85b565c7f7",
+          "tree_antes": "cbad67935891e3ce1a2cad0ca1f1e48ba0d6c916",
           "tree_depois": "bc5e1f51ed8b872d337f719dacccb4309a2ac682"
         },
         {

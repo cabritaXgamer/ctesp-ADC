@@ -63,6 +63,7 @@ ctesp-ADC/fase-0/ficheiros/
     commit-2/    feat(nucleo): criar pacote gestor_campanhas com ponto de entrada
     commit-3/    feat(config): adicionar configuração dos caminhos de dados
     commit-4/    chore: adicionar pyproject.toml
+    commit-5/    docs: atualizar introdução do README
   0.2/    Base de dados e menu inicial
     commit-1/    feat(bd): adicionar ligação SQLite e criação de tabelas
     commit-2/    feat(cli): adicionar funções comuns dos menus

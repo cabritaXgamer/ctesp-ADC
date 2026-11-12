@@ -182,7 +182,7 @@ No fim de cada fase a aplicação corre e os testes passam, por isso qualquer fa
 
 | Unidade | Membro |
 |---|---|
-| 0.1 Estrutura do pacote: `__main__.py`, `config.py`, `pyproject.toml`, `.gitignore`, `.gitattributes` | Fabio |
+| 0.1 Estrutura do pacote: `__main__.py`, `config.py`, `pyproject.toml`, `.gitignore`, `.gitattributes` e introdução no README | Fabio |
 | 0.2 Base de dados (`bd.py`), funções comuns dos menus e menu inicial | Tomas |
 | 0.3 pytest com um primeiro teste e workflow do GitHub Actions | Ricardo |
 | 0.4 README, esqueleto do Sphinx, `CONTRIBUTING.md` com o fluxo Git, modelos de issue e de PR | Fabio |

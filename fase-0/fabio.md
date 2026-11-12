@@ -59,6 +59,7 @@ Criar a estrutura base do projeto, para que a aplicação possa ser arrancada co
 - [ ] Pacote `gestor_campanhas` com a versão e o ponto de entrada
 - [ ] Módulo `config` com os caminhos da pasta de dados e da base de dados
 - [ ] `pyproject.toml` com a descrição do projeto
+- [ ] README com a introdução do projeto, mensagens de commit e explicação do `pyproject.toml`
 ```
 
 **d)** Na coluna da direita, escolhe:
@@ -91,9 +92,9 @@ git switch -c feature/0.1-estrutura-pacote
 
 **Deves ver**, na última linha: `Switched to a new branch 'feature/0.1-estrutura-pacote'`.
 
-### Passo 4 — Copia e grava os 4 commits
+### Passo 4 — Copia e grava os 5 commits
 
-São 4 commits. Cada um faz-se em dois tempos: primeiro copias os ficheiros, depois gravas.
+São 5 commits. Cada um faz-se em dois tempos: primeiro copias os ficheiros, depois gravas.
 
 | Comando | O que faz |
 |---|---|
@@ -165,22 +166,38 @@ git commit -m "chore: adicionar pyproject.toml"
 
 **Deves ver** uma linha a terminar em `1 file changed, 28 insertions(+)`.
 
+**Commit 5 de 5**
+
+```bash
+python ../ctesp-ADC/copiar.py 0.1 5
+```
+
+**Deves ver** `Copiados 1 ficheiro`: `README.md`.
+
+```bash
+git add -A
+git commit -m "docs: atualizar introdução do README"
+```
+
+**Deves ver** uma linha a terminar em `1 file changed, 35 insertions(+), 1 deletion(-)`.
+
 
 ### Passo 5 — Confirma que ficou igual ao original
 
 ```bash
 python ../ctesp-ADC/verificar.py 0.1
-git log --oneline -4
+git log --oneline -5
 ```
 
 | Comando | O que deves ver |
 |---|---|
 | `python ../ctesp-ADC/verificar.py 0.1` | `Tudo certo: o ramo 'feature/0.1-estrutura-pacote' está igual ao original no fim da unidade 0.1.` Este comando compara o que gravaste com o que está no repositório de trabalho. Não altera nada |
-| `git log --oneline -4` | Os teus 4 commits, do mais recente para o mais antigo |
+| `git log --oneline -5` | Os teus 5 commits, do mais recente para o mais antigo |
 
 A lista do `git log` deve ser esta. No lugar de `xxxxxxx` aparece um código diferente em cada commit, que é a identificação que o Git lhe deu:
 
 ```text
+xxxxxxx docs: atualizar introdução do README
 xxxxxxx chore: adicionar pyproject.toml
 xxxxxxx feat(config): adicionar configuração dos caminhos de dados
 xxxxxxx feat(nucleo): criar pacote gestor_campanhas com ponto de entrada
@@ -226,7 +243,7 @@ Estrutura do pacote Python
 ```markdown
 ## O que muda
 
-Cria a estrutura base do projeto: o pacote `gestor_campanhas`, o ponto de entrada, a configuração dos caminhos de dados e o `pyproject.toml`. Acrescenta também o `.gitignore` e o `.gitattributes`.
+Cria a estrutura base do projeto: o pacote `gestor_campanhas`, o ponto de entrada, a configuração dos caminhos de dados e o `pyproject.toml`. Acrescenta o `.gitignore`, o `.gitattributes` e atualiza o README com a introdução, as mensagens de commit e a explicação do `pyproject.toml`.
 
 Closes #N
 
