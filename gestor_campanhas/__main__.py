@@ -5,15 +5,26 @@ Permite arrancar a aplicação a partir da pasta do projeto com::
     python -m gestor_campanhas
 """
 
-from gestor_campanhas import __version__
+from gestor_campanhas import bd
+from gestor_campanhas.cli import principal
 
 
 def main() -> int:
     """Arranca a aplicação.
 
+    Abre a base de dados, mostra o menu inicial e, no fim, fecha a ligação.
+    Se o utilizador interromper o programa com Ctrl+C, a aplicação termina
+    sem mostrar um erro.
+
     :return: Código de saída do processo (``0`` quando termina sem erros).
     """
-    print(f"Gestor de Campanhas v{__version__}")
+    ligacao = bd.iniciar_bd()
+    try:
+        principal.executar(ligacao)
+    except (KeyboardInterrupt, EOFError):
+        print("\nA sair...")
+    finally:
+        ligacao.close()
     return 0
 
 
