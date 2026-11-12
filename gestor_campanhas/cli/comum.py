@@ -6,8 +6,25 @@ confirmações, para que todos os menus se comportem da mesma maneira.
 
 from __future__ import annotations
 
+import sys
+
 #: Largura, em caracteres, das linhas que delimitam os títulos.
 LARGURA = 60
+
+
+def configurar_terminal() -> None:
+    """Garante que os acentos são lidos e escritos em UTF-8.
+
+    Numa consola do Windows o Python já trata bem os acentos. Quando o texto
+    passa por outro programa (por exemplo no terminal Git Bash), o Python usa
+    a codificação antiga do Windows e os acentos aparecem trocados. Esta
+    função força o UTF-8 nos três canais: teclado, saída e erros.
+    """
+    for canal in (sys.stdin, sys.stdout, sys.stderr):
+        # Durante os testes os canais são substituídos por objetos que podem
+        # não ter "reconfigure"; nesse caso não há nada a fazer.
+        if hasattr(canal, "reconfigure"):
+            canal.reconfigure(encoding="utf-8", errors="replace")
 
 
 def titulo(texto: str) -> None:

@@ -6,18 +6,19 @@ Permite arrancar a aplicação a partir da pasta do projeto com::
 """
 
 from gestor_campanhas import bd
-from gestor_campanhas.cli import principal
+from gestor_campanhas.cli import comum, principal
 
 
 def main() -> int:
     """Arranca a aplicação.
 
-    Abre a base de dados, mostra o menu inicial e, no fim, fecha a ligação.
-    Se o utilizador interromper o programa com Ctrl+C, a aplicação termina
-    sem mostrar um erro.
+    Prepara o terminal, abre a base de dados, mostra o menu inicial e, no
+    fim, fecha a ligação. Se o utilizador interromper o programa com Ctrl+C,
+    a aplicação termina sem mostrar um erro.
 
     :return: Código de saída do processo (``0`` quando termina sem erros).
     """
+    comum.configurar_terminal()
     ligacao = bd.iniciar_bd()
     try:
         principal.executar(ligacao)
