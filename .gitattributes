@@ -1,0 +1,6 @@
+# Normaliza os fins de linha: LF no repositório e nas cópias de trabalho,
+# para que o projeto fique igual em Windows, Linux e macOS.
+* text=auto eol=lf
+
+# Os scripts do Windows precisam de CRLF.
+*.bat text eol=crlf
