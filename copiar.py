@@ -96,17 +96,18 @@ def descrever_ponto(arvore: str | None, unidades: dict) -> str:
     if arvore is None:
         return "O repositório ainda não tem nenhum commit."
     for unidade in unidades.values():
+        if unidade["commits"][0]["tree_antes"] == arvore:
+            return f"Neste momento, o próximo commit a fazer no teu ramo é o commit 1 da unidade {unidade['id']}."
+    for unidade in unidades.values():
         total = len(unidade["commits"])
         for commit in unidade["commits"]:
             if commit["tree_depois"] == arvore:
                 if commit["numero"] == total:
-                    return f"O teu ramo está no fim da unidade {unidade['id']} (os {total} commits já estão feitos)."
+                    return f"O teu ramo já tem os {total} commits da unidade {unidade['id']}. Não falta copiar nenhum."
                 return (
                     f"O teu ramo já tem o commit {commit['numero']} da unidade {unidade['id']}. "
                     f"O próximo é o commit {commit['numero'] + 1}."
                 )
-        if unidade["commits"][0]["tree_antes"] == arvore:
-            return f"O teu ramo está pronto para o commit 1 da unidade {unidade['id']}."
     return (
         "O conteúdo do teu ramo não corresponde a nenhum ponto conhecido. "
         "Pode haver um ficheiro alterado ou a mais num commit anterior."
@@ -159,8 +160,8 @@ def main() -> int:
         raise erro(
             f"O teu ramo não está no ponto certo para o commit {numero} da unidade {identificador}.\n"
             + descrever_ponto(arvore, unidades)
-            + "\n\nSe acabaste de criar o ramo e a unidade anterior ainda não foi junta ao develop, espera por isso.\n"
-            "Depois de ela estar junta:  git switch develop,  git pull,  e cria o ramo outra vez."
+            + "\n\nSe esperavas estar mais à frente, a unidade anterior pode ainda não estar junta ao develop.\n"
+            "Confirma no GitHub. Depois de ela estar junta, apaga este ramo e cria-o outra vez a partir do develop atualizado."
         )
 
     origem = unidade["pasta"] / f"commit-{numero}"
