@@ -5,3 +5,6 @@
 
 # Testes automáticos
 pytest>=8
+
+# Documentação do código
+sphinx>=7
