@@ -26,6 +26,7 @@ Estrutura de pastas
        comum.py           funções partilhadas por todos os menus
        principal.py       menu inicial e entrada na aplicação
        perfis.py          menu de cada perfil
+       admin.py           opções do menu do Administrador
    tests/                 testes automáticos (pytest)
    docs/                  esta documentação (Sphinx)
    dados/                 criada no primeiro arranque; não vai para o Git

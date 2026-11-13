@@ -63,3 +63,27 @@ os 15 minutos se completaram.
    No terminal Git Bash a password aparece no ecrã enquanto é escrita, porque
    esse terminal não permite escondê-la. No PowerShell, na Linha de Comandos
    e no terminal do VS Code fica escondida.
+
+Administrador
+-------------
+
+Horários de entrada e saída dos marketeers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Mostra as sessões dos marketeers, da mais recente para a mais antiga, com a
+hora de entrada, a hora de saída, a duração e o motivo da saída.
+
+A aplicação pergunta primeiro o período. As duas datas são opcionais e
+escrevem-se no formato ``AAAA-MM-DD``; com Enter, esse limite não é aplicado.
+O último dia do período é incluído por inteiro.
+
+.. code-block:: text
+
+   Marketeer         Entrada           Saída             Duração  Motivo
+   ----------------  ----------------  ----------------  -------  -----------------
+   Miguel Marketeer  2026-11-11 14:00  2026-11-11 14:15  0h15     Inatividade
+   Miguel Marketeer  2026-11-10 09:00  2026-11-10 12:30  3h30     Terminou a sessão
+
+Uma sessão que ainda não terminou aparece com ``(em curso)`` na coluna da
+saída.
+
