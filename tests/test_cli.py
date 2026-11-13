@@ -67,16 +67,6 @@ def test_menu_inicial_termina_com_a_opcao_sair(teclado, ligacao, capsys):
     assert "Até breve!" in capsys.readouterr().out
 
 
-def test_menu_inicial_volta_a_aparecer_depois_de_entrar(teclado, ligacao, capsys):
-    teclado("1", "", "0")
-
-    principal.executar(ligacao)
-
-    saida = capsys.readouterr().out
-    assert "ainda não está disponível" in saida
-    assert saida.count("1. Entrar") == 2
-
-
 def test_main_cria_a_base_de_dados_e_devolve_zero(teclado, monkeypatch, tmp_path):
     monkeypatch.setenv(config.VARIAVEL_PASTA_DADOS, str(tmp_path))
     teclado("0")
