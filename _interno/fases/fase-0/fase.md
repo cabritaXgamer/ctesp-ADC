@@ -1,6 +1,7 @@
 ---
 numero: 0
 titulo: Arranque
+fechada: sim
 testes: 20
 ---
 

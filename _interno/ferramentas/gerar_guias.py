@@ -16,24 +16,28 @@ Ficheiros lidos (todos dentro de ``_interno``):
 ``config.json``
     Endereço dos dois repositórios, nomes dos membros e quem é dono do oficial.
 ``fases/fase-N/fase.md``
-    Dados da fase. Secções: ``entrega``, ``verificacao``, ``trello``.
+    Dados da fase. Cabeçalho: ``numero``, ``titulo``, ``testes`` e, numa fase
+    já replicada, ``fechada: sim`` (deixa de ser gerada). Secções:
+    ``entrega``, ``verificacao``, ``trello``.
 ``fases/fase-N/<id>.md``
-    Uma unidade de trabalho. Cabeçalho com ``id``, ``titulo``, ``ramo``,
-    ``quem``, ``revisor``, ``milestone``. Secções: ``resumo``, ``issue``,
-    ``pr``, ``testar``, ``verificar``, ``explicacao``.
+    Uma unidade de trabalho. Cabeçalho: ``id``, ``titulo``, ``ramo``,
+    ``quem``, ``revisor``, ``milestone`` e ``tipo``:
+
+    * ``tarefa`` — quem faz cria a issue (secção ``issue``);
+    * ``stories`` — as issues já existem; ``stories`` lista os identificadores
+      e a secção ``criterios`` tem os critérios de aceitação de cada uma;
+    * ``release`` — ramo ``release/...``, pull request para ``main``, tag e
+      regresso ao ``develop``; ``versao`` no cabeçalho e secção ``notas``.
+
+    Secções comuns: ``resumo``, ``pr``, ``testar``, ``verificar``, ``explicacao``.
 ``fases/fase-N/extra-<pessoa>.md``
     Passos adicionais de uma pessoa. Cada secção ``passo: Título`` é um passo.
 ``modelos/*.md``
     Páginas soltas com marcadores ``{{REPO_A}}``, ``{{REPO_B}}``, etc.
 
-Ficheiros escritos na pasta ``_guias``:
-
-``fase-N/README.md`` e ``fase-N/<pessoa>.md``
-    Página da fase e passo a passo de cada pessoa.
-``fase-N/ficheiros/<id>/commit-<n>/``
-    Os ficheiros que cada commit acrescenta ou altera.
-``fase-N/ficheiros/manifesto.json``
-    Dados usados por ``copiar.py`` e ``verificar.py``.
+Ficheiros escritos na pasta ``_guias``: ``fase-N/README.md``,
+``fase-N/<pessoa>.md``, ``fase-N/ficheiros/<id>/commit-<n>/`` e
+``fase-N/ficheiros/manifesto.json`` (usado por ``copiar.py`` e ``verificar.py``).
 """
 
 from __future__ import annotations
@@ -57,6 +61,9 @@ REPO = GUIAS.parent
 
 #: Ramo de integração onde as unidades são fundidas.
 RAMO_INTEGRACAO = "develop"
+
+#: Linha que as issues das user stories têm no lugar dos critérios de aceitação.
+LINHA_CRITERIOS = "A detalhar quando a story entrar no Sprint Backlog."
 
 
 # --------------------------------------------------------------------------
@@ -171,22 +178,50 @@ def plural(n: int, singular: str, plural_: str) -> str:
     return f"{n} {singular if n == 1 else plural_}"
 
 
+def pagina(pessoa: str) -> str:
+    """Nome do ficheiro da página de uma pessoa."""
+    return f"{sem_acentos(pessoa)}.md"
+
+
+def passos_texto(vez: dict) -> str:
+    """Texto "passo N" ou "passos N a M" de uma vez."""
+    if vez["primeiro"] == vez["ultimo"]:
+        return f"passo {vez['primeiro']}"
+    return f"passos {vez['primeiro']} a {vez['ultimo']}"
+
+
+def ref(vez: dict) -> str:
+    """Ligação para os passos de uma vez, na página da pessoa que a faz."""
+    return f"[página de {vez['pessoa']}]({pagina(vez['pessoa'])}), {passos_texto(vez)}"
+
+
+def criterios_por_story(u: dict) -> dict[str, str]:
+    """Separa a secção ``criterios`` de uma unidade pelos títulos ``### ID``."""
+    resultado, atual, linhas = {}, None, []
+    for linha in u.get("criterios", "").splitlines():
+        if linha.startswith("### "):
+            if atual:
+                resultado[atual] = "\n".join(linhas).strip()
+            atual, linhas = linha[4:].strip(), []
+        else:
+            linhas.append(linha)
+    if atual:
+        resultado[atual] = "\n".join(linhas).strip()
+    return resultado
+
+
 # --------------------------------------------------------------------------
-# Passos comuns a todas as unidades
+# Passos comuns
 # --------------------------------------------------------------------------
 
 
-def passos_autor(u: dict, anterior: dict | None, config: dict, ref_revisor: str) -> list[tuple[str, str]]:
-    """Passos de quem faz uma unidade de trabalho."""
-    b, oficial, trabalho = config["repo_b"], config["pasta_oficial"], config["pasta_trabalho"]
-    copiar, verificar = f"python ../{trabalho}/copiar.py", f"python ../{trabalho}/verificar.py"
-    ramo, n, fase = u["ramo"], len(u["commits"]), u["fase"]
-    passos = []
-
+def passo_confirmar(u: dict, anterior: dict | None, config: dict) -> tuple[str, str]:
+    """Passo em que quem faz a unidade confirma que a anterior já está junta."""
+    b = config["repo_b"]
     if anterior is None:
         corpo = (
-            "Antes do primeiro passo tens de ter feito a [Preparação](../preparacao.md), "
-            f"e o repositório oficial já tem de ter o ramo `develop` (passo B1 da Preparação, feito por {config['dono']})."
+            "A fase anterior tem de estar fechada: todos os pull requests juntos e o `develop` do teu computador "
+            "atualizado. Se for a primeira fase, tens de ter feito a [Preparação](../preparacao.md)."
         )
     else:
         corpo = (
@@ -195,49 +230,87 @@ def passos_autor(u: dict, anterior: dict | None, config: dict, ref_revisor: str)
             f"Abre {b}/pulls?q=is%3Apr+is%3Amerged e confirma que ele está na lista, com o símbolo roxo "
             "**Merged**. Se não estiver, espera: ainda não podes começar."
         )
-    passos.append(("Confirma que podes começar", corpo))
+    return ("Confirma que podes começar", corpo)
 
-    passos.append(
-        (
+
+def passo_issue(u: dict, config: dict) -> tuple[str, str]:
+    """Passo da issue: criá-la (tarefa, release) ou ficar com as que já existem (stories)."""
+    b = config["repo_b"]
+    if u["tipo"] != "stories":
+        return (
             f"Cria a issue da unidade {u['id']}",
             "A issue é o registo, no GitHub, do trabalho que vai ser feito. "
-            "O pull request que vais abrir mais à frente fecha-a sozinho.\n\n"
+            "Um pull request fecha-a sozinho mais à frente.\n\n"
             f"**a)** Abre {b}/issues e clica no botão verde **New issue**. "
-            "Se aparecer uma lista de modelos, escolhe **Blank issue**.\n\n"
-            "**b)** No campo do título, cola:\n\n"
+            "Se aparecer uma lista de modelos, escolhe **Tarefa**.\n\n"
+            "**b)** No campo do título, apaga o que lá estiver e cola:\n\n"
             + bloco(f"[{u['id']}] {u['titulo']}", "text")
-            + "\n\n**c)** Na caixa grande de texto, cola:\n\n"
+            + "\n\n**c)** Na caixa grande de texto, apaga o que lá estiver e cola:\n\n"
             + bloco(u["issue"], "markdown")
             + "\n\n**d)** Na coluna da direita, escolhe:\n\n"
             "- **Assignees:** tu (clica em *assign yourself*)\n"
             "- **Labels:** `tarefa`\n"
             f"- **Milestone:** `{u['milestone']}`\n\n"
             "**e)** Clica no botão verde **Create** (em alguns ecrãs chama-se *Submit new issue*).\n\n"
-            "**f)** Repara no número que aparece a seguir ao título, por exemplo `#3`. "
-            "Aponta-o: vais precisar dele quando abrires o pull request.",
+            "**f)** Repara no número que aparece a seguir ao título, por exemplo `#40`. "
+            "Aponta-o: vais precisar dele mais à frente.",
         )
-    )
-
-    passos.append(
-        (
-            "Atualiza as duas pastas e cria o ramo",
-            f"No terminal, dentro da pasta `{oficial}`:\n\n"
-            + bloco(f"git -C ../{trabalho} pull\ngit switch develop\ngit pull\ngit switch -c {ramo}", "bash")
-            + "\n\n| Comando | O que faz |\n|---|---|\n"
-            f"| `git -C ../{trabalho} pull` | Atualiza a pasta do repositório de trabalho, sem saíres da pasta onde estás. "
-            "É de lá que vais copiar os ficheiros |\n"
-            "| `git switch develop` | Muda para o ramo `develop` do repositório oficial |\n"
-            "| `git pull` | Atualiza o teu `develop` com o que o grupo já juntou no GitHub |\n"
-            f"| `git switch -c {ramo}` | Cria um ramo novo a partir do `develop` e muda para ele. É neste ramo que vais trabalhar |\n\n"
-            f"**Deves ver**, na última linha: `Switched to a new branch '{ramo}'`.",
-        )
-    )
-
+    stories = [s.strip() for s in u["stories"].split(",")]
+    criterios = criterios_por_story(u)
     linhas = [
-        f"São {n} commits. Cada um faz-se em dois tempos: primeiro copias os ficheiros, depois gravas.\n\n"
+        f"As issues desta unidade já existem: foram criadas na Fase 0, uma por user story. "
+        f"São {plural(len(stories), 'issue', 'issues')}: {', '.join(stories)}. "
+        "Vais ficar responsável por elas e escrever os critérios de aceitação, que dizem o que tem de "
+        "funcionar para a story estar feita.\n\n"
+        "Para cada uma:\n\n"
+        "**a)** Abre a ligação indicada e clica na issue.\n\n"
+        "**b)** Na coluna da direita, em **Assignees**, clica em *assign yourself*.\n\n"
+        "**c)** No canto superior direito da descrição da issue, clica nos três pontos **…** e em **Edit**.\n\n"
+        f"**d)** Apaga a linha `{LINHA_CRITERIOS}` e cola no lugar dela os critérios indicados aqui.\n\n"
+        "**e)** Clica em **Save** (em alguns ecrãs chama-se *Update comment*).\n\n"
+        "**f)** Aponta o número da issue, que aparece a seguir ao título, por exemplo `#12`.\n"
+    ]
+    for story in stories:
+        if story not in criterios:
+            raise SystemExit(f"Unidade {u['id']}: faltam os critérios de {story}.")
+        linhas.append(
+            f"**Issue {story}** — {b}/issues?q=is%3Aissue+in%3Atitle+%22%5B{story}%5D%22\n\n"
+            + bloco(criterios[story], "markdown")
+            + "\n"
+        )
+    linhas.append(
+        "Por fim, no quadro Trello, move os cards destas stories de **Sprint Backlog** para **Work In Progress**."
+    )
+    return (f"Fica com as issues da unidade {u['id']}", "\n".join(linhas))
+
+
+def passo_ramo(u: dict, config: dict) -> tuple[str, str]:
+    """Passo em que se atualizam as duas pastas e se cria o ramo."""
+    oficial, trabalho, ramo = config["pasta_oficial"], config["pasta_trabalho"], u["ramo"]
+    return (
+        "Atualiza as duas pastas e cria o ramo",
+        f"No terminal, dentro da pasta `{oficial}`:\n\n"
+        + bloco(f"git -C ../{trabalho} pull\ngit switch develop\ngit pull\ngit switch -c {ramo}", "bash")
+        + "\n\n| Comando | O que faz |\n|---|---|\n"
+        f"| `git -C ../{trabalho} pull` | Atualiza a pasta do repositório de trabalho, sem saíres da pasta onde estás. "
+        "É de lá que vais copiar os ficheiros |\n"
+        "| `git switch develop` | Muda para o ramo `develop` do repositório oficial |\n"
+        "| `git pull` | Atualiza o teu `develop` com o que o grupo já juntou no GitHub |\n"
+        f"| `git switch -c {ramo}` | Cria um ramo novo a partir do `develop` e muda para ele. É neste ramo que vais trabalhar |\n\n"
+        f"**Deves ver**, na última linha: `Switched to a new branch '{ramo}'`.",
+    )
+
+
+def passo_commits(u: dict, config: dict) -> tuple[str, str]:
+    """Passo em que se copiam os ficheiros e se gravam os commits, um a um."""
+    trabalho = config["pasta_trabalho"]
+    copiar = f"python ../{trabalho}/copiar.py"
+    n = len(u["commits"])
+    linhas = [
+        f"São {plural(n, 'commit', 'commits')}. Cada um faz-se em dois tempos: primeiro copias os ficheiros, depois gravas.\n\n"
         "| Comando | O que faz |\n|---|---|\n"
         f"| `{copiar} {u['id']} 1` | Copia para esta pasta os ficheiros do commit 1 da unidade {u['id']}. "
-        f"Eles estão na pasta `{trabalho}/fase-{fase}/ficheiros/{u['id']}/commit-1`. "
+        f"Eles estão na pasta `{trabalho}/fase-{u['fase']}/ficheiros/{u['id']}/commit-1`. "
         "Antes de copiar, confirma que estás no ramo certo e que não saltaste nenhum commit |\n"
         "| `git add -A` | Diz ao Git que as alterações que estão na pasta são para entrar no próximo commit |\n"
         "| `git commit -m \"mensagem\"` | Grava essas alterações num commit **teu**, com o teu nome e a mensagem entre aspas |\n\n"
@@ -255,168 +328,475 @@ def passos_autor(u: dict, anterior: dict | None, config: dict, ref_revisor: str)
             + bloco(f"git add -A\ngit commit -m \"{c['mensagem']}\"", "bash")
             + f"\n\n**Deves ver** uma linha a terminar em `{c['resumo']}`.\n"
         )
-    passos.append((f"Copia e grava os {n} commits", "\n".join(linhas)))
+    return (f"Copia e grava os {plural(n, 'commit', 'commits')}", "\n".join(linhas))
 
+
+def passo_igual(u: dict, config: dict) -> tuple[str, str]:
+    """Passo em que se confirma que o ramo ficou igual ao original."""
+    verificar = f"python ../{config['pasta_trabalho']}/verificar.py"
+    n, ramo = len(u["commits"]), u["ramo"]
     mensagens = "\n".join(f"xxxxxxx {c['mensagem']}" for c in reversed(u["commits"]))
-    passos.append(
-        (
-            "Confirma que ficou igual ao original",
-            bloco(f"{verificar} {u['id']}\ngit log --oneline -{n}", "bash")
-            + "\n\n| Comando | O que deves ver |\n|---|---|\n"
-            f"| `{verificar} {u['id']}` | `Tudo certo: o ramo '{ramo}' está igual ao original no fim da unidade {u['id']}.` "
-            "Este comando compara o que gravaste com o que está no repositório de trabalho. Não altera nada |\n"
-            f"| `git log --oneline -{n}` | Os teus {n} commits, do mais recente para o mais antigo |\n\n"
-            "A lista do `git log` deve ser esta. No lugar de `xxxxxxx` aparece um código diferente em cada commit, "
-            "que é a identificação que o Git lhe deu:\n\n" + bloco(mensagens, "text"),
-        )
+    return (
+        "Confirma que ficou igual ao original",
+        bloco(f"{verificar} {u['id']}\ngit log --oneline -{n}", "bash")
+        + "\n\n| Comando | O que deves ver |\n|---|---|\n"
+        f"| `{verificar} {u['id']}` | `Tudo certo: o ramo '{ramo}' está igual ao original no fim da unidade {u['id']}.` "
+        "Este comando compara o que gravaste com o que está no repositório de trabalho. Não altera nada |\n"
+        f"| `git log --oneline -{n}` | Os teus {plural(n, 'commit', 'commits')}, do mais recente para o mais antigo |\n\n"
+        "A lista do `git log` deve ser esta. No lugar de `xxxxxxx` aparece um código diferente em cada commit, "
+        "que é a identificação que o Git lhe deu:\n\n" + bloco(mensagens, "text"),
     )
 
-    passos.append(("Experimenta o que gravaste", u["testar"]))
 
-    passos.append(
-        (
-            "Envia o ramo para o GitHub",
-            bloco(f"git push -u origin {ramo}", "bash")
-            + "\n\nO `push` envia o teu ramo e os teus commits para o repositório oficial no GitHub. "
-            "O `-u` liga o ramo do teu computador ao do GitHub.\n\n"
-            "Na primeira vez pode abrir-se uma janela a pedir para entrares na tua conta do GitHub. Entra e volta ao terminal.\n\n"
-            f"**Deves ver**, perto do fim: `* [new branch]      {ramo} -> {ramo}`.",
-        )
+def passo_push(u: dict) -> tuple[str, str]:
+    """Passo em que o ramo é enviado para o GitHub."""
+    ramo = u["ramo"]
+    return (
+        "Envia o ramo para o GitHub",
+        bloco(f"git push -u origin {ramo}", "bash")
+        + "\n\nO `push` envia o teu ramo e os teus commits para o repositório oficial no GitHub. "
+        "O `-u` liga o ramo do teu computador ao do GitHub.\n\n"
+        f"**Deves ver**, perto do fim: `* [new branch]      {ramo} -> {ramo}`.",
     )
 
-    passos.append(
-        (
-            "Abre o pull request",
-            f"O pull request é o pedido para juntar o teu ramo ao `develop`. É nele que {u['revisor']} vai rever o teu trabalho.\n\n"
-            f"**a)** Abre {b}/pulls. Normalmente aparece uma faixa amarela com o nome do teu ramo e o botão "
-            "**Compare & pull request**: clica nele. Se a faixa não aparecer, clica em **New pull request** e, "
-            f"em *compare*, escolhe `{ramo}`.\n\n"
+
+def passo_pull_request(u: dict, config: dict) -> tuple[str, str]:
+    """Passo em que se abre o pull request da unidade."""
+    b, ramo = config["repo_b"], u["ramo"]
+    base = "main" if u["tipo"] == "release" else "develop"
+    if u["tipo"] == "stories":
+        numeros = (
+            "Troca cada `#(número da issue ...)` pelo número que apontaste, por exemplo `#12`. "
+            "A palavra `Closes` tem de ficar antes de cada número"
+        )
+        labels = "`user story`"
+    elif u["tipo"] == "release":
+        numeros = "Não é preciso trocar nada"
+        labels = "`tarefa`"
+    else:
+        numeros = "Troca `#N` pelo número da issue que apontaste"
+        labels = "`tarefa`"
+    if base == "main":
+        confirmar_base = (
+            f"**b)** No topo, a base tem de ser `main`, e não `develop`. Clica em **base: develop**, escolhe `main` e "
+            f"confirma que fica **base: main** e **compare: {ramo}**. Uma release vai para o `main`, que é o ramo "
+            "das versões entregues.\n\n"
+        )
+    else:
+        confirmar_base = (
             f"**b)** Confirma, no topo, que está **base: develop** e **compare: {ramo}**. "
             "Se a base for `main`, muda para `develop`.\n\n"
-            "**c)** No título, cola:\n\n"
-            + bloco(u["titulo"], "text")
-            + "\n\n**d)** Na descrição, apaga o que lá estiver e cola o texto seguinte. "
-            "Troca `#N` pelo número da issue que apontaste:\n\n"
-            + bloco(u["pr"], "markdown")
-            + "\n\n**e)** Na coluna da direita, escolhe:\n\n"
-            f"- **Reviewers:** {u['revisor']} (no GitHub, `{config['utilizadores'][u['revisor']]}`)\n"
-            "- **Assignees:** tu\n"
-            "- **Labels:** `tarefa`\n"
-            f"- **Milestone:** `{u['milestone']}`\n\n"
-            "**f)** Clica no botão verde **Create pull request**.\n\n"
-            "**g)** Se aparecerem verificações automáticas no fundo da página (*Testes*, *Documentação*), "
-            "espera um ou dois minutos até ficarem com um visto verde.",
         )
+    corpo = (
+        f"O pull request é o pedido para juntar o teu ramo ao `{base}`. É nele que {u['revisor']} vai rever o teu trabalho.\n\n"
+        f"**a)** Abre {b}/pulls. Normalmente aparece uma faixa amarela com o nome do teu ramo e o botão "
+        "**Compare & pull request**: clica nele. Se a faixa não aparecer, clica em **New pull request** e, "
+        f"em *compare*, escolhe `{ramo}`.\n\n"
+        + confirmar_base
+        + "**c)** No título, cola:\n\n"
+        + bloco(u["titulo"], "text")
+        + f"\n\n**d)** Na descrição, apaga o que lá estiver e cola o texto seguinte. {numeros}:\n\n"
+        + bloco(u["pr"], "markdown")
+        + "\n\n**e)** Na coluna da direita, escolhe:\n\n"
+        f"- **Reviewers:** {u['revisor']} (no GitHub, `{config['utilizadores'][u['revisor']]}`)\n"
+        "- **Assignees:** tu\n"
+        f"- **Labels:** {labels}\n"
+        f"- **Milestone:** `{u['milestone']}`\n\n"
+        "**f)** Clica no botão verde **Create pull request**.\n\n"
+        "**g)** No fundo da página aparecem as verificações automáticas (*Testes*, *Documentação*). "
+        "Espera um ou dois minutos até ficarem com um visto verde."
+    )
+    if u["tipo"] == "stories":
+        corpo += "\n\n**h)** No Trello, move os cards destas stories para **Ready to Verify**."
+    return ("Abre o pull request", corpo)
+
+
+def passo_avisar(texto: str, seguinte: dict) -> tuple[str, str]:
+    """Passo em que se passa a vez à pessoa seguinte."""
+    return (
+        f"Avisa {seguinte['pessoa']}",
+        f"Diz a {seguinte['pessoa']} que {texto}. A partir daqui é a vez de {seguinte['pessoa']}: {ref(seguinte)}.",
     )
 
-    passos.append(
+
+def passo_arrumar(u: dict, quem_juntou: str) -> tuple[str, str]:
+    """Passo em que quem fez a unidade atualiza o seu computador depois do merge."""
+    ramo = u["ramo"]
+    return (
+        f"Quando {quem_juntou} disser que juntou, arruma o teu computador",
+        bloco(f"git switch develop\ngit pull\ngit branch -d {ramo}", "bash")
+        + "\n\n| Comando | O que faz |\n|---|---|\n"
+        "| `git switch develop` | Volta ao ramo `develop` |\n"
+        "| `git pull` | Traz do GitHub o `develop` já com o teu trabalho junto |\n"
+        f"| `git branch -d {ramo}` | Apaga o ramo do teu computador. Já não é preciso: os commits estão no `develop` |",
+    )
+
+
+def passos_abrir_e_ler(u: dict, config: dict) -> list[tuple[str, str]]:
+    """Primeiros passos de quem revê: abrir o pull request e ler as alterações."""
+    return [
         (
-            f"Avisa {u['revisor']}",
-            f"Diz a {u['revisor']} que o pull request da unidade {u['id']} está pronto para rever. "
-            f"A partir daqui é a vez de {u['revisor']}: {ref_revisor}.",
-        )
-    )
-
-    passos.append(
-        (
-            f"Quando {u['revisor']} disser que juntou, arruma o teu computador",
-            bloco(f"git switch develop\ngit pull\ngit branch -d {ramo}", "bash")
-            + "\n\n| Comando | O que faz |\n|---|---|\n"
-            "| `git switch develop` | Volta ao ramo `develop` |\n"
-            "| `git pull` | Traz do GitHub o `develop` já com o teu trabalho junto |\n"
-            f"| `git branch -d {ramo}` | Apaga o ramo do teu computador. Já não é preciso: os commits estão no `develop` |",
-        )
-    )
-    return passos
-
-
-def passos_revisor(u: dict, config: dict, ref_autor: str, ref_seguinte: str) -> list[tuple[str, str]]:
-    """Passos de quem revê e junta uma unidade de trabalho."""
-    b, oficial = config["repo_b"], config["pasta_oficial"]
-    verificar = f"python ../{config['pasta_trabalho']}/verificar.py"
-    ramo, autor = u["ramo"], u["quem"]
-    passos = []
-
-    passos.append(
-        (
-            f"Abre o pull request de {autor}",
-            f"Faz este passo quando {autor} te avisar que o pull request da unidade {u['id']} está pronto.\n\n"
-            f"Abre {b}/pulls e clica em **{u['titulo']}**.",
-        )
-    )
-
-    passos.append(
+            f"Abre o pull request de {u['quem']}",
+            f"Faz este passo quando {u['quem']} te avisar que o pull request da unidade {u['id']} está pronto.\n\n"
+            f"Abre {config['repo_b']}/pulls e clica em **{u['titulo']}**.",
+        ),
         (
             "Lê as alterações",
             "Clica no separador **Files changed**. A verde estão as linhas acrescentadas e a vermelho as retiradas.\n\n"
             "Não precisas de perceber todas as linhas. Percorre os ficheiros e confirma que correspondem ao que a "
             "descrição do pull request diz. Se tiveres uma dúvida sobre uma linha, passa o rato por cima do número "
             "da linha, clica no `+` azul e escreve a pergunta.",
-        )
+        ),
+    ]
+
+
+def passo_experimentar_revisor(u: dict, config: dict) -> tuple[str, str]:
+    """Passo em que quem revê traz o ramo para o seu computador e o experimenta."""
+    ramo, autor = u["ramo"], u["quem"]
+    return (
+        "Experimenta no teu computador",
+        f"No terminal, dentro da pasta `{config['pasta_oficial']}`, traz o ramo de {autor}:\n\n"
+        + bloco(f"git fetch origin\ngit switch {ramo}", "bash")
+        + "\n\n| Comando | O que faz |\n|---|---|\n"
+        f"| `git fetch origin` | Vai ver o que há de novo no GitHub, incluindo o ramo de {autor}. Não mexe nos teus ficheiros |\n"
+        f"| `git switch {ramo}` | Cria no teu computador uma cópia desse ramo e muda para ela |\n\n"
+        f"**Deves ver** `Switched to a new branch '{ramo}'`.\n\n"
+        "Agora experimenta:\n\n" + u["testar"] + "\n\nConfirma também:\n\n" + u["verificar"],
     )
 
-    passos.append(
-        (
-            "Experimenta no teu computador",
-            f"No terminal, dentro da pasta `{oficial}`, traz o ramo de {autor}:\n\n"
-            + bloco(f"git fetch origin\ngit switch {ramo}", "bash")
-            + "\n\n| Comando | O que faz |\n|---|---|\n"
-            f"| `git fetch origin` | Vai ver o que há de novo no GitHub, incluindo o ramo de {autor}. Não mexe nos teus ficheiros |\n"
-            f"| `git switch {ramo}` | Cria no teu computador uma cópia desse ramo e muda para ela |\n\n"
-            f"**Deves ver** `Switched to a new branch '{ramo}'`.\n\n"
-            "Agora experimenta:\n\n" + u["testar"] + "\n\nConfirma também:\n\n" + u["verificar"],
-        )
+
+def passo_aprovar(autor: str) -> tuple[str, str]:
+    """Passo em que quem revê aprova o pull request."""
+    return (
+        "Aprova",
+        "**a)** Na página do pull request, separador **Files changed**, clica no botão verde **Review changes** "
+        "(em alguns ecrãs chama-se *Submit review*).\n\n"
+        "**b)** Escreve o que verificaste, pelas tuas palavras. Por exemplo: que correste a aplicação, o que "
+        "experimentaste e o que viste.\n\n"
+        "**c)** Escolhe **Approve** e clica em **Submit review**.\n\n"
+        "Se encontraste um problema, escolhe **Request changes** em vez de **Approve**, descreve o problema e "
+        f"avisa {autor}. Não avances para o passo seguinte.",
     )
 
-    passos.append(
-        (
-            "Aprova",
-            "**a)** Na página do pull request, separador **Files changed**, clica no botão verde **Review changes** "
-            "(em alguns ecrãs chama-se *Submit review*).\n\n"
-            "**b)** Escreve o que verificaste, pelas tuas palavras. Por exemplo: que correste a aplicação, o que "
-            "experimentaste e o que viste.\n\n"
-            "**c)** Escolhe **Approve** e clica em **Submit review**.\n\n"
-            "Se encontraste um problema, escolhe **Request changes** em vez de **Approve**, descreve o problema e "
-            f"avisa {autor}. Não avances para o passo seguinte.",
+
+def passo_merge(destino: str, apagar_ramo: bool, extra: str = "") -> tuple[str, str]:
+    """Passo em que quem revê junta o pull request."""
+    if apagar_ramo:
+        fim = "**e)** Clica em **Delete branch**. O ramo já não é preciso: os commits ficaram no " f"`{destino}`.\n\n"
+    else:
+        fim = (
+            "**e)** **Não cliques em Delete branch.** O ramo deste pull request é o `main`, que tem de continuar "
+            "a existir.\n\n"
         )
+    return (
+        f"Junta o pull request ao {destino} (merge)",
+        "**a)** Volta ao separador **Conversation** e desce até ao fundo da página.\n\n"
+        "**b)** Confirma que as verificações automáticas têm um visto verde.\n\n"
+        "**c)** O botão verde tem de dizer **Merge pull request**. Se disser *Squash and merge* ou "
+        "*Rebase and merge*, clica na seta ao lado e escolhe **Create a merge commit**.\n\n"
+        "**d)** Clica em **Merge pull request** e depois em **Confirm merge**.\n\n"
+        + fim
+        + "**Deves ver** o símbolo roxo **Merged** no topo da página."
+        + extra,
     )
 
-    passos.append(
-        (
-            "Junta o pull request ao develop (merge)",
-            "**a)** Volta ao separador **Conversation** e desce até ao fundo da página.\n\n"
-            "**b)** Confirma que as verificações automáticas, se existirem, têm um visto verde.\n\n"
-            "**c)** O botão verde tem de dizer **Merge pull request**. Se disser *Squash and merge* ou "
-            "*Rebase and merge*, clica na seta ao lado e escolhe **Create a merge commit**.\n\n"
-            "**d)** Clica em **Merge pull request** e depois em **Confirm merge**.\n\n"
-            "**e)** Clica em **Delete branch**. O ramo já não é preciso: os commits ficaram no `develop`.\n\n"
-            "**Deves ver** o símbolo roxo **Merged** no topo da página. A issue da unidade fica fechada sozinha.",
-        )
+
+def passo_atualizar_e_verificar(u: dict, config: dict, apagar: str | None) -> tuple[str, str]:
+    """Passo em que se atualiza o ``develop`` e se confirma que ficou igual ao original."""
+    verificar = f"python ../{config['pasta_trabalho']}/verificar.py"
+    comandos = ["git switch develop", "git pull"]
+    tabela = (
+        "| `git switch develop` | Volta ao ramo `develop` |\n"
+        "| `git pull` | Traz do GitHub o `develop` com o pull request já junto |\n"
+    )
+    if apagar:
+        comandos.append(f"git branch -d {apagar}")
+        tabela += f"| `git branch -d {apagar}` | Apaga a cópia do ramo que criaste para experimentar |\n"
+    comandos.append(f"{verificar} {u['id']}")
+    tabela += (
+        f"| `{verificar} {u['id']}` | Confirma que o `develop` do repositório oficial ficou igual ao original "
+        f"no fim da unidade {u['id']} |\n"
+    )
+    return (
+        "Atualiza o teu computador e confirma o resultado",
+        bloco("\n".join(comandos), "bash")
+        + "\n\n| Comando | O que faz |\n|---|---|\n"
+        + tabela
+        + f"\n**Deves ver** `Tudo certo: o ramo 'develop' está igual ao original no fim da unidade {u['id']}.`\n\n"
+        "Se aparecer `ERRO`, não avancem. Copia a mensagem e passa-a a Fabio, para a enviar ao Claude.",
     )
 
-    passos.append(
-        (
-            "Atualiza o teu computador e confirma o resultado",
-            bloco(f"git switch develop\ngit pull\ngit branch -d {ramo}\n{verificar} {u['id']}", "bash")
-            + "\n\n| Comando | O que faz |\n|---|---|\n"
-            "| `git switch develop` | Volta ao ramo `develop` |\n"
-            "| `git pull` | Traz do GitHub o `develop` com o pull request já junto |\n"
-            f"| `git branch -d {ramo}` | Apaga a cópia do ramo que criaste para experimentar |\n"
-            f"| `{verificar} {u['id']}` | Confirma que o `develop` do repositório oficial ficou igual ao original "
-            f"no fim da unidade {u['id']} |\n\n"
-            f"**Deves ver** `Tudo certo: o ramo 'develop' está igual ao original no fim da unidade {u['id']}.`\n\n"
-            "Se aparecer `ERRO`, não avancem. Copia a mensagem e passa-a a Fabio, para a enviar ao Claude.",
-        )
-    )
 
-    passos.append(
+def texto_seguinte(pessoa: str, seguinte: dict | None) -> str:
+    """Frase que diz quem continua depois de uma vez terminar."""
+    if seguinte is None:
+        return "Esta era a última vez da fase. Falta o fecho, descrito na [página da fase](README.md)."
+    if seguinte["pessoa"] == pessoa:
+        return f"A vez seguinte é tua: continua no passo {seguinte['primeiro']}."
+    return f"Diz também a {seguinte['pessoa']} que já pode avançar ({ref(seguinte)})."
+
+
+# --------------------------------------------------------------------------
+# Vezes: o que cada pessoa faz, por ordem
+# --------------------------------------------------------------------------
+
+
+def vez_autor(vez: dict, ctx: dict) -> list[tuple[str, str]]:
+    """Passos de quem faz uma unidade normal (tarefa ou user stories)."""
+    u, config = vez["unidade"], ctx["config"]
+    revisao = ctx["seguinte"]
+    return [
+        passo_confirmar(u, ctx["unidade_anterior"], config),
+        passo_issue(u, config),
+        passo_ramo(u, config),
+        passo_commits(u, config),
+        passo_igual(u, config),
+        ("Experimenta o que gravaste", u["testar"]),
+        passo_push(u),
+        passo_pull_request(u, config),
+        passo_avisar(f"o pull request da unidade {u['id']} está pronto para rever", revisao),
+        passo_arrumar(u, u["revisor"]),
+    ]
+
+
+def vez_revisor(vez: dict, ctx: dict) -> list[tuple[str, str]]:
+    """Passos de quem revê e junta uma unidade normal."""
+    u, config = vez["unidade"], ctx["config"]
+    autoria = ctx["anterior"]
+    extra = " As issues da unidade ficam fechadas sozinhas."
+    if u["tipo"] == "stories":
+        extra += "\n\n**f)** No Trello, move os cards destas stories para **Ready**."
+    return [
+        *passos_abrir_e_ler(u, config),
+        passo_experimentar_revisor(u, config),
+        passo_aprovar(u["quem"]),
+        passo_merge("develop", True, extra),
+        passo_atualizar_e_verificar(u, config, u["ramo"]),
         (
             "Avisa o grupo",
-            f"Diz a {autor} que o pull request está junto e que já pode arrumar o computador ({ref_autor}).\n\n"
-            + ref_seguinte,
+            f"Diz a {u['quem']} que o pull request está junto e que já pode arrumar o computador "
+            f"(passo {autoria['ultimo']} da [página de {u['quem']}]({pagina(u['quem'])})).\n\n"
+            + texto_seguinte(vez["pessoa"], ctx["seguinte"]),
+        ),
+    ]
+
+
+def vez_release_preparar(vez: dict, ctx: dict) -> list[tuple[str, str]]:
+    """Release, primeira parte: quem a faz prepara o ramo e abre o pull request para ``main``."""
+    u, config = vez["unidade"], ctx["config"]
+    return [
+        passo_confirmar(u, ctx["unidade_anterior"], config),
+        passo_issue(u, config),
+        passo_ramo(u, config),
+        passo_commits(u, config),
+        passo_igual(u, config),
+        ("Experimenta o que gravaste", u["testar"]),
+        passo_push(u),
+        passo_pull_request(u, config),
+        passo_avisar(f"o pull request da release {u['versao']} está pronto para rever", ctx["seguinte"]),
+    ]
+
+
+def vez_release_rever(vez: dict, ctx: dict) -> list[tuple[str, str]]:
+    """Release, segunda parte: quem revê aprova e junta ao ``main``."""
+    u, config = vez["unidade"], ctx["config"]
+    ramo = u["ramo"]
+    return [
+        *passos_abrir_e_ler(u, config),
+        passo_experimentar_revisor(u, config),
+        passo_aprovar(u["quem"]),
+        passo_merge("main", True),
+        (
+            "Arruma o teu computador",
+            bloco(f"git switch develop\ngit branch -D {ramo}", "bash")
+            + "\n\n| Comando | O que faz |\n|---|---|\n"
+            "| `git switch develop` | Volta ao ramo `develop` |\n"
+            f"| `git branch -D {ramo}` | Apaga a cópia do ramo que criaste para experimentar. O `-D` maiúsculo é preciso "
+            "porque o `develop` ainda não tem estes commits: chegam lá no pull request seguinte |",
+        ),
+        passo_avisar(f"a release {u['versao']} já está no `main`", ctx["seguinte"]),
+    ]
+
+
+def vez_release_publicar(vez: dict, ctx: dict) -> list[tuple[str, str]]:
+    """Release, terceira parte: quem a faz publica a versão e pede o regresso ao ``develop``."""
+    u, config = vez["unidade"], ctx["config"]
+    b, versao = config["repo_b"], u["versao"]
+    return [
+        (
+            f"Publica a release {versao} no GitHub",
+            f"Faz este passo quando {u['revisor']} te avisar que a release está no `main`.\n\n"
+            "Publicar a release cria a **tag**, uma etiqueta que marca para sempre o commit desta versão.\n\n"
+            f"**a)** Abre {b}/releases/new\n\n"
+            f"**b)** Clica em **Choose a tag**, escreve `{versao}` e clica em **Create new tag: {versao} on publish**.\n\n"
+            "**c)** Em **Target**, escolhe `main`.\n\n"
+            "**d)** Em **Release title**, cola:\n\n"
+            + bloco(f"{versao} — {u['nome_fase']}", "text")
+            + "\n\n**e)** Na caixa de texto, cola:\n\n"
+            + bloco(u["notas"], "markdown")
+            + "\n\n**f)** Clica em **Publish release**.\n\n"
+            f"**Deves ver** a página da release, e a tag `{versao}` em {b}/tags\n\n"
+            f"**g)** Fecha a milestone da fase: abre {b}/milestones, e na linha `{u['milestone']}` clica em **Close**. "
+            "Se ainda tiver issues abertas, não a feches e avisa o grupo.",
+        ),
+        (
+            "Abre o pull request que leva a release para o develop",
+            "A release está no `main`, mas o `develop` ainda não tem os commits dela (a versão nova e o registo de "
+            "alterações). Este pull request leva-os para lá, para os dois ramos ficarem alinhados.\n\n"
+            f"**a)** Abre {b}/compare/develop...main\n\n"
+            "**b)** Confirma, no topo, que está **base: develop** e **compare: main**, e clica em **Create pull request**.\n\n"
+            "**c)** No título, cola:\n\n"
+            + bloco(f"Juntar a release {versao} ao develop", "text")
+            + "\n\n**d)** Na descrição, apaga o que lá estiver e cola o texto seguinte. "
+            "Troca `#N` pelo número da issue da release, que apontaste no início:\n\n"
+            + bloco(
+                f"## O que muda\n\nTraz para o `develop` os commits da release {versao}, que já estão no `main`: "
+                "a versão nova, o registo de alterações e o README.\n\nCloses #N",
+                "markdown",
+            )
+            + "\n\n**e)** Na coluna da direita, escolhe:\n\n"
+            f"- **Reviewers:** {u['revisor']} (no GitHub, `{config['utilizadores'][u['revisor']]}`)\n"
+            "- **Assignees:** tu\n"
+            "- **Labels:** `tarefa`\n"
+            f"- **Milestone:** `{u['milestone']}`\n\n"
+            "**f)** Clica em **Create pull request**.",
+        ),
+        passo_avisar(f"o pull request que leva a release {versao} para o `develop` está aberto", ctx["seguinte"]),
+        passo_arrumar(u, u["revisor"]),
+    ]
+
+
+def vez_release_juntar(vez: dict, ctx: dict) -> list[tuple[str, str]]:
+    """Release, quarta parte: quem revê junta o ``main`` ao ``develop``."""
+    u, config = vez["unidade"], ctx["config"]
+    publicar = ctx["anterior"]
+    return [
+        (
+            "Aprova o pull request que leva a release para o develop",
+            f"Faz este passo quando {u['quem']} te avisar.\n\n"
+            f"**a)** Abre {config['repo_b']}/pulls e clica em **Juntar a release {u['versao']} ao develop**.\n\n"
+            "**b)** No separador **Files changed**, confirma que as alterações são as da release: o número da versão, "
+            "o `CHANGELOG.md` e o `README.md`.\n\n"
+            "**c)** Clica em **Review changes**, escolhe **Approve** e clica em **Submit review**.",
+        ),
+        passo_merge("develop", False, " A issue da release fica fechada sozinha."),
+        passo_atualizar_e_verificar(u, config, None),
+        (
+            "Avisa o grupo",
+            f"Diz a {u['quem']} que a release está no `develop` e que já pode arrumar o computador "
+            f"(passo {publicar['ultimo']} da [página de {u['quem']}]({pagina(u['quem'])})).\n\n"
+            + texto_seguinte(vez["pessoa"], ctx["seguinte"]),
+        ),
+    ]
+
+
+def vez_extra(vez: dict, ctx: dict) -> list[tuple[str, str]]:
+    """Passos adicionais de uma pessoa, escritos à mão."""
+    return vez["passos"]
+
+
+def descricao_vez(vez: dict) -> str:
+    """Descrição curta de uma vez, para as tabelas de resumo."""
+    if vez["papel"] == "extra":
+        return "; ".join(titulo for titulo, _ in vez["passos"])
+    u = vez["unidade"]
+    descricoes = {
+        "autor": f"Fazer a unidade {u['id']} — {u['titulo']}",
+        "revisor": f"Rever e juntar a unidade {u['id']} (de {u['quem']})",
+        "release-preparar": f"Preparar a release {u.get('versao', '')}",
+        "release-rever": f"Rever a release {u.get('versao', '')} e juntá-la ao main",
+        "release-publicar": f"Publicar a release {u.get('versao', '')} e pedir o regresso ao develop",
+        "release-juntar": f"Juntar a release {u.get('versao', '')} ao develop",
+    }
+    return descricoes[vez["papel"]]
+
+
+def titulo_vez(vez: dict) -> str:
+    """Título e frase de abertura da secção de uma vez, na página da pessoa."""
+    if vez["papel"] == "extra":
+        return "## Outras tarefas desta fase\n"
+    u = vez["unidade"]
+    if vez["papel"] in ("autor", "release-preparar"):
+        return f"## {descricao_vez(vez)}\n\n{u['resumo']}\n"
+    if vez["papel"] == "revisor":
+        return (
+            f"## Rever e juntar a unidade {u['id']} — {u['titulo']}\n\n"
+            f"Quem fez: {u['quem']}. Tu confirmas que funciona e juntas o trabalho ao `develop`.\n"
         )
-    )
-    return passos
+    if vez["papel"] == "release-rever":
+        return (
+            f"## {descricao_vez(vez)}\n\n"
+            f"Quem fez: {u['quem']}. Tu confirmas que a versão está pronta e juntas o ramo da release ao `main`.\n"
+        )
+    if vez["papel"] == "release-publicar":
+        return (
+            f"## {descricao_vez(vez)}\n\n"
+            "Com a release no `main`, falta marcá-la com uma tag e levar os commits dela de volta ao `develop`.\n"
+        )
+    return f"## {descricao_vez(vez)}\n\nÉ o último pull request da fase.\n"
+
+
+FUNCOES = {
+    "autor": vez_autor,
+    "revisor": vez_revisor,
+    "release-preparar": vez_release_preparar,
+    "release-rever": vez_release_rever,
+    "release-publicar": vez_release_publicar,
+    "release-juntar": vez_release_juntar,
+    "extra": vez_extra,
+}
+
+
+def planear_vezes(fase: dict, config: dict) -> list[dict]:
+    """Calcula a ordem das vezes, os passos de cada uma e os seus números.
+
+    Os textos de uma vez referem os números dos passos de outras vezes, que
+    só se sabem depois de contar os passos todos. Por isso os passos são
+    gerados duas vezes: a primeira para os contar, a segunda já com os
+    números certos.
+    """
+    vezes = []
+    for unidade in fase["unidades"]:
+        if unidade["tipo"] == "release":
+            papeis = [
+                ("release-preparar", unidade["quem"]),
+                ("release-rever", unidade["revisor"]),
+                ("release-publicar", unidade["quem"]),
+                ("release-juntar", unidade["revisor"]),
+            ]
+        else:
+            papeis = [("autor", unidade["quem"]), ("revisor", unidade["revisor"])]
+        for papel, pessoa in papeis:
+            vezes.append({"pessoa": pessoa, "papel": papel, "unidade": unidade, "primeiro": 0, "ultimo": 0})
+    encadeadas = list(vezes)
+    for pessoa in config["membros"]:
+        extras = fase["extras"].get(sem_acentos(pessoa), [])
+        if extras:
+            vezes.append({"pessoa": pessoa, "papel": "extra", "passos": extras, "primeiro": 0, "ultimo": 0})
+
+    for _ in range(2):
+        proximo = {pessoa: 1 for pessoa in config["membros"]}
+        for vez in vezes:
+            ctx = {"config": config, "anterior": None, "seguinte": None, "unidade_anterior": None}
+            if vez in encadeadas:
+                indice = encadeadas.index(vez)
+                ctx["anterior"] = encadeadas[indice - 1] if indice > 0 else None
+                ctx["seguinte"] = encadeadas[indice + 1] if indice + 1 < len(encadeadas) else None
+                posicao = fase["unidades"].index(vez["unidade"])
+                ctx["unidade_anterior"] = fase["unidades"][posicao - 1] if posicao > 0 else None
+            vez["lista"] = FUNCOES[vez["papel"]](vez, ctx)
+            vez["primeiro"] = proximo[vez["pessoa"]]
+            vez["ultimo"] = vez["primeiro"] + len(vez["lista"]) - 1
+            proximo[vez["pessoa"]] = vez["ultimo"] + 1
+            if vez["papel"] == "extra":
+                vez["quando"] = "Em qualquer altura durante a fase"
+            elif ctx["anterior"] is None:
+                vez["quando"] = "No início da fase"
+            elif ctx["anterior"]["pessoa"] == vez["pessoa"]:
+                vez["quando"] = "A seguir ao teu passo anterior"
+            else:
+                vez["quando"] = f"Quando {ctx['anterior']['pessoa']} avisar"
+    return vezes
 
 
 # --------------------------------------------------------------------------
@@ -430,7 +810,7 @@ def carregar_fase(pasta: Path) -> dict:
     fase = {**cabecalho, **dict(seccoes), "pasta": pasta.name, "unidades": [], "extras": {}}
     for ficheiro in sorted(pasta.glob("[0-9]*.md")):
         cabecalho, seccoes = ler_ficheiro(ficheiro)
-        unidade = {**cabecalho, **dict(seccoes), "fase": fase["numero"]}
+        unidade = {"tipo": "tarefa", **cabecalho, **dict(seccoes), "fase": fase["numero"], "nome_fase": fase["titulo"]}
         unidade["commits"] = commits_do_ramo(unidade["ramo"])
         fase["unidades"].append(unidade)
     for ficheiro in sorted(pasta.glob("extra-*.md")):
@@ -478,74 +858,6 @@ def exportar_ficheiros(fase: dict, destino: Path, config: dict) -> None:
     )
 
 
-def planear_vezes(fase: dict, config: dict) -> list[dict]:
-    """Calcula a ordem das vezes e os números dos passos de cada pessoa.
-
-    Cada unidade dá origem a duas vezes: a de quem a faz e a de quem a revê.
-    Os passos de cada pessoa são numerados de seguida, pela ordem das vezes.
-    """
-    vezes = []
-    for unidade in fase["unidades"]:
-        vezes.append({"pessoa": unidade["quem"], "papel": "autor", "unidade": unidade})
-        vezes.append({"pessoa": unidade["revisor"], "papel": "revisor", "unidade": unidade})
-    proximo = {pessoa: 1 for pessoa in config["membros"]}
-    for vez in vezes:
-        total = 10 if vez["papel"] == "autor" else 7
-        vez["primeiro"] = proximo[vez["pessoa"]]
-        vez["ultimo"] = vez["primeiro"] + total - 1
-        proximo[vez["pessoa"]] += total
-    for pessoa in config["membros"]:
-        extras = fase["extras"].get(sem_acentos(pessoa), [])
-        if extras:
-            vezes.append(
-                {
-                    "pessoa": pessoa,
-                    "papel": "extra",
-                    "passos": extras,
-                    "primeiro": proximo[pessoa],
-                    "ultimo": proximo[pessoa] + len(extras) - 1,
-                }
-            )
-    return vezes
-
-
-def descricao_vez(vez: dict) -> str:
-    """Descrição curta de uma vez, para as tabelas de resumo."""
-    if vez["papel"] == "extra":
-        return "; ".join(titulo for titulo, _ in vez["passos"])
-    u = vez["unidade"]
-    if vez["papel"] == "autor":
-        return f"Fazer a unidade {u['id']} — {u['titulo']}"
-    return f"Rever e juntar a unidade {u['id']} (de {u['quem']})"
-
-
-def quando_vez(vez: dict, vezes: list[dict]) -> str:
-    """Diz quando é que uma vez pode começar."""
-    if vez["papel"] == "extra":
-        return "Em qualquer altura depois da Preparação"
-    indice = vezes.index(vez)
-    if indice == 0:
-        return "Logo a seguir à Preparação"
-    anterior = vezes[indice - 1]
-    if anterior["pessoa"] == vez["pessoa"]:
-        return "A seguir ao teu passo anterior"
-    if vez["papel"] == "revisor":
-        return f"Quando {anterior['pessoa']} avisar que o pull request está aberto"
-    return f"Quando {anterior['pessoa']} avisar que juntou a unidade {anterior['unidade']['id']}"
-
-
-def pagina(pessoa: str) -> str:
-    """Nome do ficheiro da página de uma pessoa."""
-    return f"{sem_acentos(pessoa)}.md"
-
-
-def passos_texto(vez: dict) -> str:
-    """Texto "passo N" ou "passos N a M" de uma vez."""
-    if vez["primeiro"] == vez["ultimo"]:
-        return f"passo {vez['primeiro']}"
-    return f"passos {vez['primeiro']} a {vez['ultimo']}"
-
-
 def preencher(texto: str, config: dict) -> str:
     """Substitui os marcadores comuns por valores da configuração."""
     valores = {
@@ -583,49 +895,15 @@ def gerar_pagina_pessoa(pessoa: str, fase: dict, vezes: list[dict], config: dict
     ]
     for vez in minhas:
         intervalo = f"{vez['primeiro']} a {vez['ultimo']}" if vez["ultimo"] > vez["primeiro"] else str(vez["primeiro"])
-        partes[-1] += f"\n| {intervalo} | {descricao_vez(vez)} | {quando_vez(vez, vezes)} |"
+        partes[-1] += f"\n| {intervalo} | {descricao_vez(vez)} | {vez['quando']} |"
     partes[-1] += "\n"
 
     for vez in minhas:
-        if vez["papel"] == "extra":
-            partes.append("---\n\n## Outras tarefas desta fase\n")
-            passos = vez["passos"]
-        else:
-            u = vez["unidade"]
-            indice = vezes.index(vez)
-            if vez["papel"] == "autor":
-                partes.append(f"---\n\n## Fazer a unidade {u['id']} — {u['titulo']}\n\n{u['resumo']}\n")
-                posicao = fase["unidades"].index(u)
-                anterior = fase["unidades"][posicao - 1] if posicao > 0 else None
-                revisao = vezes[indice + 1]
-                ref_revisor = f"[página de {revisao['pessoa']}]({pagina(revisao['pessoa'])}), {passos_texto(revisao)}"
-                passos = passos_autor(u, anterior, config, ref_revisor)
-            else:
-                partes.append(
-                    f"---\n\n## Rever e juntar a unidade {u['id']} — {u['titulo']}\n\n"
-                    f"Quem fez: {u['quem']}. Tu confirmas que funciona e juntas o trabalho ao `develop`.\n"
-                )
-                autoria = vezes[indice - 1]
-                ref_autor = f"passo {autoria['ultimo']} da [página de {autoria['pessoa']}]({pagina(autoria['pessoa'])})"
-                seguintes = [v for v in vezes[indice + 1 :] if v["papel"] == "autor"]
-                if not seguintes:
-                    ref_seguinte = (
-                        "Esta era a última unidade da fase. Falta o fecho, descrito na [página da fase](README.md)."
-                    )
-                elif seguintes[0]["pessoa"] == pessoa:
-                    ref_seguinte = f"A unidade seguinte é tua: continua no passo {seguintes[0]['primeiro']}."
-                else:
-                    s = seguintes[0]
-                    ref_seguinte = (
-                        f"Diz também a {s['pessoa']} que já pode começar a unidade {s['unidade']['id']} "
-                        f"([página de {s['pessoa']}]({pagina(s['pessoa'])}), passo {s['primeiro']})."
-                    )
-                passos = passos_revisor(u, config, ref_autor, ref_seguinte)
-            assert len(passos) == vez["ultimo"] - vez["primeiro"] + 1, (pessoa, u["id"], len(passos))
-        for numero, (titulo, corpo) in enumerate(passos, start=vez["primeiro"]):
+        partes.append("---\n\n" + titulo_vez(vez))
+        for numero, (titulo, corpo) in enumerate(vez["lista"], start=vez["primeiro"]):
             partes.append(f"### Passo {numero} — {titulo}\n\n{corpo}\n")
 
-    explicadas = [v["unidade"] for v in minhas if v["papel"] == "autor"]
+    explicadas = [v["unidade"] for v in minhas if v["papel"] in ("autor", "release-preparar")]
     if explicadas:
         partes.append(
             "---\n\n## O código que gravaste, explicado\n\n"
@@ -650,10 +928,7 @@ def gerar_pagina_fase(fase: dict, vezes: list[dict], config: dict) -> str:
     ]
     for pessoa in config["membros"]:
         partes[-1] += f"\n| {pessoa} | [{pagina(pessoa)}]({pagina(pessoa)}) |"
-    partes.append(
-        "\nAntes da primeira fase, todos fazem a [Preparação](../preparacao.md). "
-        "Os termos usados estão explicados em [O que é o quê](../conceitos.md).\n"
-    )
+    partes.append("\nOs termos usados estão explicados em [O que é o quê](../conceitos.md).\n")
     partes.append("## Ordem de trabalho\n")
     partes.append(
         "As unidades assentam umas nas outras, por isso o trabalho é feito à vez, por esta ordem. "
@@ -681,7 +956,7 @@ def gerar_pagina_fase(fase: dict, vezes: list[dict], config: dict) -> str:
 
     partes.append("\n## Onde estão os ficheiros\n")
     partes.append(
-        f"Os ficheiros de cada commit estão na pasta [`ficheiros`](ficheiros/), uma subpasta por unidade "
+        "Os ficheiros de cada commit estão na pasta [`ficheiros`](ficheiros/), uma subpasta por unidade "
         "e, dentro dela, uma por commit:\n"
     )
     arvore = [f"{trabalho}/fase-{fase['numero']}/ficheiros/"]
@@ -710,13 +985,12 @@ def gerar_pagina_fase(fase: dict, vezes: list[dict], config: dict) -> str:
         + "\n\nDeve aparecer o menu inicial.\n"
     )
     partes.append("### Lista de verificação\n")
-    lista = [
-        f"{len(fase['unidades'])} issues de tarefa fechadas (ver {b}/issues?q=is%3Aissue+is%3Aclosed)",
-        f"{len(fase['unidades'])} pull requests juntos ao `develop`, cada um aprovado por outra pessoa do grupo "
-        f"(ver {b}/pulls?q=is%3Apr+is%3Amerged)",
+    lista = [linha.strip()[2:] for linha in fase.get("verificacao", "").splitlines() if linha.strip().startswith("- ")]
+    lista += [
+        f"Todos os pull requests da fase juntos, cada um aprovado por outra pessoa do grupo (ver {b}/pulls?q=is%3Apr+is%3Amerged)",
+        f"`verificar.py {ultima['id']}` responde `Tudo certo`",
+        "Testes a passar e documentação gerada sem avisos",
     ]
-    lista += [linha.strip()[2:] for linha in fase.get("verificacao", "").splitlines() if linha.strip().startswith("- ")]
-    lista += [f"`verificar.py {ultima['id']}` responde `Tudo certo`", "Testes a passar e documentação gerada sem avisos"]
     partes.append("\n".join(f"- [ ] {item}" for item in lista) + "\n")
     partes.append(
         f"Quando estiver tudo, Fabio diz ao Claude **\"avança para a Fase {int(fase['numero']) + 1}\"** e conta os "
@@ -731,21 +1005,19 @@ def gerar_pagina_fase(fase: dict, vezes: list[dict], config: dict) -> str:
         "no ramo errado, ter um commit anterior por gravar, ou a unidade anterior ainda não estar junta ao `develop` |\n"
         f"| `can't open file ... copiar.py` | As duas pastas não estão lado a lado, ou o terminal não está dentro de `{oficial}`. "
         "Vê o passo A4 da Preparação |\n"
+        "| O `copiar.py` diz que não existe a unidade | A pasta do repositório de trabalho está desatualizada. "
+        f"Corre `git -C ../{trabalho} pull` e repete |\n"
         "| Enganei-me num commit e ainda não fiz `push` | Corre `git reset --hard develop` (o ramo volta a ficar igual ao "
         "`develop` e os commits que fizeste nele desaparecem) e recomeça no passo \"Copia e grava os commits\" |\n"
         "| O commit ficou com o nome ou o email errado e ainda não fiz `push` | Corrige o nome e o email (Preparação, passo A2) "
         "e corre `git commit --amend --reset-author --no-edit` |\n"
         "| `fatal: not a git repository` | O terminal não está na pasta do repositório. Usa `cd` para entrar nela |\n"
-        "| O `git push` é recusado com `403` ou `Permission denied` | A tua conta ainda não é colaboradora do repositório oficial, "
+        "| O `git push` é recusado com `403` ou `Permission denied` | A tua conta não é colaboradora do repositório oficial, "
         "ou não aceitaste o convite (Preparação, passo A3) |\n"
-        "| O `git push` é recusado por causa do email (`GH007`) | O GitHub está a proteger o teu email. Em GitHub → Settings → Emails "
-        "copia o endereço que termina em `users.noreply.github.com`, usa-o no `git config --global user.email` e corre "
-        "`git commit --amend --reset-author --no-edit` |\n"
         "| O `verificar.py` responde `ERRO` | Não avancem. Copiem a mensagem e passem-na a Fabio, para a enviar ao Claude |\n"
         "| Uma verificação automática fica com uma cruz vermelha | Clica em *Details* ao lado da verificação, copia o erro "
         "e passa-o a Fabio, para o enviar ao Claude |\n"
-        "| O `python` não é reconhecido | Experimenta `py` em vez de `python`. Se também não der, falta instalar o Python "
-        "(Preparação, passo A1) |\n"
+        "| O `python` não é reconhecido | Experimenta `py` em vez de `python` |\n"
     )
     return preencher("\n".join(partes), config)
 
@@ -761,6 +1033,10 @@ def main() -> int:
         escritos.append((GUIAS / modelo.name, preencher(modelo.read_text(encoding="utf-8"), config)))
 
     for pasta in sorted((INTERNO / "fases").glob("fase-*")):
+        cabecalho, _ = ler_ficheiro(pasta / "fase.md")
+        if cabecalho.get("fechada") == "sim":
+            print(f"fechada: {pasta.name} (não é gerada outra vez)")
+            continue
         fase = carregar_fase(pasta)
         vezes = planear_vezes(fase, config)
         destino = GUIAS / pasta.name

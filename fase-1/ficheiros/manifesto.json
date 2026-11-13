@@ -1,0 +1,769 @@
+{
+  "fase": 1,
+  "repo_oficial": "ADC-TrabGrupo",
+  "unidades": [
+    {
+      "id": "1.1",
+      "titulo": "Login e logout dos três perfis",
+      "ramo": "feature/1.1-login-perfis",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(bd): adicionar a tabela de utilizadores",
+          "ficheiros": [
+            "gestor_campanhas/bd.py"
+          ],
+          "apagar": [],
+          "tree_antes": "e23ce33a02ee1b09f716387a450d50aaf413f3ce",
+          "tree_depois": "7fcfe1b4b4cac9679a2997769f98fae8a24e631a"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(modelos): adicionar utilizador, perfis, erros e relógio",
+          "ficheiros": [
+            "gestor_campanhas/erros.py",
+            "gestor_campanhas/modelos.py",
+            "gestor_campanhas/relogio.py"
+          ],
+          "apagar": [],
+          "tree_antes": "7fcfe1b4b4cac9679a2997769f98fae8a24e631a",
+          "tree_depois": "d912147bf724673a5f87e76c9d67766bca51101c"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(seguranca): guardar as passwords com hash e salt",
+          "ficheiros": [
+            "gestor_campanhas/seguranca.py"
+          ],
+          "apagar": [],
+          "tree_antes": "d912147bf724673a5f87e76c9d67766bca51101c",
+          "tree_depois": "9a9553bc8775fd107dd2ec01fca633f4e470e447"
+        },
+        {
+          "numero": 4,
+          "mensagem": "feat(utilizadores): adicionar o repositório de utilizadores",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/__init__.py",
+            "gestor_campanhas/repositorios/utilizadores.py"
+          ],
+          "apagar": [],
+          "tree_antes": "9a9553bc8775fd107dd2ec01fca633f4e470e447",
+          "tree_depois": "b1a7497861a570cbed90d474f1c141d121f5e374"
+        },
+        {
+          "numero": 5,
+          "mensagem": "feat(auth): autenticar por email e password",
+          "ficheiros": [
+            "gestor_campanhas/servicos/__init__.py",
+            "gestor_campanhas/servicos/autenticacao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "b1a7497861a570cbed90d474f1c141d121f5e374",
+          "tree_depois": "44ac7d5d36d94df5ee2e0f1f9a0e0eb7b4a3a231"
+        },
+        {
+          "numero": 6,
+          "mensagem": "feat(cli): entrar na aplicação e mostrar o menu do perfil",
+          "ficheiros": [
+            "gestor_campanhas/cli/comum.py",
+            "gestor_campanhas/cli/perfis.py",
+            "gestor_campanhas/cli/principal.py"
+          ],
+          "apagar": [],
+          "tree_antes": "44ac7d5d36d94df5ee2e0f1f9a0e0eb7b4a3a231",
+          "tree_depois": "f5a7a4ef33ce87f71e5afb272a1116dfea34ec92"
+        },
+        {
+          "numero": 7,
+          "mensagem": "feat(dados): criar contas de demonstração",
+          "ficheiros": [
+            "gestor_campanhas/dados_demo.py"
+          ],
+          "apagar": [],
+          "tree_antes": "f5a7a4ef33ce87f71e5afb272a1116dfea34ec92",
+          "tree_depois": "3ac27c93fc962c3f58ea722428b791288edd9fa1"
+        },
+        {
+          "numero": 8,
+          "mensagem": "test(auth): testar passwords, utilizadores, autenticação e menus",
+          "ficheiros": [
+            "tests/conftest.py",
+            "tests/test_autenticacao.py",
+            "tests/test_cli.py"
+          ],
+          "apagar": [],
+          "tree_antes": "3ac27c93fc962c3f58ea722428b791288edd9fa1",
+          "tree_depois": "1714739730202a48c01b9c19a52ed3ac33c8b933"
+        },
+        {
+          "numero": 9,
+          "mensagem": "docs(auth): documentar a entrada na aplicação e a arquitetura em camadas",
+          "ficheiros": [
+            "README.md",
+            "docs/arquitetura.rst",
+            "docs/index.rst",
+            "docs/referencia.rst",
+            "docs/utilizacao.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "1714739730202a48c01b9c19a52ed3ac33c8b933",
+          "tree_depois": "658442305bdb8d8ea455b6e8f190baabd2412d97"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "e6ea6930c367516605376a357f751e4ebf029f12",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "cfabceb6f4eca3698ac2b548db03ec16fd46a658",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "193dde3fae0b8c4f23f0e783fe5beac34290cec3",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "38ae5e95502724056320f0cb0b08ccdd06936296",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "04c8030cd65c526f6cff26125407392f0342555c",
+        "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "90f934c5b2712bfb3316b3e1b1d83cf9df969ac5",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/comum.py": "7ae1e1c02bd3614bb17cf13a601bbfb4a490c5e6",
+        "gestor_campanhas/cli/perfis.py": "ae310c6db4576f2c2af25094be1647c29b56aaf7",
+        "gestor_campanhas/cli/principal.py": "22e2082e26b11101c6a5d330a7358cd8a9d6c276",
+        "gestor_campanhas/config.py": "29531dc732da331435fdfac8899dfdd8bef97723",
+        "gestor_campanhas/dados_demo.py": "c4212421655d4ae1f9aac4d23794d8625f0ca1f8",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "a0337502cc2bf05f8d18744f10f5027550e84581",
+        "gestor_campanhas/relogio.py": "14697a8506fb9a462b8084a7a7d01f8b6cce8511",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/utilizadores.py": "c43a0e997304625fdc771ef3bb52d173dd4059c3",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "d42760bc1da0a5936c956f18ff5baf2470927236",
+        "tests/test_autenticacao.py": "ea77a850986a43d6539ee38fe9a21809bd777e45",
+        "tests/test_bd.py": "0f89b4a4e4ab783c4ecbdbd58b914cc0be818c7f",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103"
+      }
+    },
+    {
+      "id": "1.2",
+      "titulo": "Registo de sessões e saída por inatividade",
+      "ramo": "feature/1.2-sessoes-inatividade",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(bd): adicionar a tabela de sessões",
+          "ficheiros": [
+            "gestor_campanhas/bd.py"
+          ],
+          "apagar": [],
+          "tree_antes": "658442305bdb8d8ea455b6e8f190baabd2412d97",
+          "tree_depois": "01a7127934f54bee02c3b2c1a8fa638c30273ecf"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(modelos): adicionar a sessão e o limite de inatividade por omissão",
+          "ficheiros": [
+            "gestor_campanhas/config.py",
+            "gestor_campanhas/modelos.py"
+          ],
+          "apagar": [],
+          "tree_antes": "01a7127934f54bee02c3b2c1a8fa638c30273ecf",
+          "tree_depois": "aa017b5fb53dd41b481417be28caf29905baf1b3"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(config): ler e guardar definições na base de dados",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/configuracoes.py"
+          ],
+          "apagar": [],
+          "tree_antes": "aa017b5fb53dd41b481417be28caf29905baf1b3",
+          "tree_depois": "530b7c6f52f15f35ba042e952b72e876d5e58cc8"
+        },
+        {
+          "numero": 4,
+          "mensagem": "feat(sessoes): adicionar o repositório de sessões",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/sessoes.py"
+          ],
+          "apagar": [],
+          "tree_antes": "530b7c6f52f15f35ba042e952b72e876d5e58cc8",
+          "tree_depois": "d7f8b796074063cbab314d9feb2a6f2347baa5f9"
+        },
+        {
+          "numero": 5,
+          "mensagem": "feat(sessoes): registar entradas e saídas e detetar inatividade",
+          "ficheiros": [
+            "gestor_campanhas/servicos/sessoes.py"
+          ],
+          "apagar": [],
+          "tree_antes": "d7f8b796074063cbab314d9feb2a6f2347baa5f9",
+          "tree_depois": "113347f2d6a17745c0da9abc3f171ea10a919b8c"
+        },
+        {
+          "numero": 6,
+          "mensagem": "feat(cli): abrir sessão ao entrar e terminá-la por logout ou inatividade",
+          "ficheiros": [
+            "gestor_campanhas/cli/perfis.py",
+            "gestor_campanhas/cli/principal.py"
+          ],
+          "apagar": [],
+          "tree_antes": "113347f2d6a17745c0da9abc3f171ea10a919b8c",
+          "tree_depois": "ece1b12d237ac84ba850f1ee495c4a37ccfcb4f8"
+        },
+        {
+          "numero": 7,
+          "mensagem": "test(sessoes): testar o registo de sessões e a inatividade",
+          "ficheiros": [
+            "tests/test_autenticacao.py",
+            "tests/test_sessoes.py"
+          ],
+          "apagar": [],
+          "tree_antes": "ece1b12d237ac84ba850f1ee495c4a37ccfcb4f8",
+          "tree_depois": "ac57363cb095250125fccd3a439251f9d9122a92"
+        },
+        {
+          "numero": 8,
+          "mensagem": "docs(sessoes): documentar as sessões e a inatividade",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/referencia.rst",
+            "docs/utilizacao.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "ac57363cb095250125fccd3a439251f9d9122a92",
+          "tree_depois": "dd70b844b53838fb3abd75fec8f22935fc0774ab"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "e6ea6930c367516605376a357f751e4ebf029f12",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "4df4efd12a7165714b6dbecd696a2ce126b36d70",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "193dde3fae0b8c4f23f0e783fe5beac34290cec3",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "4336aff7e76e93a7bc3c06ca78ed38750a4406fc",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "6f666276eccea07a0b6528e5e53b3eeb567a618c",
+        "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "699d4ec1552d2538a49feda70959f3a6025ad117",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/comum.py": "7ae1e1c02bd3614bb17cf13a601bbfb4a490c5e6",
+        "gestor_campanhas/cli/perfis.py": "544f95530ff30ea9eacb03add4b01e772985ad55",
+        "gestor_campanhas/cli/principal.py": "700f76fc55af2c163993f107babb4fe0cedaea14",
+        "gestor_campanhas/config.py": "74c08fc8d250abb72fa55c427d8e5df4a8cbb5ae",
+        "gestor_campanhas/dados_demo.py": "c4212421655d4ae1f9aac4d23794d8625f0ca1f8",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "822678fa94318c5417368e3c74981ca2e8395496",
+        "gestor_campanhas/relogio.py": "14697a8506fb9a462b8084a7a7d01f8b6cce8511",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/sessoes.py": "ce8194cdd7884a3283b8f7381adda7f99976c0b4",
+        "gestor_campanhas/repositorios/utilizadores.py": "c43a0e997304625fdc771ef3bb52d173dd4059c3",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/sessoes.py": "cfe32f1194233d34681c5346816413badf3d2562",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "d42760bc1da0a5936c956f18ff5baf2470927236",
+        "tests/test_autenticacao.py": "3f3dea65082734372dfc96f931dfb3496c655ca8",
+        "tests/test_bd.py": "0f89b4a4e4ab783c4ecbdbd58b914cc0be818c7f",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528"
+      }
+    },
+    {
+      "id": "1.3",
+      "titulo": "Horários de entrada e saída dos marketeers",
+      "ramo": "feature/1.3-horarios-marketeers",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(cli): ler datas e mostrar tabelas de texto",
+          "ficheiros": [
+            "gestor_campanhas/cli/comum.py"
+          ],
+          "apagar": [],
+          "tree_antes": "dd70b844b53838fb3abd75fec8f22935fc0774ab",
+          "tree_depois": "e28c87a1d68922009869a17e3eb2258c278ef176"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(sessoes): listar as sessões dos utilizadores de um perfil",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/sessoes.py"
+          ],
+          "apagar": [],
+          "tree_antes": "e28c87a1d68922009869a17e3eb2258c278ef176",
+          "tree_depois": "2561d807c7d89e85fa2a9cbec70a2a0e45521e93"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(sessoes): consultar os horários dos marketeers por período",
+          "ficheiros": [
+            "gestor_campanhas/servicos/sessoes.py"
+          ],
+          "apagar": [],
+          "tree_antes": "2561d807c7d89e85fa2a9cbec70a2a0e45521e93",
+          "tree_depois": "48e1d6d319f311e898642a6e0c3e6b9a0542b291"
+        },
+        {
+          "numero": 4,
+          "mensagem": "feat(admin): mostrar os horários de entrada e saída dos marketeers",
+          "ficheiros": [
+            "gestor_campanhas/cli/admin.py",
+            "gestor_campanhas/cli/perfis.py"
+          ],
+          "apagar": [],
+          "tree_antes": "48e1d6d319f311e898642a6e0c3e6b9a0542b291",
+          "tree_depois": "ab17a3c999ff0570cbd06e9c0fc15fa18fa33e4e"
+        },
+        {
+          "numero": 5,
+          "mensagem": "test(horarios): testar a consulta de horários e a tabela",
+          "ficheiros": [
+            "tests/test_horarios.py"
+          ],
+          "apagar": [],
+          "tree_antes": "ab17a3c999ff0570cbd06e9c0fc15fa18fa33e4e",
+          "tree_depois": "73cfcb659d840a0823ff0f4346a8da1ef2ae5ffc"
+        },
+        {
+          "numero": 6,
+          "mensagem": "docs(horarios): documentar a consulta de horários",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/referencia.rst",
+            "docs/utilizacao.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "73cfcb659d840a0823ff0f4346a8da1ef2ae5ffc",
+          "tree_depois": "cb8814f8b0608b7b71733cd304fd755b692b1557"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "e6ea6930c367516605376a357f751e4ebf029f12",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "72ddb02b71741b42993917573f36a1b92f72db55",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "193dde3fae0b8c4f23f0e783fe5beac34290cec3",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "c6c5e32a30c7f9b0fd21045a0dab46da00a538d8",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "5795ad2573f9e4c2aae32fc2d9d82ba569a0e40c",
+        "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "699d4ec1552d2538a49feda70959f3a6025ad117",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/admin.py": "97779095815a8b5a283fb216e04487e8269d4dca",
+        "gestor_campanhas/cli/comum.py": "22caad63e36790ccd7ab251f1d0ba6bcb8d61461",
+        "gestor_campanhas/cli/perfis.py": "bcb4044cabab5b8fd4b83f8adafdc65771a8e3a7",
+        "gestor_campanhas/cli/principal.py": "700f76fc55af2c163993f107babb4fe0cedaea14",
+        "gestor_campanhas/config.py": "74c08fc8d250abb72fa55c427d8e5df4a8cbb5ae",
+        "gestor_campanhas/dados_demo.py": "c4212421655d4ae1f9aac4d23794d8625f0ca1f8",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "822678fa94318c5417368e3c74981ca2e8395496",
+        "gestor_campanhas/relogio.py": "14697a8506fb9a462b8084a7a7d01f8b6cce8511",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/sessoes.py": "6e195e3188dc3d7b65bfeae6e550081e1c109008",
+        "gestor_campanhas/repositorios/utilizadores.py": "c43a0e997304625fdc771ef3bb52d173dd4059c3",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/sessoes.py": "ee60345e898dba35df5ed331c2409464183e945e",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "d42760bc1da0a5936c956f18ff5baf2470927236",
+        "tests/test_autenticacao.py": "3f3dea65082734372dfc96f931dfb3496c655ca8",
+        "tests/test_bd.py": "0f89b4a4e4ab783c4ecbdbd58b914cc0be818c7f",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_horarios.py": "33d6c456d87c5d69a2ce5e8a71bc7f5b82c9fb39",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528"
+      }
+    },
+    {
+      "id": "1.4",
+      "titulo": "Alterar a password e editar os meus dados",
+      "ramo": "feature/1.4-password-perfil",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(utilizadores): atualizar a password e os dados de um utilizador",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/utilizadores.py"
+          ],
+          "apagar": [],
+          "tree_antes": "cb8814f8b0608b7b71733cd304fd755b692b1557",
+          "tree_depois": "ee6cf3c0f6a8c5e4e66d9c91cfefd4248e885d0a"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(conta): validar e aplicar alterações à própria conta",
+          "ficheiros": [
+            "gestor_campanhas/servicos/contas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "ee6cf3c0f6a8c5e4e66d9c91cfefd4248e885d0a",
+          "tree_depois": "f65dcd5c822890daa4cb3ff402e81769d9a628a3"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(cli): editar os meus dados e alterar a password em todos os perfis",
+          "ficheiros": [
+            "gestor_campanhas/cli/comum.py",
+            "gestor_campanhas/cli/conta.py",
+            "gestor_campanhas/cli/perfis.py"
+          ],
+          "apagar": [],
+          "tree_antes": "f65dcd5c822890daa4cb3ff402e81769d9a628a3",
+          "tree_depois": "c1452fe0b784b20bc0e5a256ea8960a148a7cda8"
+        },
+        {
+          "numero": 4,
+          "mensagem": "test(conta): testar a alteração da password e dos dados",
+          "ficheiros": [
+            "tests/test_contas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "c1452fe0b784b20bc0e5a256ea8960a148a7cda8",
+          "tree_depois": "6ec544ab0705ac4b5814e6888952f2f374c16e78"
+        },
+        {
+          "numero": 5,
+          "mensagem": "docs(conta): documentar as opções da conta",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/referencia.rst",
+            "docs/utilizacao.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "6ec544ab0705ac4b5814e6888952f2f374c16e78",
+          "tree_depois": "55cb355e2c4889dcea5aa9bf7d30f34e17a26aa4"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "e6ea6930c367516605376a357f751e4ebf029f12",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "2a67391cb061b0cfc1b19f0383a37b8f45df0d9d",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "193dde3fae0b8c4f23f0e783fe5beac34290cec3",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "4c0bcc267af698c294b8d977ee92817a618b2a3d",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "caf81f5d21079f9a666aa833959d4aa3ce2df471",
+        "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "699d4ec1552d2538a49feda70959f3a6025ad117",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/admin.py": "97779095815a8b5a283fb216e04487e8269d4dca",
+        "gestor_campanhas/cli/comum.py": "21061ff6ccb28344c31f31244f27a41a895386ac",
+        "gestor_campanhas/cli/conta.py": "f8cbd345e07f1d479795b7c92a0484e2773d6db6",
+        "gestor_campanhas/cli/perfis.py": "5e0e9ea7d6a80cdb82dda34f0692e19b8bfdf487",
+        "gestor_campanhas/cli/principal.py": "700f76fc55af2c163993f107babb4fe0cedaea14",
+        "gestor_campanhas/config.py": "74c08fc8d250abb72fa55c427d8e5df4a8cbb5ae",
+        "gestor_campanhas/dados_demo.py": "c4212421655d4ae1f9aac4d23794d8625f0ca1f8",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "822678fa94318c5417368e3c74981ca2e8395496",
+        "gestor_campanhas/relogio.py": "14697a8506fb9a462b8084a7a7d01f8b6cce8511",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/sessoes.py": "6e195e3188dc3d7b65bfeae6e550081e1c109008",
+        "gestor_campanhas/repositorios/utilizadores.py": "b18c906c201f7a4ba6d9d306e6e18669dfd43dc2",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/contas.py": "ed046540f0cd7bbb3ff72a298435d43df0fd2b3f",
+        "gestor_campanhas/servicos/sessoes.py": "ee60345e898dba35df5ed331c2409464183e945e",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "d42760bc1da0a5936c956f18ff5baf2470927236",
+        "tests/test_autenticacao.py": "3f3dea65082734372dfc96f931dfb3496c655ca8",
+        "tests/test_bd.py": "0f89b4a4e4ab783c4ecbdbd58b914cc0be818c7f",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_contas.py": "9a58332943d7189ed2f457bb846326426a6c510b",
+        "tests/test_horarios.py": "33d6c456d87c5d69a2ce5e8a71bc7f5b82c9fb39",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528"
+      }
+    },
+    {
+      "id": "1.5",
+      "titulo": "Recuperar a password",
+      "ramo": "feature/1.5-recuperar-password",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(bd): adicionar a tabela de códigos de recuperação e a caixa de saída",
+          "ficheiros": [
+            "gestor_campanhas/bd.py",
+            "gestor_campanhas/config.py"
+          ],
+          "apagar": [],
+          "tree_antes": "55cb355e2c4889dcea5aa9bf7d30f34e17a26aa4",
+          "tree_depois": "8b1f5202c02a5a7d783ab2df07f366788471f899"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(correio): simular o envio de emails com ficheiros de texto",
+          "ficheiros": [
+            "gestor_campanhas/servicos/correio.py"
+          ],
+          "apagar": [],
+          "tree_antes": "8b1f5202c02a5a7d783ab2df07f366788471f899",
+          "tree_depois": "0c1408933c3d7b04d737402bc06a9489c6a4ffbe"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(recuperacao): guardar os códigos de recuperação",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/recuperacoes.py"
+          ],
+          "apagar": [],
+          "tree_antes": "0c1408933c3d7b04d737402bc06a9489c6a4ffbe",
+          "tree_depois": "0ee2fb2ac97afb8aabe2d782d431ba828f53f6d4"
+        },
+        {
+          "numero": 4,
+          "mensagem": "feat(recuperacao): pedir um código e repor a password",
+          "ficheiros": [
+            "gestor_campanhas/servicos/recuperacao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "0ee2fb2ac97afb8aabe2d782d431ba828f53f6d4",
+          "tree_depois": "5bb1907c2a85b95cadb4e9631f02f4b5e94d2eb7"
+        },
+        {
+          "numero": 5,
+          "mensagem": "feat(cli): recuperar a password a partir do menu inicial",
+          "ficheiros": [
+            "gestor_campanhas/cli/principal.py",
+            "gestor_campanhas/cli/recuperacao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "5bb1907c2a85b95cadb4e9631f02f4b5e94d2eb7",
+          "tree_depois": "ee6c09d3c4ea4b5db74dbdee82b193d070138168"
+        },
+        {
+          "numero": 6,
+          "mensagem": "test(recuperacao): testar a recuperação da password e os emails",
+          "ficheiros": [
+            "tests/test_recuperacao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "ee6c09d3c4ea4b5db74dbdee82b193d070138168",
+          "tree_depois": "e1982ed20a4dc6c26a51d1d188d09b528f894758"
+        },
+        {
+          "numero": 7,
+          "mensagem": "docs(recuperacao): documentar a recuperação da password e os emails simulados",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/instalacao.rst",
+            "docs/referencia.rst",
+            "docs/utilizacao.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "e1982ed20a4dc6c26a51d1d188d09b528f894758",
+          "tree_depois": "17165e7addb36747ca4fd1da85f4e82b9442a0e2"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "e6ea6930c367516605376a357f751e4ebf029f12",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "39c060db6f762c74f5089de0725adecabd90565d",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "6f9d97c926eaee44c3495fe5e894b7127e55c29e",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "eebce40783e2d9c4cfef7ddf9878d85576ec13f2",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "60069c8569b44ce74a3cece7c34bca50df7622fc",
+        "gestor_campanhas/__init__.py": "58c4aa383dbba38eb14ab6e6e7ffc48de0ef800f",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "3706b301e6f20fbe076d922d7e7081677bee8bd8",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/admin.py": "97779095815a8b5a283fb216e04487e8269d4dca",
+        "gestor_campanhas/cli/comum.py": "21061ff6ccb28344c31f31244f27a41a895386ac",
+        "gestor_campanhas/cli/conta.py": "f8cbd345e07f1d479795b7c92a0484e2773d6db6",
+        "gestor_campanhas/cli/perfis.py": "5e0e9ea7d6a80cdb82dda34f0692e19b8bfdf487",
+        "gestor_campanhas/cli/principal.py": "9206d99581c210bead0fc9ddb6a4679f42ffba51",
+        "gestor_campanhas/cli/recuperacao.py": "35d3ad9d38d27a70368805a9d5cce44c628ee72a",
+        "gestor_campanhas/config.py": "29b2f796bc6d174ff11e41d8719071b2dc70a099",
+        "gestor_campanhas/dados_demo.py": "c4212421655d4ae1f9aac4d23794d8625f0ca1f8",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "822678fa94318c5417368e3c74981ca2e8395496",
+        "gestor_campanhas/relogio.py": "14697a8506fb9a462b8084a7a7d01f8b6cce8511",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/recuperacoes.py": "3656e4685566b47c72bd0360e750a2e97c6921a1",
+        "gestor_campanhas/repositorios/sessoes.py": "6e195e3188dc3d7b65bfeae6e550081e1c109008",
+        "gestor_campanhas/repositorios/utilizadores.py": "b18c906c201f7a4ba6d9d306e6e18669dfd43dc2",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/contas.py": "ed046540f0cd7bbb3ff72a298435d43df0fd2b3f",
+        "gestor_campanhas/servicos/correio.py": "554f1d9db479e2c0eba2cf60b57d00eb5b7fa0c5",
+        "gestor_campanhas/servicos/recuperacao.py": "9b39b627ca52770938f8ed8b334cbab0849dd37e",
+        "gestor_campanhas/servicos/sessoes.py": "ee60345e898dba35df5ed331c2409464183e945e",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "d42760bc1da0a5936c956f18ff5baf2470927236",
+        "tests/test_autenticacao.py": "3f3dea65082734372dfc96f931dfb3496c655ca8",
+        "tests/test_bd.py": "0f89b4a4e4ab783c4ecbdbd58b914cc0be818c7f",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_contas.py": "9a58332943d7189ed2f457bb846326426a6c510b",
+        "tests/test_horarios.py": "33d6c456d87c5d69a2ce5e8a71bc7f5b82c9fb39",
+        "tests/test_recuperacao.py": "8c7ee312c1e5288374021d73d422d82409a2bc14",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528"
+      }
+    },
+    {
+      "id": "1.6",
+      "titulo": "Release v0.1.0",
+      "ramo": "release/v0.1.0",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "chore(release): passar a versão para 0.1.0",
+          "ficheiros": [
+            "gestor_campanhas/__init__.py"
+          ],
+          "apagar": [],
+          "tree_antes": "17165e7addb36747ca4fd1da85f4e82b9442a0e2",
+          "tree_depois": "6310de02ae46838c0addc88593a00c8ed97c0660"
+        },
+        {
+          "numero": 2,
+          "mensagem": "docs(release): criar o registo de alterações",
+          "ficheiros": [
+            "CHANGELOG.md"
+          ],
+          "apagar": [],
+          "tree_antes": "6310de02ae46838c0addc88593a00c8ed97c0660",
+          "tree_depois": "ccfbd0faaaff48caba8cd015b3b2f2755576ee35"
+        },
+        {
+          "numero": 3,
+          "mensagem": "docs(release): atualizar o README para a versão 0.1.0",
+          "ficheiros": [
+            "README.md"
+          ],
+          "apagar": [],
+          "tree_antes": "ccfbd0faaaff48caba8cd015b3b2f2755576ee35",
+          "tree_depois": "e8d893c5a3879a454781a1680e4fb6429bae115a"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CHANGELOG.md": "4e4edbc30f6e53b2196f913f7b5c47172f183b59",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "d366593a796684d3ff5a253479224d91b48e1ed0",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "39c060db6f762c74f5089de0725adecabd90565d",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "6f9d97c926eaee44c3495fe5e894b7127e55c29e",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "eebce40783e2d9c4cfef7ddf9878d85576ec13f2",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "60069c8569b44ce74a3cece7c34bca50df7622fc",
+        "gestor_campanhas/__init__.py": "3d9698ac700ad05f1f9b9db765ac079dd55fd05f",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "3706b301e6f20fbe076d922d7e7081677bee8bd8",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/admin.py": "97779095815a8b5a283fb216e04487e8269d4dca",
+        "gestor_campanhas/cli/comum.py": "21061ff6ccb28344c31f31244f27a41a895386ac",
+        "gestor_campanhas/cli/conta.py": "f8cbd345e07f1d479795b7c92a0484e2773d6db6",
+        "gestor_campanhas/cli/perfis.py": "5e0e9ea7d6a80cdb82dda34f0692e19b8bfdf487",
+        "gestor_campanhas/cli/principal.py": "9206d99581c210bead0fc9ddb6a4679f42ffba51",
+        "gestor_campanhas/cli/recuperacao.py": "35d3ad9d38d27a70368805a9d5cce44c628ee72a",
+        "gestor_campanhas/config.py": "29b2f796bc6d174ff11e41d8719071b2dc70a099",
+        "gestor_campanhas/dados_demo.py": "c4212421655d4ae1f9aac4d23794d8625f0ca1f8",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "822678fa94318c5417368e3c74981ca2e8395496",
+        "gestor_campanhas/relogio.py": "14697a8506fb9a462b8084a7a7d01f8b6cce8511",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/recuperacoes.py": "3656e4685566b47c72bd0360e750a2e97c6921a1",
+        "gestor_campanhas/repositorios/sessoes.py": "6e195e3188dc3d7b65bfeae6e550081e1c109008",
+        "gestor_campanhas/repositorios/utilizadores.py": "b18c906c201f7a4ba6d9d306e6e18669dfd43dc2",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/contas.py": "ed046540f0cd7bbb3ff72a298435d43df0fd2b3f",
+        "gestor_campanhas/servicos/correio.py": "554f1d9db479e2c0eba2cf60b57d00eb5b7fa0c5",
+        "gestor_campanhas/servicos/recuperacao.py": "9b39b627ca52770938f8ed8b334cbab0849dd37e",
+        "gestor_campanhas/servicos/sessoes.py": "ee60345e898dba35df5ed331c2409464183e945e",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "d42760bc1da0a5936c956f18ff5baf2470927236",
+        "tests/test_autenticacao.py": "3f3dea65082734372dfc96f931dfb3496c655ca8",
+        "tests/test_bd.py": "0f89b4a4e4ab783c4ecbdbd58b914cc0be818c7f",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_contas.py": "9a58332943d7189ed2f457bb846326426a6c510b",
+        "tests/test_horarios.py": "33d6c456d87c5d69a2ce5e8a71bc7f5b82c9fb39",
+        "tests/test_recuperacao.py": "8c7ee312c1e5288374021d73d422d82409a2bc14",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528"
+      }
+    }
+  ]
+}
