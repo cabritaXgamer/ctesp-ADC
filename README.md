@@ -20,7 +20,9 @@ O desenvolvimento é feito por fases, cada uma fechada com uma *release*. As fun
 
 | Versão | Conteúdo |
 |---|---|
-| em desenvolvimento | Estrutura base: menu inicial, base de dados, testes e documentação |
+| v0.1.0 | Autenticação e sessões: entrar e sair, registo de sessões, inatividade, horários dos marketeers, dados da conta, recuperação da password |
+
+O detalhe de cada versão está no [registo de alterações](CHANGELOG.md).
 
 ## Requisitos
 
@@ -48,9 +50,10 @@ A aplicação mostra um menu numerado. Escreve-se o número da opção e prime-s
 
 ```
 ============================================================
-Gestor de Campanhas v0.0.0
+Gestor de Campanhas v0.1.0
 ============================================================
   1. Entrar
+  2. Recuperar a password
   0. Sair
 Opção:
 ```
@@ -73,11 +76,19 @@ python -m gestor_campanhas.dados_demo
 
 Estas passwords são públicas e servem só para demonstração.
 
+### Emails
+
+A aplicação não envia emails verdadeiros. Cada mensagem (por exemplo, o código para recuperar a password) é escrita num ficheiro de texto na pasta `dados/caixa_saida`.
+
+### Sessões
+
+Todas as entradas e saídas ficam registadas. Ao fim de 15 minutos sem atividade, a sessão termina sozinha e é preciso entrar de novo.
+
 ## Configuração
 
 | Variável de ambiente | Valor por omissão | Para que serve |
 |---|---|---|
-| `GESTOR_CAMPANHAS_DADOS` | `dados` (na pasta do projeto) | Pasta onde a aplicação guarda a base de dados |
+| `GESTOR_CAMPANHAS_DADOS` | `dados` (na pasta do projeto) | Pasta onde a aplicação guarda a base de dados e os emails simulados |
 
 Exemplo em PowerShell:
 
@@ -117,6 +128,10 @@ gestor_campanhas/      código da aplicação
   __main__.py          ponto de entrada
   config.py            caminhos da pasta de dados e da base de dados
   bd.py                ligação SQLite e criação das tabelas
+  modelos.py           classes de dados
+  seguranca.py         hash das passwords
+  repositorios/        leitura e escrita na base de dados
+  servicos/            regras de negócio
   cli/                 menus da linha de comandos
 tests/                 testes automáticos (pytest)
 docs/                  documentação do código (Sphinx)
