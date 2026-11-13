@@ -55,6 +55,11 @@ Definições
 
 .. automodule:: gestor_campanhas.repositorios.configuracoes
 
+Códigos de recuperação
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.repositorios.recuperacoes
+
 Serviços
 --------
 
@@ -74,6 +79,16 @@ Conta do utilizador
 ~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: gestor_campanhas.servicos.contas
+
+Recuperação da password
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.servicos.recuperacao
+
+Emails
+~~~~~~
+
+.. automodule:: gestor_campanhas.servicos.correio
 
 Dados de demonstração
 ---------------------
@@ -109,3 +124,8 @@ Opções da conta
 ~~~~~~~~~~~~~~~
 
 .. automodule:: gestor_campanhas.cli.conta
+
+Recuperação da password
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.cli.recuperacao

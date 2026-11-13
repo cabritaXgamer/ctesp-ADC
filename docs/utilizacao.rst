@@ -48,6 +48,26 @@ errada, para não revelar que emails têm conta.
 Em qualquer menu de perfil, a opção **0. Terminar sessão** volta ao menu
 inicial.
 
+Recuperar a password
+--------------------
+
+No menu inicial, a opção **2. Recuperar a password** serve para quem se
+esqueceu da password.
+
+1. A aplicação pede o email da conta e envia para lá um código de seis
+   algarismos.
+2. Com o código, define-se a password nova, escrita duas vezes.
+
+O código vale durante 15 minutos e só pode ser usado uma vez. Um pedido novo
+anula o código anterior. A resposta da aplicação é a mesma quer o email tenha
+conta quer não.
+
+.. note::
+
+   Os emails são simulados: cada mensagem é um ficheiro de texto na pasta
+   ``dados/caixa_saida``. Para ver o código, abre-se o ficheiro mais recente
+   dessa pasta.
+
 Sessões e inatividade
 ---------------------
 
