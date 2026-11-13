@@ -64,3 +64,33 @@ def obter(ligacao: sqlite3.Connection, identificador: int) -> Sessao | None:
         "SELECT id, utilizador_id, entrada, saida, motivo_saida FROM sessoes WHERE id = ?", (identificador,)
     ).fetchone()
     return _de_linha(linha) if linha else None
+
+
+def listar_por_perfil(
+    ligacao: sqlite3.Connection,
+    perfil: str,
+    desde: datetime | None = None,
+    ate: datetime | None = None,
+) -> list[tuple[Sessao, str]]:
+    """Lista as sessões dos utilizadores de um perfil, da mais recente para a mais antiga.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param perfil: Perfil dos utilizadores, por exemplo ``"marketeer"``.
+    :param desde: Se indicado, só entram sessões com entrada a partir deste momento.
+    :param ate: Se indicado, só entram sessões com entrada antes deste momento.
+    :return: Lista de pares ``(sessão, nome do utilizador)``.
+    """
+    consulta = (
+        "SELECT s.id, s.utilizador_id, s.entrada, s.saida, s.motivo_saida, u.nome "
+        "FROM sessoes s JOIN utilizadores u ON u.id = s.utilizador_id "
+        "WHERE u.perfil = ?"
+    )
+    valores: list = [perfil]
+    if desde is not None:
+        consulta += " AND s.entrada >= ?"
+        valores.append(relogio.para_texto(desde))
+    if ate is not None:
+        consulta += " AND s.entrada < ?"
+        valores.append(relogio.para_texto(ate))
+    consulta += " ORDER BY s.entrada DESC, s.id DESC"
+    return [(_de_linha(linha), linha["nome"]) for linha in ligacao.execute(consulta, valores)]

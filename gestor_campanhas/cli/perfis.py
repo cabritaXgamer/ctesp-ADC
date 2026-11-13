@@ -9,7 +9,7 @@ from __future__ import annotations
 import sqlite3
 
 from gestor_campanhas import modelos
-from gestor_campanhas.cli import comum
+from gestor_campanhas.cli import admin, comum
 from gestor_campanhas.servicos import sessoes
 from gestor_campanhas.servicos.sessoes import SessaoAtiva
 
@@ -17,7 +17,9 @@ from gestor_campanhas.servicos.sessoes import SessaoAtiva
 #: função recebe a ligação à base de dados e o utilizador que entrou.
 #: A opção "Terminar sessão" é acrescentada automaticamente no fim.
 OPCOES: dict[str, list] = {
-    modelos.ADMINISTRADOR: [],
+    modelos.ADMINISTRADOR: [
+        ("Horários de entrada e saída dos marketeers", admin.horarios),
+    ],
     modelos.MARKETEER: [],
     modelos.CLIENTE: [],
 }

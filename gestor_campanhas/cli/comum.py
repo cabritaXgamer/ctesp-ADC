@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import getpass
 import sys
+from datetime import date, datetime
 
 #: Largura, em caracteres, das linhas que delimitam os títulos.
 LARGURA = 60
@@ -111,3 +112,43 @@ def escolher_opcao(titulo_menu: str, opcoes: list[tuple[str, str]]) -> str:
 def pausa() -> None:
     """Espera que o utilizador prima Enter antes de continuar."""
     input("\nPrima Enter para continuar...")
+
+
+def ler_data(pergunta: str) -> date | None:
+    """Pede uma data no formato ``AAAA-MM-DD``. A resposta pode ficar vazia.
+
+    Repete a pergunta enquanto a resposta não for uma data válida.
+
+    :param pergunta: Texto mostrado antes da resposta.
+    :return: A data introduzida, ou ``None`` se a resposta ficou vazia.
+    """
+    while True:
+        resposta = input(f"{pergunta} (AAAA-MM-DD, Enter para não filtrar): ").strip()
+        if not resposta:
+            return None
+        try:
+            return datetime.strptime(resposta, "%Y-%m-%d").date()
+        except ValueError:
+            print("Data inválida. Exemplo de uma data válida: 2026-11-13.")
+
+
+def mostrar_tabela(cabecalhos: list[str], linhas: list[list[str]]) -> None:
+    """Mostra uma tabela de texto, com as colunas alinhadas.
+
+    A largura de cada coluna é a do texto mais comprido que lá aparece.
+
+    :param cabecalhos: Título de cada coluna.
+    :param linhas: Linhas da tabela; cada linha tem um texto por coluna.
+    """
+    larguras = [len(cabecalho) for cabecalho in cabecalhos]
+    for linha in linhas:
+        for indice, celula in enumerate(linha):
+            larguras[indice] = max(larguras[indice], len(celula))
+
+    def formatar(celulas: list[str]) -> str:
+        return "  ".join(celula.ljust(largura) for celula, largura in zip(celulas, larguras)).rstrip()
+
+    print(formatar(cabecalhos))
+    print("  ".join("-" * largura for largura in larguras))
+    for linha in linhas:
+        print(formatar(linha))

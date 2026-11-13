@@ -94,3 +94,8 @@ Menus dos perfis
 ~~~~~~~~~~~~~~~~
 
 .. automodule:: gestor_campanhas.cli.perfis
+
+Opções do Administrador
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.cli.admin
