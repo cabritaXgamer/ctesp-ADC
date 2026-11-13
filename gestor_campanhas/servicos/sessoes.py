@@ -14,11 +14,11 @@ from __future__ import annotations
 
 import sqlite3
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
 from gestor_campanhas import config, modelos, relogio
 from gestor_campanhas.erros import ErroValidacao
-from gestor_campanhas.modelos import Utilizador
+from gestor_campanhas.modelos import Sessao, Utilizador
 from gestor_campanhas.repositorios import configuracoes, sessoes
 
 #: Nome da definição que guarda o limite de inatividade, em minutos.
@@ -113,3 +113,33 @@ def terminar(ligacao: sqlite3.Connection, sessao: SessaoAtiva, motivo: str = mod
     saida = sessao.momento_de_expiracao if motivo == modelos.INATIVIDADE else relogio.agora()
     sessoes.fechar(ligacao, sessao.id, saida, motivo)
     sessao.aberta = False
+
+
+def horarios_dos_marketeers(
+    ligacao: sqlite3.Connection, desde: date | None = None, ate: date | None = None
+) -> list[tuple[Sessao, str]]:
+    """Lista as entradas e saídas dos marketeers, da mais recente para a mais antiga.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param desde: Primeiro dia a incluir. ``None`` para não limitar.
+    :param ate: Último dia a incluir (o dia inteiro). ``None`` para não limitar.
+    :return: Lista de pares ``(sessão, nome do marketeer)``.
+    :raises ErroValidacao: Se a data inicial for posterior à data final.
+    """
+    if desde is not None and ate is not None and desde > ate:
+        raise ErroValidacao("A data inicial não pode ser posterior à data final.")
+    inicio = datetime.combine(desde, time.min) if desde else None
+    # O filtro é "antes do início do dia seguinte", para incluir o último dia inteiro.
+    fim = datetime.combine(ate + timedelta(days=1), time.min) if ate else None
+    return sessoes.listar_por_perfil(ligacao, modelos.MARKETEER, inicio, fim)
+
+
+def duracao(sessao: Sessao) -> timedelta | None:
+    """Calcula quanto tempo durou uma sessão.
+
+    :param sessao: Sessão a medir.
+    :return: Tempo entre a entrada e a saída, ou ``None`` se ainda está aberta.
+    """
+    if sessao.saida is None:
+        return None
+    return sessao.saida - sessao.entrada
