@@ -8,7 +8,7 @@ from gestor_campanhas import dados_demo, modelos, seguranca
 from gestor_campanhas.cli import perfis, principal
 from gestor_campanhas.erros import ErroAutenticacao
 from gestor_campanhas.repositorios import utilizadores
-from gestor_campanhas.servicos import autenticacao
+from gestor_campanhas.servicos import autenticacao, sessoes
 from tests.conftest import PASSWORD_TESTE
 
 # --- passwords ---------------------------------------------------------------
@@ -131,7 +131,7 @@ def test_menu_do_perfil_executa_a_opcao_escolhida(teclado, ligacao, contas, monk
     )
     teclado("1", "0")
 
-    perfis.executar(ligacao, contas[modelos.CLIENTE])
+    perfis.executar(ligacao, sessoes.iniciar(ligacao, contas[modelos.CLIENTE]))
 
     assert chamadas == [contas[modelos.CLIENTE]]
     assert "1. Opção de teste" in capsys.readouterr().out
