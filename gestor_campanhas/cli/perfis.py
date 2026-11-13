@@ -9,9 +9,15 @@ from __future__ import annotations
 import sqlite3
 
 from gestor_campanhas import modelos
-from gestor_campanhas.cli import admin, comum
+from gestor_campanhas.cli import admin, comum, conta
 from gestor_campanhas.servicos import sessoes
 from gestor_campanhas.servicos.sessoes import SessaoAtiva
+
+#: Opções que aparecem no menu de todos os perfis.
+OPCOES_DA_CONTA = [
+    ("Editar os meus dados", conta.editar_dados),
+    ("Alterar a password", conta.alterar_password),
+]
 
 #: Opções de cada perfil. Cada opção é um par ``(descrição, função)``; a
 #: função recebe a ligação à base de dados e o utilizador que entrou.
@@ -19,9 +25,10 @@ from gestor_campanhas.servicos.sessoes import SessaoAtiva
 OPCOES: dict[str, list] = {
     modelos.ADMINISTRADOR: [
         ("Horários de entrada e saída dos marketeers", admin.horarios),
+        *OPCOES_DA_CONTA,
     ],
-    modelos.MARKETEER: [],
-    modelos.CLIENTE: [],
+    modelos.MARKETEER: [*OPCOES_DA_CONTA],
+    modelos.CLIENTE: [*OPCOES_DA_CONTA],
 }
 
 
