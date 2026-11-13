@@ -28,6 +28,7 @@ Estrutura de pastas
        perfis.py          menu de cada perfil
        admin.py           opções do menu do Administrador
        conta.py           opções da conta, comuns a todos os perfis
+       recuperacao.py     recuperação da password
    tests/                 testes automáticos (pytest)
    docs/                  esta documentação (Sphinx)
    dados/                 criada no primeiro arranque; não vai para o Git
@@ -120,6 +121,15 @@ por isso a inatividade é verificada quando o utilizador responde a um menu.
 Se nesse momento o limite já tiver passado, a sessão é dada como terminada à
 hora em que o limite foi atingido, e é preciso entrar de novo.
 
+Emails
+------
+
+A aplicação não envia emails verdadeiros.
+:func:`gestor_campanhas.servicos.correio.enviar` escreve cada mensagem num
+ficheiro de texto da pasta ``caixa_saida``, dentro da pasta de dados. O resto
+da aplicação chama essa função como se o email fosse mesmo enviado, por isso
+trocar a simulação por um envio a sério só obriga a alterar esse módulo.
+
 Base de dados
 -------------
 
@@ -143,3 +153,6 @@ executadas em todos os arranques sem apagar dados.
    * - ``sessoes``
      - Uma linha por entrada na aplicação: utilizador, hora de entrada, hora
        de saída e motivo da saída (``logout`` ou ``inatividade``).
+   * - ``recuperacoes``
+     - Uma linha por pedido de recuperação de password: utilizador, hash do
+       código, prazo de validade e se já foi usado.

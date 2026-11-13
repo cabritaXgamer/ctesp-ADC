@@ -42,7 +42,8 @@ Configuração
      - Para que serve
    * - ``GESTOR_CAMPANHAS_DADOS``
      - ``dados`` (na pasta do projeto)
-     - Pasta onde a aplicação guarda a base de dados.
+     - Pasta onde a aplicação guarda a base de dados e os emails simulados
+       (subpasta ``caixa_saida``).
 
 Exemplo, para usar uma pasta separada numa demonstração:
 

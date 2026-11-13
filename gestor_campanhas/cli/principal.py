@@ -8,13 +8,14 @@ from __future__ import annotations
 import sqlite3
 
 from gestor_campanhas import __version__
-from gestor_campanhas.cli import comum, perfis
+from gestor_campanhas.cli import comum, perfis, recuperacao
 from gestor_campanhas.erros import ErroAutenticacao
 from gestor_campanhas.servicos import autenticacao, sessoes
 
 #: Opções do menu inicial, como pares ``(chave, descrição)``.
 OPCOES = [
     ("1", "Entrar"),
+    ("2", "Recuperar a password"),
     ("0", "Sair"),
 ]
 
@@ -32,6 +33,8 @@ def executar(ligacao: sqlite3.Connection) -> None:
             return
         if escolha == "1":
             entrar(ligacao)
+        if escolha == "2":
+            recuperacao.recuperar(ligacao)
 
 
 def entrar(ligacao: sqlite3.Connection) -> None:

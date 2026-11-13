@@ -47,6 +47,14 @@ CREATE TABLE IF NOT EXISTS sessoes (
     saida TEXT,
     motivo_saida TEXT CHECK (motivo_saida IN ('logout', 'inatividade'))
 );
+
+CREATE TABLE IF NOT EXISTS recuperacoes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    utilizador_id INTEGER NOT NULL REFERENCES utilizadores (id),
+    codigo_hash TEXT NOT NULL,
+    expira_em TEXT NOT NULL,
+    usado INTEGER NOT NULL DEFAULT 0
+);
 """
 
 
