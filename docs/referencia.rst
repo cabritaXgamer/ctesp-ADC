@@ -45,6 +45,16 @@ Utilizadores
 
 .. automodule:: gestor_campanhas.repositorios.utilizadores
 
+Sessões
+~~~~~~~
+
+.. automodule:: gestor_campanhas.repositorios.sessoes
+
+Definições
+~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.repositorios.configuracoes
+
 Serviços
 --------
 
@@ -54,6 +64,11 @@ Autenticação
 ~~~~~~~~~~~~
 
 .. automodule:: gestor_campanhas.servicos.autenticacao
+
+Sessões e inatividade
+~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.servicos.sessoes
 
 Dados de demonstração
 ---------------------
