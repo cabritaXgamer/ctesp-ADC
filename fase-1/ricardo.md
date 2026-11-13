@@ -163,7 +163,7 @@ Abre https://github.com/Blive77/ADC-TrabGrupo/pulls?q=is%3Apr+is%3Amerged e conf
 
 ### Passo 9 — Fica com as issues da unidade 1.2
 
-As issues desta unidade já existem: foram criadas na Fase 0, uma por user story. São 1 issue: A02. Vais ficar responsável por elas e escrever os critérios de aceitação, que dizem o que tem de funcionar para a story estar feita.
+As issues desta unidade já existem: foram criadas na Fase 0, uma por user story. Esta unidade tem 1 issue: A02. Vais ficar responsável por elas e escrever os critérios de aceitação, que dizem o que tem de funcionar para a story estar feita.
 
 Para cada uma:
 
@@ -609,7 +609,7 @@ Abre https://github.com/Blive77/ADC-TrabGrupo/pulls?q=is%3Apr+is%3Amerged e conf
 
 ### Passo 26 — Fica com as issues da unidade 1.5
 
-As issues desta unidade já existem: foram criadas na Fase 0, uma por user story. São 1 issue: C02. Vais ficar responsável por elas e escrever os critérios de aceitação, que dizem o que tem de funcionar para a story estar feita.
+As issues desta unidade já existem: foram criadas na Fase 0, uma por user story. Esta unidade tem 1 issue: C02. Vais ficar responsável por elas e escrever os critérios de aceitação, que dizem o que tem de funcionar para a story estar feita.
 
 Para cada uma:
 

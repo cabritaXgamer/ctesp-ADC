@@ -38,7 +38,7 @@ A fase anterior tem de estar fechada: todos os pull requests juntos e o `develop
 
 ### Passo 2 — Fica com as issues da unidade 1.1
 
-As issues desta unidade já existem: foram criadas na Fase 0, uma por user story. São 3 issues: A01, M01, C01. Vais ficar responsável por elas e escrever os critérios de aceitação, que dizem o que tem de funcionar para a story estar feita.
+As issues desta unidade já existem: foram criadas na Fase 0, uma por user story. Esta unidade tem 3 issues: A01, M01, C01. Vais ficar responsável por elas e escrever os critérios de aceitação, que dizem o que tem de funcionar para a story estar feita.
 
 Para cada uma:
 
@@ -524,7 +524,7 @@ Abre https://github.com/Blive77/ADC-TrabGrupo/pulls?q=is%3Apr+is%3Amerged e conf
 
 ### Passo 19 — Fica com as issues da unidade 1.4
 
-As issues desta unidade já existem: foram criadas na Fase 0, uma por user story. São 2 issues: C03, C04. Vais ficar responsável por elas e escrever os critérios de aceitação, que dizem o que tem de funcionar para a story estar feita.
+As issues desta unidade já existem: foram criadas na Fase 0, uma por user story. Esta unidade tem 2 issues: C03, C04. Vais ficar responsável por elas e escrever os critérios de aceitação, que dizem o que tem de funcionar para a story estar feita.
 
 Para cada uma:
 

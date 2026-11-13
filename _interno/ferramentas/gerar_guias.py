@@ -259,7 +259,7 @@ def passo_issue(u: dict, config: dict) -> tuple[str, str]:
     criterios = criterios_por_story(u)
     linhas = [
         f"As issues desta unidade já existem: foram criadas na Fase 0, uma por user story. "
-        f"São {plural(len(stories), 'issue', 'issues')}: {', '.join(stories)}. "
+        f"Esta unidade tem {plural(len(stories), 'issue', 'issues')}: {', '.join(stories)}. "
         "Vais ficar responsável por elas e escrever os critérios de aceitação, que dizem o que tem de "
         "funcionar para a story estar feita.\n\n"
         "Para cada uma:\n\n"
