@@ -2,7 +2,17 @@
 
 import pytest
 
-from gestor_campanhas import bd
+from gestor_campanhas import bd, modelos, seguranca
+from gestor_campanhas.repositorios import utilizadores
+
+#: Password de todas as contas criadas pela fixture ``contas``.
+PASSWORD_TESTE = "segredo-123"
+
+
+@pytest.fixture(autouse=True)
+def hash_rapido(monkeypatch):
+    """Reduz o trabalho do hash das passwords, para os testes serem rápidos."""
+    monkeypatch.setattr(seguranca, "ITERACOES", 1000)
 
 
 @pytest.fixture
@@ -38,5 +48,24 @@ def teclado(monkeypatch):
                 raise EOFError from None
 
         monkeypatch.setattr("builtins.input", responder)
+        # As passwords são pedidas com getpass quando há uma consola a sério.
+        monkeypatch.setattr("getpass.getpass", responder)
 
     return definir_respostas
+
+
+@pytest.fixture
+def contas(ligacao):
+    """Cria uma conta de cada perfil, todas com a password ``PASSWORD_TESTE``.
+
+    Devolve um dicionário com os utilizadores, pelo nome do perfil.
+    """
+    dados = {
+        modelos.ADMINISTRADOR: ("Ana Admin", "ana@agencia.pt"),
+        modelos.MARKETEER: ("Miguel Marketeer", "miguel@agencia.pt"),
+        modelos.CLIENTE: ("Carla Cliente", "carla@empresa.pt"),
+    }
+    return {
+        perfil: utilizadores.criar(ligacao, nome, email, seguranca.gerar_hash(PASSWORD_TESTE), perfil)
+        for perfil, (nome, email) in dados.items()
+    }

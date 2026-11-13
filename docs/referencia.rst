@@ -24,6 +24,42 @@ Base de dados
 
 .. automodule:: gestor_campanhas.bd
 
+Modelos, erros e utilitários
+----------------------------
+
+.. automodule:: gestor_campanhas.modelos
+
+.. automodule:: gestor_campanhas.erros
+
+.. automodule:: gestor_campanhas.relogio
+
+.. automodule:: gestor_campanhas.seguranca
+
+Repositórios
+------------
+
+.. automodule:: gestor_campanhas.repositorios
+
+Utilizadores
+~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.repositorios.utilizadores
+
+Serviços
+--------
+
+.. automodule:: gestor_campanhas.servicos
+
+Autenticação
+~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.servicos.autenticacao
+
+Dados de demonstração
+---------------------
+
+.. automodule:: gestor_campanhas.dados_demo
+
 Linha de comandos
 -----------------
 
@@ -38,3 +74,8 @@ Menu inicial
 ~~~~~~~~~~~~
 
 .. automodule:: gestor_campanhas.cli.principal
+
+Menus dos perfis
+~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.cli.perfis

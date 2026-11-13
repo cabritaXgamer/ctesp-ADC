@@ -26,6 +26,19 @@ CREATE TABLE IF NOT EXISTS configuracoes (
     chave TEXT PRIMARY KEY,
     valor TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS utilizadores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL,
+    perfil TEXT NOT NULL CHECK (perfil IN ('administrador', 'marketeer', 'cliente')),
+    ativo INTEGER NOT NULL DEFAULT 1,
+    telefone TEXT NOT NULL DEFAULT '',
+    empresa TEXT NOT NULL DEFAULT '',
+    nif TEXT NOT NULL DEFAULT '',
+    criado_em TEXT NOT NULL
+);
 """
 
 

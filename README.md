@@ -57,6 +57,22 @@ Opção:
 
 No primeiro arranque é criada a pasta `dados`, com a base de dados `app.db`. Essa pasta não vai para o Git.
 
+### Contas de demonstração
+
+Uma instalação nova não tem contas. Para criar uma de cada perfil:
+
+```bash
+python -m gestor_campanhas.dados_demo
+```
+
+| Perfil | Email | Password |
+|---|---|---|
+| Administrador | `admin@agencia.pt` | `admin12345` |
+| Marketeer | `marketeer@agencia.pt` | `marketeer12345` |
+| Cliente | `cliente@empresa.pt` | `cliente12345` |
+
+Estas passwords são públicas e servem só para demonstração.
+
 ## Configuração
 
 | Variável de ambiente | Valor por omissão | Para que serve |

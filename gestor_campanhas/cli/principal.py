@@ -8,7 +8,9 @@ from __future__ import annotations
 import sqlite3
 
 from gestor_campanhas import __version__
-from gestor_campanhas.cli import comum
+from gestor_campanhas.cli import comum, perfis
+from gestor_campanhas.erros import ErroAutenticacao
+from gestor_campanhas.servicos import autenticacao
 
 #: Opções do menu inicial, como pares ``(chave, descrição)``.
 OPCOES = [
@@ -29,5 +31,25 @@ def executar(ligacao: sqlite3.Connection) -> None:
             print("Até breve!")
             return
         if escolha == "1":
-            print("A autenticação ainda não está disponível nesta versão.")
-            comum.pausa()
+            entrar(ligacao)
+
+
+def entrar(ligacao: sqlite3.Connection) -> None:
+    """Pede o email e a password e, se estiverem certos, abre o menu do perfil.
+
+    Quando as credenciais estão erradas, mostra a mensagem e volta ao menu
+    inicial.
+
+    :param ligacao: Ligação aberta à base de dados.
+    """
+    comum.titulo("Entrar")
+    email = comum.ler_texto("Email")
+    password = comum.ler_password()
+    try:
+        utilizador = autenticacao.autenticar(ligacao, email, password)
+    except ErroAutenticacao as erro:
+        print(erro)
+        comum.pausa()
+        return
+    print(f"Bem-vindo, {utilizador.nome}.")
+    perfis.executar(ligacao, utilizador)
