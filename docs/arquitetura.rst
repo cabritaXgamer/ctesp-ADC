@@ -15,9 +15,17 @@ Estrutura de pastas
      __main__.py          ponto de entrada (python -m gestor_campanhas)
      config.py            caminhos da pasta de dados e da base de dados
      bd.py                ligação SQLite e criação das tabelas
+     modelos.py           classes de dados (Utilizador) e perfis
+     erros.py             erros que os menus mostram ao utilizador
+     relogio.py           data e hora atuais
+     seguranca.py         hash das passwords
+     dados_demo.py        cria as contas de demonstração
+     repositorios/        leitura e escrita na base de dados, uma tabela por módulo
+     servicos/            regras de negócio, um assunto por módulo
      cli/                 menus da linha de comandos
        comum.py           funções partilhadas por todos os menus
-       principal.py       menu inicial
+       principal.py       menu inicial e entrada na aplicação
+       perfis.py          menu de cada perfil
    tests/                 testes automáticos (pytest)
    docs/                  esta documentação (Sphinx)
    dados/                 criada no primeiro arranque; não vai para o Git
@@ -25,8 +33,8 @@ Estrutura de pastas
 Camadas
 -------
 
-O código está separado por responsabilidades. Cada camada só conhece a que
-está abaixo dela:
+O código está separado por responsabilidades. Cada camada só conhece as que
+estão abaixo dela:
 
 .. code-block:: text
 
@@ -36,19 +44,49 @@ está abaixo dela:
    cli             mostra menus, lê respostas, apresenta resultados
       |
       v
+   servicos        regras de negócio: decide o que é permitido
+      |
+      v
+   repositorios    lê e escreve na base de dados (único sítio com SQL)
+      |
+      v
    bd              abre a ligação e cria as tabelas
       |
       v
    SQLite          ficheiro dados/app.db
 
-Duas regras orientam esta separação:
+Três regras orientam esta separação:
 
 * **Os menus não tomam decisões.** O pacote ``cli`` limita-se a perguntar e a
-  mostrar. As regras da aplicação ficam em módulos próprios, que podem ser
-  testados sem simular o teclado.
+  mostrar. As regras ficam em ``servicos``, que não lê do teclado nem escreve
+  no ecrã, e por isso pode ser testado diretamente.
+* **Os erros esperados são exceções próprias.** Quando uma regra não é
+  cumprida, o serviço lança um erro de :mod:`gestor_campanhas.erros`. O menu
+  apanha-o e mostra a mensagem.
 * **A ligação à base de dados é passada como argumento.** Só o ponto de
   entrada abre a ligação; os outros módulos recebem-na já aberta. Assim, os
   testes podem entregar uma base de dados em memória em vez da verdadeira.
+
+Exemplo: entrar na aplicação
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. :func:`gestor_campanhas.cli.principal.entrar` pede o email e a password.
+2. :func:`gestor_campanhas.servicos.autenticacao.autenticar` procura o
+   utilizador, confirma a password e verifica se a conta está ativa.
+3. :mod:`gestor_campanhas.repositorios.utilizadores` faz as consultas SQL.
+4. :func:`gestor_campanhas.seguranca.verificar_password` compara a password
+   com o hash guardado.
+5. Se tudo estiver certo, :func:`gestor_campanhas.cli.perfis.executar` mostra
+   o menu do perfil. Se não, é lançado
+   :class:`~gestor_campanhas.erros.ErroAutenticacao` e o menu mostra a
+   mensagem.
+
+Passwords
+---------
+
+A aplicação nunca guarda passwords. Guarda um hash calculado com PBKDF2
+(SHA-256), com um *salt* aleatório por conta, no formato
+``algoritmo$iterações$salt$hash``. Ver :mod:`gestor_campanhas.seguranca`.
 
 Arranque
 --------
@@ -80,3 +118,7 @@ executadas em todos os arranques sem apagar dados.
    * - ``configuracoes``
      - Pares chave/valor com definições que podem ser alteradas durante a
        utilização da aplicação.
+   * - ``utilizadores``
+     - Uma linha por conta: nome, email (único), hash da password, perfil
+       (``administrador``, ``marketeer`` ou ``cliente``), se está ativa,
+       telefone e, para os clientes, empresa e NIF.
