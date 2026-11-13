@@ -64,6 +64,42 @@ os 15 minutos se completaram.
    esse terminal não permite escondê-la. No PowerShell, na Linha de Comandos
    e no terminal do VS Code fica escondida.
 
+A minha conta
+-------------
+
+Estas duas opções aparecem no menu de todos os perfis.
+
+Editar os meus dados
+~~~~~~~~~~~~~~~~~~~~
+
+Mostra os dados da conta e pede cada um, com o valor atual entre parênteses
+retos. Com Enter, o valor mantém-se.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Dado
+     - Regras
+   * - Email
+     - Não pode ser alterado.
+   * - Nome
+     - Não pode ficar vazio.
+   * - Telefone
+     - Vazio, ou 9 a 15 algarismos, com ou sem ``+`` no início.
+   * - Empresa
+     - Só é pedida aos clientes.
+   * - NIF
+     - Só é pedido aos clientes. Vazio ou 9 algarismos.
+
+Se algum valor não respeitar as regras, nenhum dado é alterado.
+
+Alterar a password
+~~~~~~~~~~~~~~~~~~
+
+Pede a password atual e a nova, duas vezes. A password nova tem de ter pelo
+menos 8 caracteres e ser diferente da atual.
+
 Administrador
 -------------
 

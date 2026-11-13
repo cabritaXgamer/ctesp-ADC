@@ -71,6 +71,17 @@ def ler_texto(pergunta: str, obrigatorio: bool = True) -> str:
         print("Este campo é obrigatório.")
 
 
+def ler_texto_com_valor(pergunta: str, atual: str) -> str:
+    """Pede um texto, mostrando o valor atual. Com Enter, o valor atual mantém-se.
+
+    :param pergunta: Texto mostrado antes da resposta.
+    :param atual: Valor atual, mostrado entre parênteses retos.
+    :return: A resposta, ou ``atual`` se a resposta ficou vazia.
+    """
+    resposta = input(f"{pergunta} [{atual}]: ").strip()
+    return resposta if resposta else atual
+
+
 def confirmar(pergunta: str) -> bool:
     """Pede uma confirmação de sim ou não.
 

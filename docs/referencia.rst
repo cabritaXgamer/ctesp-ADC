@@ -70,6 +70,11 @@ Sessões e inatividade
 
 .. automodule:: gestor_campanhas.servicos.sessoes
 
+Conta do utilizador
+~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.servicos.contas
+
 Dados de demonstração
 ---------------------
 
@@ -99,3 +104,8 @@ Opções do Administrador
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: gestor_campanhas.cli.admin
+
+Opções da conta
+~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.cli.conta

@@ -119,3 +119,36 @@ def contar(ligacao: sqlite3.Connection) -> int:
     :return: Número de utilizadores.
     """
     return ligacao.execute("SELECT COUNT(*) FROM utilizadores").fetchone()[0]
+
+
+def atualizar_password(ligacao: sqlite3.Connection, identificador: int, password_hash: str) -> None:
+    """Substitui o hash da password de um utilizador.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Identificador do utilizador.
+    :param password_hash: Hash da nova password.
+    """
+    ligacao.execute("UPDATE utilizadores SET password_hash = ? WHERE id = ?", (password_hash, identificador))
+    ligacao.commit()
+
+
+def atualizar_dados(
+    ligacao: sqlite3.Connection, identificador: int, nome: str, telefone: str, empresa: str, nif: str
+) -> Utilizador:
+    """Altera o nome, o telefone e os dados da empresa de um utilizador.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Identificador do utilizador.
+    :param nome: Novo nome.
+    :param telefone: Novo telefone.
+    :param empresa: Novo nome da empresa.
+    :param nif: Novo número de contribuinte.
+    :return: O utilizador, já com os dados novos.
+    """
+    ligacao.execute(
+        "UPDATE utilizadores SET nome = ?, telefone = ?, empresa = ?, nif = ? WHERE id = ?",
+        (nome, telefone, empresa, nif, identificador),
+    )
+    ligacao.commit()
+    return obter_por_id(ligacao, identificador)
+

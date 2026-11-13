@@ -27,6 +27,7 @@ Estrutura de pastas
        principal.py       menu inicial e entrada na aplicação
        perfis.py          menu de cada perfil
        admin.py           opções do menu do Administrador
+       conta.py           opções da conta, comuns a todos os perfis
    tests/                 testes automáticos (pytest)
    docs/                  esta documentação (Sphinx)
    dados/                 criada no primeiro arranque; não vai para o Git
