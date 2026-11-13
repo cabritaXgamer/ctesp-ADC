@@ -48,6 +48,16 @@ errada, para não revelar que emails têm conta.
 Em qualquer menu de perfil, a opção **0. Terminar sessão** volta ao menu
 inicial.
 
+Sessões e inatividade
+---------------------
+
+Cada entrada e cada saída ficam registadas, com data e hora.
+
+Se o utilizador estiver mais de 15 minutos sem responder a um menu, a sessão
+termina sozinha: ao responder, aparece o aviso de que a sessão terminou por
+inatividade e é preciso entrar de novo. A saída fica registada à hora em que
+os 15 minutos se completaram.
+
 .. note::
 
    No terminal Git Bash a password aparece no ecrã enquanto é escrita, porque

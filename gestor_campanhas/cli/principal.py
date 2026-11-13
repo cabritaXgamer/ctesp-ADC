@@ -10,7 +10,7 @@ import sqlite3
 from gestor_campanhas import __version__
 from gestor_campanhas.cli import comum, perfis
 from gestor_campanhas.erros import ErroAutenticacao
-from gestor_campanhas.servicos import autenticacao
+from gestor_campanhas.servicos import autenticacao, sessoes
 
 #: Opções do menu inicial, como pares ``(chave, descrição)``.
 OPCOES = [
@@ -38,7 +38,9 @@ def entrar(ligacao: sqlite3.Connection) -> None:
     """Pede o email e a password e, se estiverem certos, abre o menu do perfil.
 
     Quando as credenciais estão erradas, mostra a mensagem e volta ao menu
-    inicial.
+    inicial. Quando estão certas, fica registada uma sessão, com a hora de
+    entrada. A saída é sempre registada, mesmo que o programa seja
+    interrompido a meio.
 
     :param ligacao: Ligação aberta à base de dados.
     """
@@ -52,4 +54,10 @@ def entrar(ligacao: sqlite3.Connection) -> None:
         comum.pausa()
         return
     print(f"Bem-vindo, {utilizador.nome}.")
-    perfis.executar(ligacao, utilizador)
+    sessao = sessoes.iniciar(ligacao, utilizador)
+    try:
+        perfis.executar(ligacao, sessao)
+    finally:
+        # Se o programa for interrompido com a sessão aberta, a saída fica
+        # registada na mesma. Se já foi registada, isto não faz nada.
+        sessoes.terminar(ligacao, sessao)

@@ -102,6 +102,22 @@ Quando se executa ``python -m gestor_campanhas``:
 4. A ligação à base de dados é fechada, mesmo que o programa seja
    interrompido com Ctrl+C.
 
+Sessões e inatividade
+---------------------
+
+Quando alguém entra, :func:`gestor_campanhas.servicos.sessoes.iniciar` regista
+uma linha na tabela ``sessoes`` com a hora de entrada. A saída é registada por
+:func:`gestor_campanhas.servicos.sessoes.terminar`, com o motivo.
+
+O limite de inatividade é de 15 minutos por omissão
+(:data:`gestor_campanhas.config.MINUTOS_INATIVIDADE`) e pode ser alterado na
+tabela ``configuracoes``, com a chave ``minutos_inatividade``.
+
+Uma aplicação de linha de comandos fica parada enquanto espera pelo teclado,
+por isso a inatividade é verificada quando o utilizador responde a um menu.
+Se nesse momento o limite já tiver passado, a sessão é dada como terminada à
+hora em que o limite foi atingido, e é preciso entrar de novo.
+
 Base de dados
 -------------
 
@@ -122,3 +138,6 @@ executadas em todos os arranques sem apagar dados.
      - Uma linha por conta: nome, email (único), hash da password, perfil
        (``administrador``, ``marketeer`` ou ``cliente``), se está ativa,
        telefone e, para os clientes, empresa e NIF.
+   * - ``sessoes``
+     - Uma linha por entrada na aplicação: utilizador, hora de entrada, hora
+       de saída e motivo da saída (``logout`` ou ``inatividade``).

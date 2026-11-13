@@ -20,6 +20,10 @@ PASTA_PROJETO = Path(__file__).resolve().parent.parent
 #: Nome do ficheiro da base de dados, dentro da pasta de dados.
 NOME_FICHEIRO_BD = "app.db"
 
+#: Minutos sem atividade ao fim dos quais a sessão termina sozinha. É o valor
+#: usado enquanto não houver outro guardado na tabela ``configuracoes``.
+MINUTOS_INATIVIDADE = 15
+
 
 def pasta_dados() -> Path:
     """Devolve a pasta onde a aplicação guarda os seus dados.

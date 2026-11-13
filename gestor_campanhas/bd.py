@@ -39,6 +39,14 @@ CREATE TABLE IF NOT EXISTS utilizadores (
     nif TEXT NOT NULL DEFAULT '',
     criado_em TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS sessoes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    utilizador_id INTEGER NOT NULL REFERENCES utilizadores (id),
+    entrada TEXT NOT NULL,
+    saida TEXT,
+    motivo_saida TEXT CHECK (motivo_saida IN ('logout', 'inatividade'))
+);
 """
 
 
