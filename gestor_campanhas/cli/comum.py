@@ -6,6 +6,7 @@ confirmações, para que todos os menus se comportem da mesma maneira.
 
 from __future__ import annotations
 
+import getpass
 import sys
 
 #: Largura, em caracteres, das linhas que delimitam os títulos.
@@ -36,6 +37,22 @@ def titulo(texto: str) -> None:
     print("=" * LARGURA)
     print(texto)
     print("=" * LARGURA)
+
+
+def ler_password(pergunta: str = "Password") -> str:
+    """Pede uma password sem a mostrar no ecrã.
+
+    Numa consola normal, o que se escreve não aparece. Quando a aplicação não
+    está ligada diretamente a uma consola (por exemplo no terminal Git Bash,
+    ou nos testes), não é possível esconder o texto e a password é lida como
+    qualquer outra resposta.
+
+    :param pergunta: Texto mostrado antes da resposta.
+    :return: Password introduzida, tal como foi escrita.
+    """
+    if sys.stdin is not None and sys.stdin.isatty():
+        return getpass.getpass(f"{pergunta}: ")
+    return input(f"{pergunta}: ")
 
 
 def ler_texto(pergunta: str, obrigatorio: bool = True) -> str:
