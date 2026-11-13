@@ -7,6 +7,7 @@ valores nos tipos certos do Python.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import datetime
 
 #: Perfil de quem gere a plataforma.
 ADMINISTRADOR = "administrador"
@@ -14,6 +15,11 @@ ADMINISTRADOR = "administrador"
 MARKETEER = "marketeer"
 #: Perfil de quem pede campanhas e acompanha o trabalho.
 CLIENTE = "cliente"
+
+#: Motivo de saída de uma sessão terminada pelo próprio utilizador.
+LOGOUT = "logout"
+#: Motivo de saída de uma sessão terminada por falta de atividade.
+INATIVIDADE = "inatividade"
 
 #: Todos os perfis, com o nome que é mostrado nos menus.
 NOMES_PERFIS = {
@@ -50,3 +56,22 @@ class Utilizador:
     def nome_perfil(self) -> str:
         """Nome do perfil tal como aparece nos menus, por exemplo ``"Marketeer"``."""
         return NOMES_PERFIS[self.perfil]
+
+
+@dataclass
+class Sessao:
+    """Um período em que um utilizador esteve dentro da aplicação.
+
+    :param id: Identificador na base de dados.
+    :param utilizador_id: Identificador do utilizador que entrou.
+    :param entrada: Data e hora em que entrou.
+    :param saida: Data e hora em que saiu, ou ``None`` se ainda não saiu.
+    :param motivo_saida: :data:`LOGOUT` ou :data:`INATIVIDADE`; ``None``
+        enquanto a sessão está aberta.
+    """
+
+    id: int
+    utilizador_id: int
+    entrada: datetime
+    saida: datetime | None = None
+    motivo_saida: str | None = None
