@@ -20,6 +20,9 @@ PASTA_PROJETO = Path(__file__).resolve().parent.parent
 #: Nome do ficheiro da base de dados, dentro da pasta de dados.
 NOME_FICHEIRO_BD = "app.db"
 
+#: Minutos durante os quais um código de recuperação de password é válido.
+MINUTOS_VALIDADE_CODIGO = 15
+
 #: Minutos sem atividade ao fim dos quais a sessão termina sozinha. É o valor
 #: usado enquanto não houver outro guardado na tabela ``configuracoes``.
 MINUTOS_INATIVIDADE = 15
@@ -45,3 +48,14 @@ def ficheiro_bd() -> Path:
     :return: Caminho do ficheiro ``app.db`` dentro da pasta de dados.
     """
     return pasta_dados() / NOME_FICHEIRO_BD
+
+
+def pasta_caixa_saida() -> Path:
+    """Devolve a pasta onde ficam os emails "enviados" pela aplicação.
+
+    A aplicação não envia emails verdadeiros: escreve cada mensagem num
+    ficheiro de texto desta pasta.
+
+    :return: Caminho da pasta ``caixa_saida`` dentro da pasta de dados.
+    """
+    return pasta_dados() / "caixa_saida"
