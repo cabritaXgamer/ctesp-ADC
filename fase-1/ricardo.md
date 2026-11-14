@@ -45,15 +45,17 @@ Não precisas de perceber todas as linhas. Percorre os ficheiros e confirma que 
 
 ### Passo 3 — Experimenta no teu computador
 
-No terminal, dentro da pasta `ADC-TrabGrupo`, traz o ramo de Tomas:
+No terminal, dentro da pasta `ADC-TrabGrupo`, atualiza a pasta de trabalho e traz o ramo de Tomas:
 
 ```bash
+git -C ../ctesp-ADC pull
 git fetch origin
 git switch feature/1.1-login-perfis
 ```
 
 | Comando | O que faz |
 |---|---|
+| `git -C ../ctesp-ADC pull` | Atualiza a pasta do repositório de trabalho. Sem isto, o `verificar.py` não conhece as unidades desta fase |
 | `git fetch origin` | Vai ver o que há de novo no GitHub, incluindo o ramo de Tomas. Não mexe nos teus ficheiros |
 | `git switch feature/1.1-login-perfis` | Cria no teu computador uma cópia desse ramo e muda para ela |
 
@@ -494,15 +496,17 @@ Não precisas de perceber todas as linhas. Percorre os ficheiros e confirma que 
 
 ### Passo 20 — Experimenta no teu computador
 
-No terminal, dentro da pasta `ADC-TrabGrupo`, traz o ramo de Tomas:
+No terminal, dentro da pasta `ADC-TrabGrupo`, atualiza a pasta de trabalho e traz o ramo de Tomas:
 
 ```bash
+git -C ../ctesp-ADC pull
 git fetch origin
 git switch feature/1.4-password-perfil
 ```
 
 | Comando | O que faz |
 |---|---|
+| `git -C ../ctesp-ADC pull` | Atualiza a pasta do repositório de trabalho. Sem isto, o `verificar.py` não conhece as unidades desta fase |
 | `git fetch origin` | Vai ver o que há de novo no GitHub, incluindo o ramo de Tomas. Não mexe nos teus ficheiros |
 | `git switch feature/1.4-password-perfil` | Cria no teu computador uma cópia desse ramo e muda para ela |
 

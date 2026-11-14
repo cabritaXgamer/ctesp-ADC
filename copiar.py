@@ -131,7 +131,12 @@ def main() -> int:
 
     identificador, numero = sys.argv[1], int(sys.argv[2])
     if identificador not in unidades:
-        raise erro(f"Não existe a unidade {identificador}. Unidades disponíveis: {', '.join(unidades)}.")
+        raise erro(
+            f"Não existe a unidade {identificador}. Unidades disponíveis: {', '.join(unidades)}.\n"
+            "Se a unidade é de uma fase nova, a pasta do repositório de trabalho está desatualizada.\n"
+            f'Atualiza-a com:  git -C "{TRABALHO}" pull\n'
+            "e repete o comando."
+        )
     unidade = unidades[identificador]
     total = len(unidade["commits"])
     if not 1 <= numero <= total:

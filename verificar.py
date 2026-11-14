@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import sys
 
-from copiar import carregar_unidades, configurar_saida, confirmar_pasta_oficial, descrever_ponto, erro, git
+from copiar import TRABALHO, carregar_unidades, configurar_saida, confirmar_pasta_oficial, descrever_ponto, erro, git
 
 
 def main() -> int:
@@ -25,7 +25,12 @@ def main() -> int:
         raise erro("Indica a unidade. Exemplo:\n  python ../ctesp-ADC/verificar.py 0.1")
     identificador = sys.argv[1]
     if identificador not in unidades:
-        raise erro(f"Não existe a unidade {identificador}. Unidades disponíveis: {', '.join(unidades)}.")
+        raise erro(
+            f"Não existe a unidade {identificador}. Unidades disponíveis: {', '.join(unidades)}.\n"
+            "Se a unidade é de uma fase nova, a pasta do repositório de trabalho está desatualizada.\n"
+            f'Atualiza-a com:  git -C "{TRABALHO}" pull\n'
+            "e repete o comando."
+        )
     unidade = unidades[identificador]
 
     ramo = git("branch", "--show-current")

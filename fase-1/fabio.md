@@ -46,15 +46,17 @@ Não precisas de perceber todas as linhas. Percorre os ficheiros e confirma que 
 
 ### Passo 3 — Experimenta no teu computador
 
-No terminal, dentro da pasta `ADC-TrabGrupo`, traz o ramo de Ricardo:
+No terminal, dentro da pasta `ADC-TrabGrupo`, atualiza a pasta de trabalho e traz o ramo de Ricardo:
 
 ```bash
+git -C ../ctesp-ADC pull
 git fetch origin
 git switch feature/1.2-sessoes-inatividade
 ```
 
 | Comando | O que faz |
 |---|---|
+| `git -C ../ctesp-ADC pull` | Atualiza a pasta do repositório de trabalho. Sem isto, o `verificar.py` não conhece as unidades desta fase |
 | `git fetch origin` | Vai ver o que há de novo no GitHub, incluindo o ramo de Ricardo. Não mexe nos teus ficheiros |
 | `git switch feature/1.2-sessoes-inatividade` | Cria no teu computador uma cópia desse ramo e muda para ela |
 
@@ -459,15 +461,17 @@ Não precisas de perceber todas as linhas. Percorre os ficheiros e confirma que 
 
 ### Passo 20 — Experimenta no teu computador
 
-No terminal, dentro da pasta `ADC-TrabGrupo`, traz o ramo de Ricardo:
+No terminal, dentro da pasta `ADC-TrabGrupo`, atualiza a pasta de trabalho e traz o ramo de Ricardo:
 
 ```bash
+git -C ../ctesp-ADC pull
 git fetch origin
 git switch feature/1.5-recuperar-password
 ```
 
 | Comando | O que faz |
 |---|---|
+| `git -C ../ctesp-ADC pull` | Atualiza a pasta do repositório de trabalho. Sem isto, o `verificar.py` não conhece as unidades desta fase |
 | `git fetch origin` | Vai ver o que há de novo no GitHub, incluindo o ramo de Ricardo. Não mexe nos teus ficheiros |
 | `git switch feature/1.5-recuperar-password` | Cria no teu computador uma cópia desse ramo e muda para ela |
 

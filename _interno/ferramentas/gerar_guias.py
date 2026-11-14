@@ -455,9 +455,11 @@ def passo_experimentar_revisor(u: dict, config: dict) -> tuple[str, str]:
     ramo, autor = u["ramo"], u["quem"]
     return (
         "Experimenta no teu computador",
-        f"No terminal, dentro da pasta `{config['pasta_oficial']}`, traz o ramo de {autor}:\n\n"
-        + bloco(f"git fetch origin\ngit switch {ramo}", "bash")
+        f"No terminal, dentro da pasta `{config['pasta_oficial']}`, atualiza a pasta de trabalho e traz o ramo de {autor}:\n\n"
+        + bloco(f"git -C ../{config['pasta_trabalho']} pull\ngit fetch origin\ngit switch {ramo}", "bash")
         + "\n\n| Comando | O que faz |\n|---|---|\n"
+        f"| `git -C ../{config['pasta_trabalho']} pull` | Atualiza a pasta do repositório de trabalho. Sem isto, "
+        "o `verificar.py` não conhece as unidades desta fase |\n"
         f"| `git fetch origin` | Vai ver o que há de novo no GitHub, incluindo o ramo de {autor}. Não mexe nos teus ficheiros |\n"
         f"| `git switch {ramo}` | Cria no teu computador uma cópia desse ramo e muda para ela |\n\n"
         f"**Deves ver** `Switched to a new branch '{ramo}'`.\n\n"

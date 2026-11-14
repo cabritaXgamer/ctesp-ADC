@@ -410,15 +410,17 @@ Não precisas de perceber todas as linhas. Percorre os ficheiros e confirma que 
 
 ### Passo 13 — Experimenta no teu computador
 
-No terminal, dentro da pasta `ADC-TrabGrupo`, traz o ramo de Fabio:
+No terminal, dentro da pasta `ADC-TrabGrupo`, atualiza a pasta de trabalho e traz o ramo de Fabio:
 
 ```bash
+git -C ../ctesp-ADC pull
 git fetch origin
 git switch feature/1.3-horarios-marketeers
 ```
 
 | Comando | O que faz |
 |---|---|
+| `git -C ../ctesp-ADC pull` | Atualiza a pasta do repositório de trabalho. Sem isto, o `verificar.py` não conhece as unidades desta fase |
 | `git fetch origin` | Vai ver o que há de novo no GitHub, incluindo o ramo de Fabio. Não mexe nos teus ficheiros |
 | `git switch feature/1.3-horarios-marketeers` | Cria no teu computador uma cópia desse ramo e muda para ela |
 
@@ -823,15 +825,17 @@ Não precisas de perceber todas as linhas. Percorre os ficheiros e confirma que 
 
 ### Passo 30 — Experimenta no teu computador
 
-No terminal, dentro da pasta `ADC-TrabGrupo`, traz o ramo de Fabio:
+No terminal, dentro da pasta `ADC-TrabGrupo`, atualiza a pasta de trabalho e traz o ramo de Fabio:
 
 ```bash
+git -C ../ctesp-ADC pull
 git fetch origin
 git switch release/v0.1.0
 ```
 
 | Comando | O que faz |
 |---|---|
+| `git -C ../ctesp-ADC pull` | Atualiza a pasta do repositório de trabalho. Sem isto, o `verificar.py` não conhece as unidades desta fase |
 | `git fetch origin` | Vai ver o que há de novo no GitHub, incluindo o ramo de Fabio. Não mexe nos teus ficheiros |
 | `git switch release/v0.1.0` | Cria no teu computador uma cópia desse ramo e muda para ela |
 
