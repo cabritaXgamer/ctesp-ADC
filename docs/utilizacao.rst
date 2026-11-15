@@ -211,6 +211,8 @@ a password. A conta não é apagada: continua na lista, com o estado
 ``Desativada``, e os seus dados e o seu histórico mantêm-se. A mesma opção
 reativa a conta, e o cliente volta a entrar com a password que tinha.
 
+Nos dois casos, o cliente recebe um email a avisar da alteração.
+
 Marketeers
 ~~~~~~~~~~
 
@@ -232,6 +234,11 @@ empresa nem NIF, por isso esses dados não são pedidos nem aparecem na lista.
 
 O marketeer novo recebe por email as credenciais de acesso, tal como um
 cliente novo.
+
+**Desativar ou reativar marketeer** também funciona como nos clientes: pede
+confirmação, a conta desativada deixa de poder entrar e o marketeer é avisado
+por email. As sessões que o marketeer já fez continuam a aparecer nos
+horários de entrada e saída.
 
 Horários de entrada e saída dos marketeers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
