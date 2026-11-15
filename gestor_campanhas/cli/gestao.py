@@ -18,6 +18,7 @@ from gestor_campanhas.servicos import gestao
 #: Nome de cada perfil gerido, no singular e no plural, para as mensagens.
 NOMES = {
     modelos.CLIENTE: ("cliente", "clientes"),
+    modelos.MARKETEER: ("marketeer", "marketeers"),
 }
 
 
@@ -165,6 +166,10 @@ ACOES = {
         ("Editar", editar),
         ("Desativar ou reativar", alterar_estado),
     ],
+    modelos.MARKETEER: [
+        ("Adicionar", adicionar),
+        ("Editar", editar),
+    ],
 }
 
 
@@ -209,3 +214,12 @@ def clientes(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
     :param utilizador: Administrador que está a consultar.
     """
     gerir(ligacao, modelos.CLIENTE)
+
+
+def marketeers(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
+    """Opção "Marketeers" do menu do Administrador.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param utilizador: Administrador que está a consultar.
+    """
+    gerir(ligacao, modelos.MARKETEER)
