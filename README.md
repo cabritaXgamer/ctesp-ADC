@@ -21,6 +21,7 @@ O desenvolvimento é feito por fases, cada uma fechada com uma *release*. As fun
 | Versão | Conteúdo |
 |---|---|
 | v0.1.0 | Autenticação e sessões: entrar e sair, registo de sessões, inatividade, horários dos marketeers, dados da conta, recuperação da password |
+| v0.2.0 | Clientes e marketeers: o Administrador lista, pesquisa, adiciona, edita, desativa e reativa as contas de clientes e de marketeers |
 
 O detalhe de cada versão está no [registo de alterações](CHANGELOG.md).
 
@@ -50,7 +51,7 @@ A aplicação mostra um menu numerado. Escreve-se o número da opção e prime-s
 
 ```
 ============================================================
-Gestor de Campanhas v0.1.0
+Gestor de Campanhas v0.2.0
 ============================================================
   1. Entrar
   2. Recuperar a password
@@ -62,7 +63,7 @@ No primeiro arranque é criada a pasta `dados`, com a base de dados `app.db`. Es
 
 ### Contas de demonstração
 
-Uma instalação nova não tem contas. Para criar uma de cada perfil:
+Uma instalação nova não tem contas. Para criar as contas de demonstração:
 
 ```bash
 python -m gestor_campanhas.dados_demo
@@ -72,13 +73,22 @@ python -m gestor_campanhas.dados_demo
 |---|---|---|
 | Administrador | `admin@agencia.pt` | `admin12345` |
 | Marketeer | `marketeer@agencia.pt` | `marketeer12345` |
+| Marketeer | `marta@agencia.pt` | `marta12345` |
 | Cliente | `cliente@empresa.pt` | `cliente12345` |
+| Cliente | `jose@padaria.pt` | `jose12345` |
+| Cliente | `beatriz@bicicletas.pt` | `beatriz12345` |
 
 Estas passwords são públicas e servem só para demonstração.
 
+### Clientes e marketeers
+
+O Administrador gere as contas dos clientes e dos marketeers nas opções **Clientes** e **Marketeers** do seu menu. Cada uma mostra a lista das contas e, por baixo, as opções para pesquisar por nome, adicionar, editar e desativar ou reativar.
+
+Uma conta nova começa com uma password aleatória, enviada por email para a pessoa. Uma conta desativada deixa de poder entrar, mas não é apagada e pode ser reativada.
+
 ### Emails
 
-A aplicação não envia emails verdadeiros. Cada mensagem (por exemplo, o código para recuperar a password) é escrita num ficheiro de texto na pasta `dados/caixa_saida`.
+A aplicação não envia emails verdadeiros. Cada mensagem (por exemplo, o código para recuperar a password ou as credenciais de uma conta nova) é escrita num ficheiro de texto na pasta `dados/caixa_saida`.
 
 ### Sessões
 
