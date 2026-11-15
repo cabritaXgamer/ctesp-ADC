@@ -152,6 +152,7 @@ def alterar_estado(ligacao: sqlite3.Connection, perfil: str) -> None:
     if comum.confirmar("Desativar a conta?" if conta.ativo else "Reativar a conta?"):
         gestao.definir_estado(ligacao, perfil, conta.id, not conta.ativo)
         print("\nConta desativada." if conta.ativo else "\nConta reativada.")
+        print(f"Foi enviado um aviso para {conta.email}.")
     else:
         print("\nNada foi alterado.")
     comum.pausa()
@@ -169,6 +170,7 @@ ACOES = {
     modelos.MARKETEER: [
         ("Adicionar", adicionar),
         ("Editar", editar),
+        ("Desativar ou reativar", alterar_estado),
     ],
 }
 

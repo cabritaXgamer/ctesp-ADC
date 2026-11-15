@@ -9,7 +9,7 @@ from gestor_campanhas.cli import gestao as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroAutenticacao, ErroValidacao
 from gestor_campanhas.repositorios import utilizadores
-from gestor_campanhas.servicos import autenticacao, gestao
+from gestor_campanhas.servicos import autenticacao, gestao, sessoes
 from tests.conftest import PASSWORD_TESTE
 
 
@@ -538,3 +538,83 @@ def test_opcao_marketeers_so_existe_no_menu_do_administrador():
     assert "Marketeers" in descricoes[modelos.ADMINISTRADOR]
     assert "Marketeers" not in descricoes[modelos.MARKETEER]
     assert "Marketeers" not in descricoes[modelos.CLIENTE]
+
+
+# --- desativar e reativar marketeers, e avisos por email ---------------------
+
+
+def test_marketeer_desativado_deixa_de_poder_entrar_e_reativado_volta(ligacao, contas):
+    marketeer = contas[modelos.MARKETEER]
+
+    gestao.definir_estado(ligacao, modelos.MARKETEER, marketeer.id, False)
+    with pytest.raises(ErroAutenticacao, match="Esta conta está desativada"):
+        autenticacao.autenticar(ligacao, marketeer.email, PASSWORD_TESTE)
+
+    gestao.definir_estado(ligacao, modelos.MARKETEER, marketeer.id, True)
+    assert autenticacao.autenticar(ligacao, marketeer.email, PASSWORD_TESTE) == marketeer
+
+
+def test_marketeer_desativado_continua_nos_horarios(ligacao, contas):
+    marketeer = contas[modelos.MARKETEER]
+    sessao = sessoes.iniciar(ligacao, marketeer)
+    sessoes.terminar(ligacao, sessao, modelos.LOGOUT)
+
+    gestao.definir_estado(ligacao, modelos.MARKETEER, marketeer.id, False)
+
+    assert [nome for _, nome in sessoes.horarios_dos_marketeers(ligacao)] == ["Miguel Marketeer"]
+
+
+def test_desativar_e_reativar_avisam_a_pessoa_por_email(ligacao, contas):
+    marketeer = contas[modelos.MARKETEER]
+
+    gestao.definir_estado(ligacao, modelos.MARKETEER, marketeer.id, False)
+    gestao.definir_estado(ligacao, modelos.MARKETEER, marketeer.id, True)
+
+    avisos = emails()
+    assert len(avisos) == 2
+    assert all("Para: miguel@agencia.pt" in aviso for aviso in avisos)
+    assert any("Assunto: A sua conta foi desativada" in aviso for aviso in avisos)
+    assert any("Assunto: A sua conta foi reativada" in aviso for aviso in avisos)
+
+
+def test_alteracao_recusada_nao_envia_email(ligacao, contas):
+    with pytest.raises(ErroValidacao):
+        gestao.definir_estado(ligacao, modelos.MARKETEER, contas[modelos.MARKETEER].id, True)
+
+    assert emails() == []
+
+
+def test_menu_desativar_marketeer(teclado, ligacao, contas, capsys):
+    marketeer = contas[modelos.MARKETEER]
+    teclado("4", str(marketeer.id), "s", "", "0")
+
+    menu.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "4. Desativar ou reativar marketeer" in saida
+    assert "Miguel Marketeer (miguel@agencia.pt) tem a conta ativa." in saida
+    assert "Conta desativada." in saida
+    assert "Foi enviado um aviso para miguel@agencia.pt." in saida
+    assert not utilizadores.obter_por_id(ligacao, marketeer.id).ativo
+
+
+def test_menu_reativar_marketeer(teclado, ligacao, contas, capsys):
+    marketeer = contas[modelos.MARKETEER]
+    gestao.definir_estado(ligacao, modelos.MARKETEER, marketeer.id, False)
+    teclado("4", str(marketeer.id), "s", "", "0")
+
+    menu.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "Conta reativada." in capsys.readouterr().out
+    assert utilizadores.obter_por_id(ligacao, marketeer.id).ativo
+
+
+def test_menu_desativar_marketeer_sem_confirmar(teclado, ligacao, contas, capsys):
+    marketeer = contas[modelos.MARKETEER]
+    teclado("4", str(marketeer.id), "n", "", "0")
+
+    menu.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "Nada foi alterado." in capsys.readouterr().out
+    assert utilizadores.obter_por_id(ligacao, marketeer.id).ativo
+    assert emails() == []
