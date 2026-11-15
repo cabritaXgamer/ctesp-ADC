@@ -326,3 +326,98 @@ def test_menu_editar_cliente_pode_ser_cancelado(teclado, ligacao, contas, capsys
     menu.clientes(ligacao, contas[modelos.ADMINISTRADOR])
 
     assert "A editar" not in capsys.readouterr().out
+
+
+# --- desativar e reativar ----------------------------------------------------
+
+
+def test_cliente_desativado_deixa_de_poder_entrar(ligacao, contas):
+    cliente = contas[modelos.CLIENTE]
+
+    desativado = gestao.definir_estado(ligacao, modelos.CLIENTE, cliente.id, False)
+
+    assert not desativado.ativo
+    with pytest.raises(ErroAutenticacao, match="Esta conta está desativada"):
+        autenticacao.autenticar(ligacao, cliente.email, PASSWORD_TESTE)
+
+
+def test_cliente_desativado_mantem_os_dados_e_continua_na_lista(ligacao, contas):
+    cliente = contas[modelos.CLIENTE]
+
+    gestao.definir_estado(ligacao, modelos.CLIENTE, cliente.id, False)
+
+    (na_lista,) = gestao.listar(ligacao, modelos.CLIENTE)
+    assert (na_lista.nome, na_lista.email, na_lista.ativo) == (cliente.nome, cliente.email, False)
+
+
+def test_cliente_reativado_volta_a_entrar_com_a_mesma_password(ligacao, contas):
+    cliente = contas[modelos.CLIENTE]
+    gestao.definir_estado(ligacao, modelos.CLIENTE, cliente.id, False)
+
+    gestao.definir_estado(ligacao, modelos.CLIENTE, cliente.id, True)
+
+    assert autenticacao.autenticar(ligacao, cliente.email, PASSWORD_TESTE) == cliente
+
+
+def test_nao_se_desativa_nem_reativa_duas_vezes(ligacao, contas):
+    cliente = contas[modelos.CLIENTE]
+
+    with pytest.raises(ErroValidacao, match="já está ativa"):
+        gestao.definir_estado(ligacao, modelos.CLIENTE, cliente.id, True)
+    gestao.definir_estado(ligacao, modelos.CLIENTE, cliente.id, False)
+    with pytest.raises(ErroValidacao, match="já está desativada"):
+        gestao.definir_estado(ligacao, modelos.CLIENTE, cliente.id, False)
+
+
+def test_so_se_altera_o_estado_de_contas_do_perfil_indicado(ligacao, contas):
+    with pytest.raises(ErroValidacao, match="Não existe nenhum cliente"):
+        gestao.definir_estado(ligacao, modelos.CLIENTE, contas[modelos.MARKETEER].id, False)
+    with pytest.raises(ValueError, match="não é gerido"):
+        gestao.definir_estado(ligacao, modelos.ADMINISTRADOR, contas[modelos.ADMINISTRADOR].id, False)
+
+    assert utilizadores.obter_por_id(ligacao, contas[modelos.MARKETEER].id).ativo
+    assert utilizadores.obter_por_id(ligacao, contas[modelos.ADMINISTRADOR].id).ativo
+
+
+def test_menu_desativar_cliente_pede_confirmacao(teclado, ligacao, contas, capsys):
+    cliente = contas[modelos.CLIENTE]
+    teclado("4", str(cliente.id), "s", "", "0")
+
+    menu.clientes(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "Carla Cliente (carla@empresa.pt) tem a conta ativa." in saida
+    assert "Conta desativada." in saida
+    assert "carla@empresa.pt            Desativada" in saida
+    assert not utilizadores.obter_por_id(ligacao, cliente.id).ativo
+
+
+def test_menu_desativar_cliente_sem_confirmar_nao_altera_nada(teclado, ligacao, contas, capsys):
+    cliente = contas[modelos.CLIENTE]
+    teclado("4", str(cliente.id), "n", "", "0")
+
+    menu.clientes(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "Nada foi alterado." in capsys.readouterr().out
+    assert utilizadores.obter_por_id(ligacao, cliente.id).ativo
+
+
+def test_menu_reativar_cliente(teclado, ligacao, contas, capsys):
+    cliente = contas[modelos.CLIENTE]
+    gestao.definir_estado(ligacao, modelos.CLIENTE, cliente.id, False)
+    teclado("4", str(cliente.id), "s", "", "0")
+
+    menu.clientes(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "tem a conta desativada." in saida
+    assert "Conta reativada." in saida
+    assert utilizadores.obter_por_id(ligacao, cliente.id).ativo
+
+
+def test_menu_estado_com_numero_que_nao_existe_ou_cancelado(teclado, ligacao, contas, capsys):
+    teclado("4", "999", "", "4", "", "0")
+
+    menu.clientes(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "Não existe nenhum cliente com o número 999." in capsys.readouterr().out
