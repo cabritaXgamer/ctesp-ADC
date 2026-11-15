@@ -177,7 +177,7 @@ def definir_estado(ligacao: sqlite3.Connection, perfil: str, identificador: int,
 
     Quem tem a conta desativada deixa de poder entrar e de poder recuperar a
     password. A conta não é apagada: os dados e o histórico mantêm-se, e
-    pode ser reativada mais tarde.
+    pode ser reativada mais tarde. A pessoa é avisada por email da alteração.
 
     :param ligacao: Ligação aberta à base de dados.
     :param perfil: Perfil da conta: um dos :data:`PERFIS_GERIDOS`.
@@ -191,4 +191,15 @@ def definir_estado(ligacao: sqlite3.Connection, perfil: str, identificador: int,
     conta = obter(ligacao, perfil, identificador)
     if conta.ativo == ativo:
         raise ErroValidacao("Esta conta já está ativa." if ativo else "Esta conta já está desativada.")
-    return utilizadores.definir_ativo(ligacao, conta.id, ativo)
+    conta = utilizadores.definir_ativo(ligacao, conta.id, ativo)
+    if ativo:
+        assunto = "A sua conta foi reativada"
+        texto = "A sua conta no Gestor de Campanhas foi reativada. Pode voltar a entrar com a password que tinha."
+    else:
+        assunto = "A sua conta foi desativada"
+        texto = (
+            "A sua conta no Gestor de Campanhas foi desativada e deixou de poder entrar.\n"
+            "Se pensa que foi um engano, fale com o administrador."
+        )
+    correio.enviar(conta.email, assunto, f"Olá, {conta.nome}.\n\n{texto}")
+    return conta
