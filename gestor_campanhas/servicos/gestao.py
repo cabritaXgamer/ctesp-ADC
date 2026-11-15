@@ -2,11 +2,21 @@
 
 from __future__ import annotations
 
+import secrets
 import sqlite3
 import unicodedata
 
+from gestor_campanhas import modelos, seguranca
+from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Utilizador
 from gestor_campanhas.repositorios import utilizadores
+from gestor_campanhas.servicos import correio, validacao
+
+#: Perfis cujas contas o Administrador pode gerir.
+PERFIS_GERIDOS = (modelos.CLIENTE, modelos.MARKETEER)
+
+#: Mensagem mostrada quando o email indicado já pertence a outra conta.
+MENSAGEM_EMAIL_REPETIDO = "Já existe uma conta com este email."
 
 
 def simplificar(texto: str) -> str:
@@ -43,3 +53,70 @@ def listar(ligacao: sqlite3.Connection, perfil: str, pesquisa: str = "") -> list
     # A ordenação é feita aqui, e não no SQL, porque o SQLite põe as letras
     # com acento depois do "z": "Álvaro" ficaria no fim da lista.
     return sorted(contas, key=lambda conta: simplificar(conta.nome))
+
+
+def gerar_password_inicial() -> str:
+    """Gera a password com que uma conta nova começa.
+
+    :return: Password aleatória de 12 caracteres (letras, algarismos, ``-`` e ``_``).
+    """
+    return secrets.token_urlsafe(9)
+
+
+def _dados_validados(perfil: str, nome: str, email: str, telefone: str, empresa: str, nif: str) -> tuple:
+    """Valida os dados de uma conta e devolve-os arrumados, pela mesma ordem.
+
+    A empresa e o NIF só existem nos clientes; nos outros perfis ficam vazios.
+    """
+    if perfil not in PERFIS_GERIDOS:
+        raise ValueError(f"O perfil {perfil!r} não é gerido pelo Administrador.")
+    nome, email, telefone = validacao.nome(nome), validacao.email(email), validacao.telefone(telefone)
+    if perfil == modelos.CLIENTE:
+        empresa, nif = empresa.strip(), validacao.nif(nif)
+    else:
+        empresa, nif = "", ""
+    return nome, email, telefone, empresa, nif
+
+
+def criar(
+    ligacao: sqlite3.Connection,
+    perfil: str,
+    nome: str,
+    email: str,
+    telefone: str = "",
+    empresa: str = "",
+    nif: str = "",
+) -> Utilizador:
+    """Cria uma conta e envia as credenciais de acesso para o email dela.
+
+    A conta começa com uma password aleatória, que só aparece no email. Quem
+    a recebe deve trocá-la na primeira vez que entrar.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param perfil: Perfil da conta: um dos :data:`PERFIS_GERIDOS`.
+    :param nome: Nome da pessoa. Obrigatório.
+    :param email: Email, usado para entrar. Obrigatório e único.
+    :param telefone: Telefone: vazio, ou 9 a 15 algarismos.
+    :param empresa: Nome da empresa (só clientes).
+    :param nif: Número de contribuinte: vazio ou 9 algarismos (só clientes).
+    :return: A conta criada.
+    :raises ErroValidacao: Se algum dos valores não respeitar as regras ou
+        se já existir uma conta com o mesmo email.
+    """
+    nome, email, telefone, empresa, nif = _dados_validados(perfil, nome, email, telefone, empresa, nif)
+    if utilizadores.obter_por_email(ligacao, email) is not None:
+        raise ErroValidacao(MENSAGEM_EMAIL_REPETIDO)
+    password = gerar_password_inicial()
+    conta = utilizadores.criar(
+        ligacao, nome, email, seguranca.gerar_hash(password), perfil, telefone=telefone, empresa=empresa, nif=nif
+    )
+    correio.enviar(
+        conta.email,
+        "A sua conta no Gestor de Campanhas",
+        f"Olá, {conta.nome}.\n\n"
+        f"Foi criada uma conta de {conta.nome_perfil} para si no Gestor de Campanhas.\n\n"
+        f"Email: {conta.email}\n"
+        f"Password: {password}\n\n"
+        'Por segurança, altere a password na primeira vez que entrar (opção "Alterar a password").',
+    )
+    return conta
