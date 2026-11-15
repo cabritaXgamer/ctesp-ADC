@@ -135,10 +135,12 @@ Clientes
 Mostra todos os clientes, por ordem alfabética do nome, com a empresa, o
 email, o telefone e o estado da conta. As contas desativadas também aparecem.
 
-A aplicação pergunta primeiro o que pesquisar. Com Enter, mostra todos os
-clientes. Com um texto, mostra só os clientes cujo nome contém esse texto, em
-qualquer posição. A pesquisa não distingue maiúsculas nem acentos: ``jose``
-encontra ``José Padeiro``.
+Por baixo da lista aparecem as opções de gestão. Depois de cada uma, a lista
+volta a ser mostrada, já com as alterações.
+
+**Pesquisar por nome** mostra só os clientes cujo nome contém o texto
+escrito, em qualquer posição. A pesquisa não distingue maiúsculas nem acentos:
+``jose`` encontra ``José Padeiro``. Com Enter, voltam a aparecer todos.
 
 .. code-block:: text
 
@@ -151,6 +153,49 @@ encontra ``José Padeiro``.
    3 clientes.
 
 O número da primeira coluna identifica o cliente nas outras opções de gestão.
+
+Adicionar cliente
+^^^^^^^^^^^^^^^^^
+
+Pede os dados do cliente e cria a conta.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Dado
+     - Regras
+   * - Nome
+     - Obrigatório.
+   * - Email
+     - Obrigatório, na forma ``nome@empresa.pt``. Não pode ser igual ao de
+       outra conta, de qualquer perfil.
+   * - Telefone
+     - Opcional. 9 a 15 algarismos, com ou sem ``+`` no início.
+   * - Empresa
+     - Opcional.
+   * - NIF
+     - Opcional. 9 algarismos.
+
+A conta começa com uma password aleatória. O email e a password são enviados
+para o email do cliente, com o pedido de trocar a password na primeira vez
+que entrar. O Administrador não chega a ver a password.
+
+.. note::
+
+   Como os emails são simulados, a mensagem com as credenciais fica na pasta
+   ``dados/caixa_saida``.
+
+Editar cliente
+^^^^^^^^^^^^^^
+
+Pede o número do cliente e mostra cada dado, com o valor atual entre
+parênteses retos. Com Enter, o valor mantém-se. As regras são as mesmas de
+quando se adiciona um cliente.
+
+A password do cliente não é alterada. Se o email mudar, o cliente passa a
+entrar com o email novo. Se algum valor não respeitar as regras, nenhum dado
+é alterado.
 
 Horários de entrada e saída dos marketeers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
