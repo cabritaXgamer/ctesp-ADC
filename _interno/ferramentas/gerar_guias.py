@@ -169,8 +169,22 @@ def sem_acentos(texto: str) -> str:
 
 
 def bloco(texto: str, linguagem: str = "") -> str:
-    """Envolve um texto num bloco de código Markdown."""
-    return f"```{linguagem}\n{texto}\n```"
+    """Envolve um texto num bloco de código Markdown.
+
+    Se o próprio texto tiver um bloco de código, a cerca de fora leva mais
+    um acento grave do que a maior de dentro, para o bloco não acabar a meio.
+    """
+    maior = max((len(cerca) for cerca in re.findall(r"`{3,}", texto)), default=2)
+    cerca = "`" * (maior + 1)
+    return f"{cerca}{linguagem}\n{texto}\n{cerca}"
+
+
+def cards(u: dict) -> str:
+    """Devolve ``"o card da story A04"`` ou ``"os cards das stories A05 e A06"``."""
+    stories = [s.strip() for s in u["stories"].split(",")]
+    if len(stories) == 1:
+        return f"o card da story {stories[0]}"
+    return f"os cards das stories {', '.join(stories[:-1])} e {stories[-1]}"
 
 
 def plural(n: int, singular: str, plural_: str) -> str:
@@ -279,7 +293,7 @@ def passo_issue(u: dict, config: dict) -> tuple[str, str]:
             + "\n"
         )
     linhas.append(
-        "Por fim, no quadro Trello, move os cards destas stories de **Sprint Backlog** para **Work In Progress**."
+        f"Por fim, no quadro Trello, move {cards(u)} de **Sprint Backlog** para **Work In Progress**."
     )
     return (f"Fica com as issues da unidade {u['id']}", "\n".join(linhas))
 
@@ -407,7 +421,14 @@ def passo_pull_request(u: dict, config: dict) -> tuple[str, str]:
         "Espera um ou dois minutos até ficarem com um visto verde."
     )
     if u["tipo"] == "stories":
-        corpo += "\n\n**h)** No Trello, move os cards destas stories para **Ready to Verify**."
+        corpo += f"\n\n**h)** No Trello, move {cards(u)} para **Ready to Verify**."
+    if base == "main":
+        corpo += (
+            "\n\n**h)** Confirma o destino. Por baixo do título do pull request tem de estar escrito "
+            f"`... wants to merge 3 commits into main from {ramo}`. Se disser `into develop`, **não avises ninguém "
+            "ainda**: clica em **Edit**, à direita do título, clica em **base: develop**, escolhe `main`, confirma em "
+            "**Change base** e clica em **Save**."
+        )
     return ("Abre o pull request", corpo)
 
 
@@ -567,7 +588,7 @@ def vez_revisor(vez: dict, ctx: dict) -> list[tuple[str, str]]:
     autoria = ctx["anterior"]
     extra = " As issues da unidade ficam fechadas sozinhas."
     if u["tipo"] == "stories":
-        extra += "\n\n**f)** No Trello, move os cards destas stories para **Ready**."
+        extra += f"\n\n**f)** No Trello, move {cards(u)} para **Ready**."
     return [
         *passos_abrir_e_ler(u, config),
         passo_experimentar_revisor(u, config),
@@ -607,6 +628,15 @@ def vez_release_rever(vez: dict, ctx: dict) -> list[tuple[str, str]]:
         *passos_abrir_e_ler(u, config),
         passo_experimentar_revisor(u, config),
         passo_aprovar(u["quem"]),
+        (
+            "Confirma que o pull request vai para o main",
+            "Este é o único pull request da fase que não vai para o `develop`. Se for junto ao ramo errado, o `main` "
+            "fica sem a versão e a tag fica no sítio errado.\n\n"
+            "Por baixo do título do pull request tem de estar escrito "
+            f"`... wants to merge 3 commits into main from {ramo}`.\n\n"
+            f"Se disser `into develop`, **não juntes**. Avisa {u['quem']}, que corrige o destino no botão **Edit**, "
+            "à direita do título. Depois de corrigido, atualiza a página e confirma outra vez.",
+        ),
         passo_merge("main", True),
         (
             "Arruma o teu computador",
@@ -637,9 +667,9 @@ def vez_release_publicar(vez: dict, ctx: dict) -> list[tuple[str, str]]:
             + "\n\n**e)** Na caixa de texto, cola:\n\n"
             + bloco(u["notas"], "markdown")
             + "\n\n**f)** Clica em **Publish release**.\n\n"
-            f"**Deves ver** a página da release, e a tag `{versao}` em {b}/tags\n\n"
-            f"**g)** Fecha a milestone da fase: abre {b}/milestones, e na linha `{u['milestone']}` clica em **Close**. "
-            "Se ainda tiver issues abertas, não a feches e avisa o grupo.",
+            f"**Deves ver** a página da release, e a tag `{versao}` em {b}/tags. Na linha da tag aparece o commit "
+            f"`Merge pull request ... from .../{u['ramo']}`. Se aparecer outro commit, o **Target** ficou errado: "
+            "avisa o grupo antes de continuar.",
         ),
         (
             "Abre o pull request que leva a release para o develop",
@@ -665,6 +695,14 @@ def vez_release_publicar(vez: dict, ctx: dict) -> list[tuple[str, str]]:
         ),
         passo_avisar(f"o pull request que leva a release {versao} para o `develop` está aberto", ctx["seguinte"]),
         passo_arrumar(u, u["revisor"]),
+        (
+            "Fecha a milestone da fase",
+            f"Faz este passo depois de {u['revisor']} juntar o último pull request. Nessa altura a issue da release "
+            "já está fechada, e a milestone fica com todas as issues fechadas.\n\n"
+            f"**a)** Abre {b}/milestones\n\n"
+            f"**b)** Na linha `{u['milestone']}`, confirma que a barra está a 100% e clica em **Close**.\n\n"
+            "Se a barra não estiver a 100%, clica no nome da milestone para ver que issues estão abertas e avisa o grupo.",
+        ),
     ]
 
 

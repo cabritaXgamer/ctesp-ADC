@@ -37,11 +37,37 @@ Decisões tomadas nesta fase:
 - **Inatividade verificada ao responder.** A aplicação fica parada à espera do teclado, por isso a inatividade é detetada quando o utilizador responde a um menu.
 - **Opções da conta em todos os perfis.** As user stories de alterar a password e editar os dados são do Cliente, mas as opções ficaram disponíveis para os três perfis.
 
+## Fase 2 — Clientes e marketeers
+
+Release: **v0.2.0**.
+
+| Unidade | User stories | Quem fez | Quem reviu |
+|---|---|---|---|
+| 2.1 Lista de clientes com pesquisa | A04 | Fabio | Tomas |
+| 2.2 Adicionar e editar clientes | A05, A06 | Tomas | Ricardo |
+| 2.3 Desativar e reativar clientes | A07 | Ricardo | Fabio |
+| 2.4 Adicionar e editar marketeers | A08, A09 | Fabio | Tomas |
+| 2.5 Desativar e reativar marketeers | A10 | Tomas | Ricardo |
+| 2.6 Release v0.2.0 | — | Tomas | Ricardo |
+
+Resultado: 7 user stories concluídas (15 no total); 194 testes automáticos; segunda versão publicada.
+
+Decisões tomadas nesta fase:
+
+- **Remover é desativar.** As user stories falam em remover clientes e marketeers, mas pedem que o histórico se mantenha. A conta fica desativada, com os dados guardados, e pode ser reativada.
+- **Password inicial aleatória.** Quem é adicionado recebe por email uma password gerada pela aplicação. O Administrador não a vê.
+- **Os mesmos ecrãs para os dois perfis.** A gestão de marketeers reutiliza os ecrãs da gestão de clientes, que passaram a receber o perfil.
+- **Pesquisa e ordenação sem acentos.** A pesquisa por nome e a ordem alfabética são feitas em Python, porque o SQLite põe as letras com acento depois do "z".
+- **Duas partes adiadas para a Fase 3.** O número de campanhas ativas por cliente (A04) e a reatribuição das campanhas antes de desativar um marketeer (A10) dependem das campanhas, que ainda não existem.
+
+O que correu mal e como se resolveu:
+
+- **Release da Fase 1 junta ao ramo errado.** O pull request da release v0.1.0 foi junto ao `develop` em vez do `main`, e a tag ficou num commit sem código. Corrigiu-se com um pull request do `develop` para o `main` e refazendo a tag. O guia de trabalho passou a ter dois passos de confirmação do destino.
+
 ## Fases seguintes
 
 | Fase | Tema | User stories | Release |
 |---|---|---|---|
-| 2 | Gestão de clientes e marketeers | 7 | v0.2.0 |
 | 3 | Campanhas e pedidos de campanha | 12 | v0.3.0 |
 | 4 | Criativos | 15 | v0.4.0 |
 | 5 | Budget | 6 | v0.5.0 |

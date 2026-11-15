@@ -1,6 +1,7 @@
 ---
 numero: 1
 titulo: Autenticação e sessões
+fechada: sim
 testes: 104
 ---
 

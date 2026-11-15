@@ -33,6 +33,25 @@ Esta separação é o que permite testar as regras diretamente, sem simular o te
 
 Quando uma regra não é cumprida, o serviço lança um erro próprio (`ErroAutenticacao`, `ErroValidacao`). O menu apanha-o e mostra a mensagem. O programa não para.
 
+## Exemplo: adicionar um cliente
+
+1. O menu (`cli/gestao.py`) pede os dados no ecrã.
+2. O serviço (`servicos/gestao.py`) valida-os, confirma que o email ainda não tem conta e gera a password inicial.
+3. O repositório (`repositorios/utilizadores.py`) guarda a conta, com o hash da password.
+4. O serviço de emails (`servicos/correio.py`) envia as credenciais.
+
+Se um dado não for válido, o serviço lança `ErroValidacao` antes de guardar seja o que for, e o menu mostra a mensagem.
+
+Os mesmos ecrãs e as mesmas funções servem para clientes e para marketeers: o perfil é passado como argumento.
+
+## Validação dos dados
+
+As regras do nome, do email, do telefone e do NIF estão num só módulo, `servicos/validacao.py`. São as mesmas quando é o próprio a alterar os seus dados e quando é o Administrador a criar ou a editar uma conta.
+
+## Contas desativadas
+
+Remover um cliente ou um marketeer não apaga a linha da tabela `utilizadores`: põe a coluna `ativo` a zero. Assim, as sessões já registadas (e, nas fases seguintes, as campanhas) continuam ligadas a uma conta que existe. Uma conta desativada não pode entrar nem recuperar a password, e pode ser reativada.
+
 ## Tabelas
 
 | Tabela | Conteúdo |

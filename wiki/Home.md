@@ -24,12 +24,12 @@ Uma agência usa-a para organizar o trabalho com os seus clientes: os clientes p
 
 | Página | Conteúdo |
 |---|---|
-| [Guia de utilização](Guia-de-utilizacao) | Como usar a aplicação: entrar, menus de cada perfil, recuperar a password |
-| [Arquitetura](Arquitetura) | Camadas do código, tabelas, passwords, sessões e emails |
+| [Guia de utilização](Guia-de-utilizacao) | Como usar a aplicação: entrar, menus de cada perfil, gestão de clientes e marketeers, recuperar a password |
+| [Arquitetura](Arquitetura) | Camadas do código, tabelas, passwords, sessões, emails e contas desativadas |
 | [Fluxo Git](Fluxo-Git) | Ramos, commits, pull requests e releases |
 | [Registo das fases](Registo-das-fases) | O que foi feito em cada fase, por quem, e as decisões tomadas |
 
-Versão atual: **v0.1.0** (Fase 1 — Autenticação e sessões).
+Versão atual: **v0.2.0** (Fase 2 — Clientes e marketeers).
 
 ## Plano de desenvolvimento
 
