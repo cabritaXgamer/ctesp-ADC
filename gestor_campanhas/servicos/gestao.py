@@ -120,3 +120,53 @@ def criar(
         'Por segurança, altere a password na primeira vez que entrar (opção "Alterar a password").',
     )
     return conta
+
+
+def obter(ligacao: sqlite3.Connection, perfil: str, identificador: int) -> Utilizador:
+    """Procura uma conta pelo número, confirmando que é do perfil esperado.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param perfil: Perfil que a conta tem de ter.
+    :param identificador: Número da conta, mostrado na primeira coluna das listas.
+    :return: A conta.
+    :raises ErroValidacao: Se não existir uma conta desse perfil com esse número.
+    """
+    conta = utilizadores.obter_por_id(ligacao, identificador)
+    if conta is None or conta.perfil != perfil:
+        raise ErroValidacao(f"Não existe nenhum {modelos.NOMES_PERFIS[perfil].lower()} com o número {identificador}.")
+    return conta
+
+
+def editar(
+    ligacao: sqlite3.Connection,
+    perfil: str,
+    identificador: int,
+    nome: str,
+    email: str,
+    telefone: str,
+    empresa: str = "",
+    nif: str = "",
+) -> Utilizador:
+    """Altera os dados de uma conta. A password e o estado não são alterados.
+
+    Nada é guardado se algum dos valores não for válido.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param perfil: Perfil da conta: um dos :data:`PERFIS_GERIDOS`.
+    :param identificador: Número da conta a alterar.
+    :param nome: Nome novo. Obrigatório.
+    :param email: Email novo. Obrigatório e único.
+    :param telefone: Telefone novo: vazio, ou 9 a 15 algarismos.
+    :param empresa: Nome da empresa (só clientes).
+    :param nif: Número de contribuinte: vazio ou 9 algarismos (só clientes).
+    :return: A conta, já com os dados novos.
+    :raises ErroValidacao: Se a conta não existir, se algum dos valores não
+        respeitar as regras ou se o email já for de outra conta.
+    """
+    conta = obter(ligacao, perfil, identificador)
+    nome, email, telefone, empresa, nif = _dados_validados(perfil, nome, email, telefone, empresa, nif)
+    if email != conta.email:
+        if utilizadores.obter_por_email(ligacao, email) is not None:
+            raise ErroValidacao(MENSAGEM_EMAIL_REPETIDO)
+        utilizadores.atualizar_email(ligacao, conta.id, email)
+    return utilizadores.atualizar_dados(ligacao, conta.id, nome, telefone, empresa, nif)
