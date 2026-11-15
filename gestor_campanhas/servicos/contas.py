@@ -8,6 +8,7 @@ from gestor_campanhas import modelos, seguranca
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Utilizador
 from gestor_campanhas.repositorios import utilizadores
+from gestor_campanhas.servicos import validacao
 
 
 def validar_password(password: str) -> None:
@@ -68,15 +69,10 @@ def atualizar_dados(
     :param nif: Número de contribuinte: vazio ou 9 algarismos (só clientes).
     :raises ErroValidacao: Se algum dos valores não respeitar as regras.
     """
-    nome, telefone, empresa, nif = nome.strip(), telefone.replace(" ", ""), empresa.strip(), nif.replace(" ", "")
-    if not nome:
-        raise ErroValidacao("O nome não pode ficar vazio.")
-    algarismos = telefone[1:] if telefone.startswith("+") else telefone
-    if telefone and not (algarismos.isdigit() and 9 <= len(algarismos) <= 15):
-        raise ErroValidacao("O telefone tem de ter entre 9 e 15 algarismos.")
+    nome = validacao.nome(nome)
+    telefone = validacao.telefone(telefone)
     if utilizador.perfil == modelos.CLIENTE:
-        if nif and not (nif.isdigit() and len(nif) == 9):
-            raise ErroValidacao("O NIF tem de ter 9 algarismos.")
+        empresa, nif = empresa.strip(), validacao.nif(nif)
     else:
         empresa, nif = utilizador.empresa, utilizador.nif
     novo = utilizadores.atualizar_dados(ligacao, utilizador.id, nome, telefone, empresa, nif)

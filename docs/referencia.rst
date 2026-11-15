@@ -80,6 +80,11 @@ Conta do utilizador
 
 .. automodule:: gestor_campanhas.servicos.contas
 
+Validação dos dados de uma conta
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.servicos.validacao
+
 Recuperação da password
 ~~~~~~~~~~~~~~~~~~~~~~~
 
