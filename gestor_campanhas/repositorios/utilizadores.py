@@ -152,3 +152,18 @@ def atualizar_dados(
     ligacao.commit()
     return obter_por_id(ligacao, identificador)
 
+
+
+def listar_por_perfil(ligacao: sqlite3.Connection, perfil: str) -> list[Utilizador]:
+    """Devolve todos os utilizadores de um perfil, pela ordem em que foram criados.
+
+    Inclui as contas desativadas.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param perfil: Um dos perfis de :mod:`gestor_campanhas.modelos`.
+    :return: Utilizadores desse perfil. Lista vazia se não houver nenhum.
+    """
+    linhas = ligacao.execute(
+        f"SELECT {_COLUNAS} FROM utilizadores WHERE perfil = ? ORDER BY id", (perfil,)
+    ).fetchall()
+    return [_de_linha(linha) for linha in linhas]
