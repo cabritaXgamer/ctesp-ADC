@@ -167,3 +167,17 @@ def listar_por_perfil(ligacao: sqlite3.Connection, perfil: str) -> list[Utilizad
         f"SELECT {_COLUNAS} FROM utilizadores WHERE perfil = ? ORDER BY id", (perfil,)
     ).fetchall()
     return [_de_linha(linha) for linha in linhas]
+
+
+def atualizar_email(ligacao: sqlite3.Connection, identificador: int, email: str) -> Utilizador:
+    """Altera o email de um utilizador.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Identificador do utilizador.
+    :param email: Email novo, que tem de ser único.
+    :return: O utilizador, já com o email novo.
+    :raises sqlite3.IntegrityError: Se o email já for de outro utilizador.
+    """
+    ligacao.execute("UPDATE utilizadores SET email = ? WHERE id = ?", (normalizar_email(email), identificador))
+    ligacao.commit()
+    return obter_por_id(ligacao, identificador)
