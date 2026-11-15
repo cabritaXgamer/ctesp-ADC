@@ -24,6 +24,9 @@ as contas de demonstração com:
    * - Marketeer
      - ``marketeer@agencia.pt``
      - ``marketeer12345``
+   * - Marketeer
+     - ``marta@agencia.pt``
+     - ``marta12345``
    * - Cliente
      - ``cliente@empresa.pt``
      - ``cliente12345``
@@ -207,6 +210,28 @@ Um cliente com a conta desativada deixa de poder entrar e de poder recuperar
 a password. A conta não é apagada: continua na lista, com o estado
 ``Desativada``, e os seus dados e o seu histórico mantêm-se. A mesma opção
 reativa a conta, e o cliente volta a entrar com a password que tinha.
+
+Marketeers
+~~~~~~~~~~
+
+Funciona como a opção **Clientes**: mostra a lista dos marketeers, por ordem
+alfabética do nome, e por baixo as opções de gestão.
+
+.. code-block:: text
+
+   N.º  Nome              Email                 Telefone   Estado
+   ---  ----------------  --------------------  ---------  ------
+   6    Marta Marques     marta@agencia.pt      910000006  Ativa
+   2    Miguel Marketeer  marketeer@agencia.pt  910000002  Ativa
+
+   2 marketeers.
+
+**Pesquisar por nome**, **Adicionar marketeer** e **Editar marketeer** seguem
+as regras descritas para os clientes, com uma diferença: um marketeer não tem
+empresa nem NIF, por isso esses dados não são pedidos nem aparecem na lista.
+
+O marketeer novo recebe por email as credenciais de acesso, tal como um
+cliente novo.
 
 Horários de entrada e saída dos marketeers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -25,6 +25,7 @@ OPCOES_DA_CONTA = [
 OPCOES: dict[str, list] = {
     modelos.ADMINISTRADOR: [
         ("Clientes", gestao.clientes),
+        ("Marketeers", gestao.marketeers),
         ("Horários de entrada e saída dos marketeers", admin.horarios),
         *OPCOES_DA_CONTA,
     ],

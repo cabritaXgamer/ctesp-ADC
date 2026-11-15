@@ -421,3 +421,120 @@ def test_menu_estado_com_numero_que_nao_existe_ou_cancelado(teclado, ligacao, co
     menu.clientes(ligacao, contas[modelos.ADMINISTRADOR])
 
     assert "Não existe nenhum cliente com o número 999." in capsys.readouterr().out
+
+
+# --- marketeers --------------------------------------------------------------
+
+
+def test_criar_marketeer_ignora_a_empresa_e_o_nif(ligacao):
+    conta = gestao.criar(ligacao, modelos.MARKETEER, "Marta Marques", "marta@agencia.pt", "910000006", "Empresa", "500000009")
+
+    assert conta.perfil == modelos.MARKETEER
+    assert (conta.nome, conta.email, conta.telefone) == ("Marta Marques", "marta@agencia.pt", "910000006")
+    assert (conta.empresa, conta.nif) == ("", "")
+
+
+def test_criar_marketeer_envia_as_credenciais(ligacao):
+    conta = gestao.criar(ligacao, modelos.MARKETEER, "Marta Marques", "marta@agencia.pt")
+
+    (email,) = emails()
+    assert "conta de Marketeer" in email
+    password = re.search(r"Password: (.+)", email).group(1)
+    assert autenticacao.autenticar(ligacao, "marta@agencia.pt", password) == conta
+
+
+def test_email_de_um_marketeer_novo_nao_pode_ser_o_de_um_cliente(ligacao, contas):
+    with pytest.raises(ErroValidacao, match="Já existe uma conta com este email"):
+        gestao.criar(ligacao, modelos.MARKETEER, "Carla", "carla@empresa.pt")
+
+
+def test_editar_marketeer_altera_o_nome_o_email_e_o_telefone(ligacao, contas):
+    marketeer = contas[modelos.MARKETEER]
+
+    novo = gestao.editar(ligacao, modelos.MARKETEER, marketeer.id, "Miguel Matos", "matos@agencia.pt", "912345678", "X", "1")
+
+    assert (novo.nome, novo.email, novo.telefone) == ("Miguel Matos", "matos@agencia.pt", "912345678")
+    assert (novo.empresa, novo.nif) == ("", "")
+    assert autenticacao.autenticar(ligacao, "matos@agencia.pt", PASSWORD_TESTE) == novo
+
+
+def test_o_numero_de_um_cliente_nao_serve_para_editar_um_marketeer(ligacao, contas):
+    cliente = contas[modelos.CLIENTE]
+
+    with pytest.raises(ErroValidacao, match="Não existe nenhum marketeer com o número"):
+        gestao.editar(ligacao, modelos.MARKETEER, cliente.id, "Outro Nome", "outro@agencia.pt", "")
+
+    assert utilizadores.obter_por_id(ligacao, cliente.id) == cliente
+
+
+def test_menu_marketeers_mostra_a_lista_sem_a_coluna_da_empresa(teclado, ligacao, contas, capsys):
+    teclado("0")
+
+    menu.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "N.º  Nome              Email              Telefone  Estado" in saida
+    assert "Miguel Marketeer  miguel@agencia.pt            Ativa" in saida
+    assert "Carla Cliente" not in saida
+    assert "1 marketeer." in saida
+
+
+def test_menu_marketeers_pesquisa_por_nome(teclado, ligacao, contas, capsys):
+    gestao.criar(ligacao, modelos.MARKETEER, "Marta Marques", "marta@agencia.pt")
+    teclado("1", "MARTA", "0")
+
+    menu.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    _, depois_da_pesquisa = capsys.readouterr().out.split('Marketeers com "MARTA" no nome')
+    assert "Marta Marques" in depois_da_pesquisa
+    assert "Miguel Marketeer" not in depois_da_pesquisa
+
+
+def test_menu_adicionar_marketeer_nao_pede_empresa_nem_nif(teclado, ligacao, contas, capsys):
+    teclado("2", "Marta Marques", "marta@agencia.pt", "910000006", "", "0")
+
+    menu.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    conta = utilizadores.obter_por_email(ligacao, "marta@agencia.pt")
+    assert f"Marketeer criado com o número {conta.id}." in saida
+    assert "As credenciais de acesso foram enviadas para marta@agencia.pt." in saida
+    assert "2 marketeers." in saida
+
+
+def test_menu_adicionar_marketeer_mostra_o_erro(teclado, ligacao, contas, capsys):
+    teclado("2", "Marta Marques", "marta", "", "", "0")
+
+    menu.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "O marketeer não foi criado." in capsys.readouterr().out
+    assert utilizadores.contar(ligacao) == 3
+
+
+def test_menu_editar_marketeer(teclado, ligacao, contas, capsys):
+    marketeer = contas[modelos.MARKETEER]
+    teclado("3", str(marketeer.id), "Miguel Matos", "", "912345678", "", "0")
+
+    menu.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    novo = utilizadores.obter_por_id(ligacao, marketeer.id)
+    assert "A editar Miguel Marketeer." in saida
+    assert "Dados guardados." in saida
+    assert (novo.nome, novo.email, novo.telefone) == ("Miguel Matos", marketeer.email, "912345678")
+
+
+def test_menu_editar_marketeer_com_o_numero_de_um_cliente(teclado, ligacao, contas, capsys):
+    teclado("3", str(contas[modelos.CLIENTE].id), "", "0")
+
+    menu.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "Não existe nenhum marketeer com o número" in capsys.readouterr().out
+
+
+def test_opcao_marketeers_so_existe_no_menu_do_administrador():
+    descricoes = {perfil: [descricao for descricao, _ in opcoes] for perfil, opcoes in perfis.OPCOES.items()}
+
+    assert "Marketeers" in descricoes[modelos.ADMINISTRADOR]
+    assert "Marketeers" not in descricoes[modelos.MARKETEER]
+    assert "Marketeers" not in descricoes[modelos.CLIENTE]
