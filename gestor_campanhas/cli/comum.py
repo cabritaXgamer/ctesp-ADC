@@ -82,6 +82,23 @@ def ler_texto_com_valor(pergunta: str, atual: str) -> str:
     return resposta if resposta else atual
 
 
+def ler_numero(pergunta: str) -> int | None:
+    """Pede um número inteiro. A resposta pode ficar vazia.
+
+    Repete a pergunta enquanto a resposta não for um número.
+
+    :param pergunta: Texto mostrado antes da resposta.
+    :return: O número introduzido, ou ``None`` se a resposta ficou vazia.
+    """
+    while True:
+        resposta = input(f"{pergunta}: ").strip()
+        if not resposta:
+            return None
+        if resposta.isdigit():
+            return int(resposta)
+        print("Escreva um número.")
+
+
 def confirmar(pergunta: str) -> bool:
     """Pede uma confirmação de sim ou não.
 

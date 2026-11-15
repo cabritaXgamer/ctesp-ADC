@@ -69,7 +69,7 @@ def test_simplificar_tira_acentos_maiusculas_e_espacos():
 
 
 def test_menu_mostra_todos_os_clientes(teclado, ligacao, contas, clientes, capsys):
-    teclado("", "")
+    teclado("0")
 
     menu.clientes(ligacao, contas[modelos.ADMINISTRADOR])
 
@@ -81,18 +81,18 @@ def test_menu_mostra_todos_os_clientes(teclado, ligacao, contas, clientes, capsy
 
 
 def test_menu_mostra_o_resultado_da_pesquisa(teclado, ligacao, contas, clientes, capsys):
-    teclado("carla", "")
+    teclado("1", "carla", "0")
 
     menu.clientes(ligacao, contas[modelos.ADMINISTRADOR])
 
-    saida = capsys.readouterr().out
-    assert "Carla Cliente" in saida
-    assert "José Padeiro" not in saida
-    assert "1 cliente." in saida
+    _, depois_da_pesquisa = capsys.readouterr().out.split('Clientes com "carla" no nome')
+    assert "Carla Cliente" in depois_da_pesquisa
+    assert "José Padeiro" not in depois_da_pesquisa
+    assert "1 cliente." in depois_da_pesquisa
 
 
 def test_menu_avisa_quando_a_pesquisa_nao_encontra_ninguem(teclado, ligacao, contas, clientes, capsys):
-    teclado("zzz", "")
+    teclado("1", "zzz", "0")
 
     menu.clientes(ligacao, contas[modelos.ADMINISTRADOR])
 
@@ -101,7 +101,7 @@ def test_menu_avisa_quando_a_pesquisa_nao_encontra_ninguem(teclado, ligacao, con
 
 def test_menu_avisa_quando_nao_ha_clientes(teclado, ligacao, capsys):
     administrador = utilizadores.criar(ligacao, "Ana", "ana@agencia.pt", "x", modelos.ADMINISTRADOR)
-    teclado("", "")
+    teclado("0")
 
     menu.clientes(ligacao, administrador)
 
