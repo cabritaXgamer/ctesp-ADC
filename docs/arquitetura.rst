@@ -27,6 +27,7 @@ Estrutura de pastas
        principal.py       menu inicial e entrada na aplicação
        perfis.py          menu de cada perfil
        admin.py           opções do menu do Administrador
+       gestao.py          gestão de clientes e marketeers, pelo Administrador
        conta.py           opções da conta, comuns a todos os perfis
        recuperacao.py     recuperação da password
    tests/                 testes automáticos (pytest)

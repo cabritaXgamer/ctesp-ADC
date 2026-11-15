@@ -5,7 +5,7 @@ Contas de demonstração
 ----------------------
 
 Uma instalação nova não tem contas. Para experimentar a aplicação, cria-se
-uma conta de cada perfil com:
+as contas de demonstração com:
 
 .. code-block:: console
 
@@ -27,6 +27,12 @@ uma conta de cada perfil com:
    * - Cliente
      - ``cliente@empresa.pt``
      - ``cliente12345``
+   * - Cliente
+     - ``jose@padaria.pt``
+     - ``jose12345``
+   * - Cliente
+     - ``beatriz@bicicletas.pt``
+     - ``beatriz12345``
 
 Estas passwords são públicas e servem só para demonstração.
 
@@ -122,6 +128,29 @@ menos 8 caracteres e ser diferente da atual.
 
 Administrador
 -------------
+
+Clientes
+~~~~~~~~
+
+Mostra todos os clientes, por ordem alfabética do nome, com a empresa, o
+email, o telefone e o estado da conta. As contas desativadas também aparecem.
+
+A aplicação pergunta primeiro o que pesquisar. Com Enter, mostra todos os
+clientes. Com um texto, mostra só os clientes cujo nome contém esse texto, em
+qualquer posição. A pesquisa não distingue maiúsculas nem acentos: ``jose``
+encontra ``José Padeiro``.
+
+.. code-block:: text
+
+   N.º  Nome           Empresa                  Email                  Telefone   Estado
+   ---  -------------  -----------------------  ---------------------  ---------  ------
+   5    Beatriz Lopes  Bicicletas do Sul, Lda.  beatriz@bicicletas.pt  910000005  Ativa
+   3    Carla Cliente  Empresa Exemplo, Lda.    cliente@empresa.pt     910000003  Ativa
+   4    José Padeiro   Padaria Central, Lda.    jose@padaria.pt        910000004  Ativa
+
+   3 clientes.
+
+O número da primeira coluna identifica o cliente nas outras opções de gestão.
 
 Horários de entrada e saída dos marketeers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
