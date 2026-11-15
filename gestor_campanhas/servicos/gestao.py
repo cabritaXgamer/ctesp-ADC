@@ -170,3 +170,25 @@ def editar(
             raise ErroValidacao(MENSAGEM_EMAIL_REPETIDO)
         utilizadores.atualizar_email(ligacao, conta.id, email)
     return utilizadores.atualizar_dados(ligacao, conta.id, nome, telefone, empresa, nif)
+
+
+def definir_estado(ligacao: sqlite3.Connection, perfil: str, identificador: int, ativo: bool) -> Utilizador:
+    """Desativa ou reativa uma conta.
+
+    Quem tem a conta desativada deixa de poder entrar e de poder recuperar a
+    password. A conta não é apagada: os dados e o histórico mantêm-se, e
+    pode ser reativada mais tarde.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param perfil: Perfil da conta: um dos :data:`PERFIS_GERIDOS`.
+    :param identificador: Número da conta.
+    :param ativo: ``False`` para desativar, ``True`` para reativar.
+    :return: A conta, já com o estado novo.
+    :raises ErroValidacao: Se a conta não existir ou já estiver nesse estado.
+    """
+    if perfil not in PERFIS_GERIDOS:
+        raise ValueError(f"O perfil {perfil!r} não é gerido pelo Administrador.")
+    conta = obter(ligacao, perfil, identificador)
+    if conta.ativo == ativo:
+        raise ErroValidacao("Esta conta já está ativa." if ativo else "Esta conta já está desativada.")
+    return utilizadores.definir_ativo(ligacao, conta.id, ativo)

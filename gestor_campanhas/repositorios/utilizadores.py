@@ -181,3 +181,18 @@ def atualizar_email(ligacao: sqlite3.Connection, identificador: int, email: str)
     ligacao.execute("UPDATE utilizadores SET email = ? WHERE id = ?", (normalizar_email(email), identificador))
     ligacao.commit()
     return obter_por_id(ligacao, identificador)
+
+
+def definir_ativo(ligacao: sqlite3.Connection, identificador: int, ativo: bool) -> Utilizador:
+    """Ativa ou desativa a conta de um utilizador.
+
+    Uma conta desativada continua na base de dados, com todos os seus dados.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Identificador do utilizador.
+    :param ativo: ``True`` para ativar, ``False`` para desativar.
+    :return: O utilizador, já com o estado novo.
+    """
+    ligacao.execute("UPDATE utilizadores SET ativo = ? WHERE id = ?", (1 if ativo else 0, identificador))
+    ligacao.commit()
+    return obter_por_id(ligacao, identificador)
