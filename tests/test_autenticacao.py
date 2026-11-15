@@ -140,10 +140,11 @@ def test_menu_do_perfil_executa_a_opcao_escolhida(teclado, ligacao, contas, monk
 # --- dados de demonstração ---------------------------------------------------
 
 
-def test_dados_demo_criam_uma_conta_por_perfil(ligacao):
+def test_dados_demo_criam_contas_de_todos_os_perfis(ligacao):
     criadas = dados_demo.criar_contas(ligacao)
 
-    assert len(criadas) == 3
+    assert len(criadas) == len(dados_demo.CONTAS)
+    assert {conta["perfil"] for conta in dados_demo.CONTAS} == set(modelos.NOMES_PERFIS)
     for conta in dados_demo.CONTAS:
         utilizador = autenticacao.autenticar(ligacao, conta["email"], conta["password"])
         assert utilizador.perfil == conta["perfil"]
@@ -153,4 +154,4 @@ def test_dados_demo_podem_ser_repetidos(ligacao):
     dados_demo.criar_contas(ligacao)
 
     assert dados_demo.criar_contas(ligacao) == []
-    assert utilizadores.contar(ligacao) == 3
+    assert utilizadores.contar(ligacao) == len(dados_demo.CONTAS)
