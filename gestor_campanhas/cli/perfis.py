@@ -9,7 +9,7 @@ from __future__ import annotations
 import sqlite3
 
 from gestor_campanhas import modelos
-from gestor_campanhas.cli import admin, comum, conta
+from gestor_campanhas.cli import admin, comum, conta, gestao
 from gestor_campanhas.servicos import sessoes
 from gestor_campanhas.servicos.sessoes import SessaoAtiva
 
@@ -24,6 +24,7 @@ OPCOES_DA_CONTA = [
 #: A opção "Terminar sessão" é acrescentada automaticamente no fim.
 OPCOES: dict[str, list] = {
     modelos.ADMINISTRADOR: [
+        ("Clientes", gestao.clientes),
         ("Horários de entrada e saída dos marketeers", admin.horarios),
         *OPCOES_DA_CONTA,
     ],

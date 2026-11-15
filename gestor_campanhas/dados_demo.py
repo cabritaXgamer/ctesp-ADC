@@ -1,7 +1,7 @@
 """Dados de demonstração.
 
-Cria uma conta de cada perfil, para se poder experimentar a aplicação logo a
-seguir a instalá-la. Corre-se a partir da pasta do projeto com::
+Cria um administrador, um marketeer e três clientes, para se poder
+experimentar a aplicação logo a seguir a instalá-la. Corre-se a partir da pasta do projeto com::
 
     python -m gestor_campanhas.dados_demo
 
@@ -19,7 +19,7 @@ from gestor_campanhas import bd, modelos, seguranca
 from gestor_campanhas.cli import comum
 from gestor_campanhas.repositorios import utilizadores
 
-#: Contas de demonstração, uma por perfil.
+#: Contas de demonstração: pelo menos uma de cada perfil.
 CONTAS = [
     {
         "nome": "Ana Administradora",
@@ -43,6 +43,24 @@ CONTAS = [
         "telefone": "910000003",
         "empresa": "Empresa Exemplo, Lda.",
         "nif": "500000000",
+    },
+    {
+        "nome": "José Padeiro",
+        "email": "jose@padaria.pt",
+        "password": "jose12345",
+        "perfil": modelos.CLIENTE,
+        "telefone": "910000004",
+        "empresa": "Padaria Central, Lda.",
+        "nif": "500000001",
+    },
+    {
+        "nome": "Beatriz Lopes",
+        "email": "beatriz@bicicletas.pt",
+        "password": "beatriz12345",
+        "perfil": modelos.CLIENTE,
+        "telefone": "910000005",
+        "empresa": "Bicicletas do Sul, Lda.",
+        "nif": "500000002",
     },
 ]
 
