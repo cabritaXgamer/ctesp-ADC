@@ -197,6 +197,17 @@ A password do cliente não é alterada. Se o email mudar, o cliente passa a
 entrar com o email novo. Se algum valor não respeitar as regras, nenhum dado
 é alterado.
 
+Desativar ou reativar cliente
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Pede o número do cliente, mostra o estado atual da conta e pede confirmação
+antes de o alterar.
+
+Um cliente com a conta desativada deixa de poder entrar e de poder recuperar
+a password. A conta não é apagada: continua na lista, com o estado
+``Desativada``, e os seus dados e o seu histórico mantêm-se. A mesma opção
+reativa a conta, e o cliente volta a entrar com a password que tinha.
+
 Horários de entrada e saída dos marketeers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
