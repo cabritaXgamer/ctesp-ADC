@@ -169,6 +169,7 @@ ACOES = {
     modelos.MARKETEER: [
         ("Adicionar", adicionar),
         ("Editar", editar),
+        ("Desativar ou reativar", alterar_estado),
     ],
 }
 
