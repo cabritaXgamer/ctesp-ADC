@@ -1,6 +1,6 @@
 """Dados de demonstração.
 
-Cria um administrador, um marketeer e três clientes, para se poder
+Cria um administrador, dois marketeers e três clientes, para se poder
 experimentar a aplicação logo a seguir a instalá-la. Corre-se a partir da pasta do projeto com::
 
     python -m gestor_campanhas.dados_demo
@@ -34,6 +34,13 @@ CONTAS = [
         "password": "marketeer12345",
         "perfil": modelos.MARKETEER,
         "telefone": "910000002",
+    },
+    {
+        "nome": "Marta Marques",
+        "email": "marta@agencia.pt",
+        "password": "marta12345",
+        "perfil": modelos.MARKETEER,
+        "telefone": "910000006",
     },
     {
         "nome": "Carla Cliente",
