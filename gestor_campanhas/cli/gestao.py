@@ -15,6 +15,7 @@ OPCOES_CLIENTES = [
     ("1", "Pesquisar por nome"),
     ("2", "Adicionar cliente"),
     ("3", "Editar cliente"),
+    ("4", "Desativar ou reativar cliente"),
     ("0", "Voltar"),
 ]
 
@@ -68,6 +69,8 @@ def clientes(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
             adicionar_cliente(ligacao)
         elif escolha == "3":
             editar_cliente(ligacao)
+        elif escolha == "4":
+            alterar_estado_cliente(ligacao)
 
 
 def adicionar_cliente(ligacao: sqlite3.Connection) -> None:
@@ -123,4 +126,32 @@ def editar_cliente(ligacao: sqlite3.Connection) -> None:
         print(f"\n{erro} Os dados não foram alterados.")
     else:
         print("\nDados guardados.")
+    comum.pausa()
+
+
+def alterar_estado_cliente(ligacao: sqlite3.Connection) -> None:
+    """Pede o número de um cliente e desativa ou reativa a conta dele.
+
+    Mostra o estado atual e pede confirmação antes de alterar.
+
+    :param ligacao: Ligação aberta à base de dados.
+    """
+    comum.titulo("Desativar ou reativar cliente")
+    numero = comum.ler_numero("Número do cliente (Enter para cancelar)")
+    if numero is None:
+        return
+    try:
+        conta = gestao.obter(ligacao, modelos.CLIENTE, numero)
+    except ErroValidacao as erro:
+        print(f"\n{erro}")
+        comum.pausa()
+        return
+    print(f"\n{conta.nome} ({conta.email}) tem a conta {estado(conta).lower()}.")
+    if conta.ativo:
+        print("Com a conta desativada, deixa de poder entrar. Os dados e o histórico mantêm-se.")
+    if comum.confirmar("Desativar a conta?" if conta.ativo else "Reativar a conta?"):
+        gestao.definir_estado(ligacao, modelos.CLIENTE, conta.id, not conta.ativo)
+        print("\nConta desativada." if conta.ativo else "\nConta reativada.")
+    else:
+        print("\nNada foi alterado.")
     comum.pausa()
