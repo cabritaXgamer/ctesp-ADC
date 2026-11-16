@@ -1,0 +1,962 @@
+{
+  "fase": 3,
+  "repo_oficial": "ADC-TrabGrupo",
+  "unidades": [
+    {
+      "id": "3.1",
+      "titulo": "Criar e editar campanhas",
+      "ramo": "feature/3.1-criar-editar-campanha",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(bd): criar a tabela das campanhas",
+          "ficheiros": [
+            "gestor_campanhas/bd.py",
+            "tests/test_bd.py"
+          ],
+          "apagar": [],
+          "tree_antes": "e3c6b419863b2374df18f5b1d489bad882584b43",
+          "tree_depois": "a8ddb9ccae4d4d7df606b549e1b9583e360a7e36"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(modelos): acrescentar a classe Campanha",
+          "ficheiros": [
+            "gestor_campanhas/modelos.py"
+          ],
+          "apagar": [],
+          "tree_antes": "a8ddb9ccae4d4d7df606b549e1b9583e360a7e36",
+          "tree_depois": "37c25b9d00e4712642cf69eb43ab3a4e359b12f5"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(repositorios): guardar e ler campanhas",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/campanhas.py",
+            "tests/test_campanhas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "37c25b9d00e4712642cf69eb43ab3a4e359b12f5",
+          "tree_depois": "22d64c9a037599d1a7785d20b69fead5abdba312"
+        },
+        {
+          "numero": 4,
+          "mensagem": "feat(validacao): validar datas e períodos",
+          "ficheiros": [
+            "docs/referencia.rst",
+            "gestor_campanhas/servicos/validacao.py",
+            "tests/test_validacao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "22d64c9a037599d1a7785d20b69fead5abdba312",
+          "tree_depois": "dcd1c27247990c3c7fd03bfbb931d45d6539f729"
+        },
+        {
+          "numero": 5,
+          "mensagem": "feat(campanhas): criar campanhas para um cliente",
+          "ficheiros": [
+            "gestor_campanhas/servicos/campanhas.py",
+            "tests/test_campanhas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "dcd1c27247990c3c7fd03bfbb931d45d6539f729",
+          "tree_depois": "fc7f9135ae1416b96e390b885715f44fea704c1b"
+        },
+        {
+          "numero": 6,
+          "mensagem": "feat(campanhas): editar o nome, o objetivo e as datas",
+          "ficheiros": [
+            "gestor_campanhas/servicos/campanhas.py",
+            "tests/test_campanhas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "fc7f9135ae1416b96e390b885715f44fea704c1b",
+          "tree_depois": "69ea69faafa0fa75c0817ac9d99d44e6bc4c3c2e"
+        },
+        {
+          "numero": 7,
+          "mensagem": "feat(cli): menu de campanhas do marketeer",
+          "ficheiros": [
+            "gestor_campanhas/cli/campanhas.py",
+            "gestor_campanhas/cli/perfis.py",
+            "tests/test_campanhas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "69ea69faafa0fa75c0817ac9d99d44e6bc4c3c2e",
+          "tree_depois": "6a64e766f5711658cdc5f58e09bc9c16dc95a5eb"
+        },
+        {
+          "numero": 8,
+          "mensagem": "docs: documentar a criação e a edição de campanhas",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/referencia.rst",
+            "docs/utilizacao.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "6a64e766f5711658cdc5f58e09bc9c16dc95a5eb",
+          "tree_depois": "53cdebee555d4bc627e6ead1e8840f7de4125052"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CHANGELOG.md": "20249ef6ca7caea9fdf24e0d6d50440bcf34bdd8",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "2c0dd705c48edcb3b0992b44da756e9b4475e878",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "c22250312a63cee6dbbf995c64771b916ba0bb3f",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "6f9d97c926eaee44c3495fe5e894b7127e55c29e",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "26874fc09c03a417b99bafa1521076eca081a784",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "9279398c5f39ae1cbef2d2c2567e38f5525f96c6",
+        "gestor_campanhas/__init__.py": "3c3b9647f049293e27ba704d4ab75c20f84770d9",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "844529f0ecaf8ce05ef79bc7c98e7cf3518b7aba",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/admin.py": "97779095815a8b5a283fb216e04487e8269d4dca",
+        "gestor_campanhas/cli/campanhas.py": "bcd017e9c1f659d155ee0926aba576d8b2f17248",
+        "gestor_campanhas/cli/comum.py": "908af101e4c841c9f5708bd96a66725af6689255",
+        "gestor_campanhas/cli/conta.py": "f8cbd345e07f1d479795b7c92a0484e2773d6db6",
+        "gestor_campanhas/cli/gestao.py": "d8272a7ce90f50e13136538aaebebfa78a381566",
+        "gestor_campanhas/cli/perfis.py": "1c3cc5336c38003e00f431995532900657cd0912",
+        "gestor_campanhas/cli/principal.py": "9206d99581c210bead0fc9ddb6a4679f42ffba51",
+        "gestor_campanhas/cli/recuperacao.py": "35d3ad9d38d27a70368805a9d5cce44c628ee72a",
+        "gestor_campanhas/config.py": "29b2f796bc6d174ff11e41d8719071b2dc70a099",
+        "gestor_campanhas/dados_demo.py": "f525416fad9a5d6e30db2b03dcc160b5954fe997",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "89e86aa292b0b9e3e9ebcbc03dccc73d0658331c",
+        "gestor_campanhas/relogio.py": "14697a8506fb9a462b8084a7a7d01f8b6cce8511",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/campanhas.py": "32e6530900ed1ba27a3da1d5bbfe957a33544b9e",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/recuperacoes.py": "3656e4685566b47c72bd0360e750a2e97c6921a1",
+        "gestor_campanhas/repositorios/sessoes.py": "6e195e3188dc3d7b65bfeae6e550081e1c109008",
+        "gestor_campanhas/repositorios/utilizadores.py": "be2a1545ced47e0dd9163b9445b1073c1bf15c6a",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/campanhas.py": "5a6ba6be6894767e83434539d5abbcbec6d6cb89",
+        "gestor_campanhas/servicos/contas.py": "baccbbe23792e28e81159b6ac536f6cd7081f804",
+        "gestor_campanhas/servicos/correio.py": "554f1d9db479e2c0eba2cf60b57d00eb5b7fa0c5",
+        "gestor_campanhas/servicos/gestao.py": "29dba8fb2b55b7718433c70bb32cfa0bbebf9bb2",
+        "gestor_campanhas/servicos/recuperacao.py": "9b39b627ca52770938f8ed8b334cbab0849dd37e",
+        "gestor_campanhas/servicos/sessoes.py": "ee60345e898dba35df5ed331c2409464183e945e",
+        "gestor_campanhas/servicos/validacao.py": "0051947c712ebae5f72d29c44e3618e6f44534e5",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "d42760bc1da0a5936c956f18ff5baf2470927236",
+        "tests/test_autenticacao.py": "15af5b14c4d062af8db8ca2a84c2422a336ea664",
+        "tests/test_bd.py": "90c33c8f5830918029d795bc59bf408f3dcb6a3a",
+        "tests/test_campanhas.py": "3aba64c3634b3481dce5eef253e87cbf33f30e7e",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_contas.py": "9a58332943d7189ed2f457bb846326426a6c510b",
+        "tests/test_gestao.py": "34e0df47814a51081ce6065321669837373b2739",
+        "tests/test_horarios.py": "33d6c456d87c5d69a2ce5e8a71bc7f5b82c9fb39",
+        "tests/test_recuperacao.py": "8c7ee312c1e5288374021d73d422d82409a2bc14",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528",
+        "tests/test_validacao.py": "db521e688569432d9fead22d17009292199b1203"
+      }
+    },
+    {
+      "id": "3.2",
+      "titulo": "Campanhas atribuídas e eliminar campanha",
+      "ramo": "feature/3.2-campanhas-atribuidas-eliminar",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(dinheiro): converter e formatar valores em euros",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/referencia.rst",
+            "gestor_campanhas/dinheiro.py",
+            "tests/test_dinheiro.py"
+          ],
+          "apagar": [],
+          "tree_antes": "53cdebee555d4bc627e6ead1e8840f7de4125052",
+          "tree_depois": "85ecea434ff781dc2ee0d2c8cd41e4ea27aff4e3"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(campanhas): calcular o estado a partir das datas",
+          "ficheiros": [
+            "gestor_campanhas/modelos.py",
+            "gestor_campanhas/relogio.py",
+            "gestor_campanhas/servicos/campanhas.py",
+            "tests/test_campanhas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "85ecea434ff781dc2ee0d2c8cd41e4ea27aff4e3",
+          "tree_depois": "18140d0e74963b09f515e9899617fc77710e5b13"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(cli): mostrar o budget, o estado e os detalhes das campanhas",
+          "ficheiros": [
+            "gestor_campanhas/cli/campanhas.py",
+            "tests/test_campanhas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "18140d0e74963b09f515e9899617fc77710e5b13",
+          "tree_depois": "b917a2501334bfc2f9341cc1a47f96a5d62067b7"
+        },
+        {
+          "numero": 4,
+          "mensagem": "feat(campanhas): eliminar uma campanha",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/campanhas.py",
+            "gestor_campanhas/servicos/campanhas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "b917a2501334bfc2f9341cc1a47f96a5d62067b7",
+          "tree_depois": "c19d9828e19c6eac446d767ae0fdea100021d85d"
+        },
+        {
+          "numero": 5,
+          "mensagem": "feat(cli): opção para eliminar uma campanha, com confirmação",
+          "ficheiros": [
+            "gestor_campanhas/cli/campanhas.py",
+            "tests/test_campanhas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "c19d9828e19c6eac446d767ae0fdea100021d85d",
+          "tree_depois": "5c27f6d30081bb7b939cecdb4e3f30fca3287a71"
+        },
+        {
+          "numero": 6,
+          "mensagem": "feat(demo): acrescentar campanhas de demonstração",
+          "ficheiros": [
+            "gestor_campanhas/dados_demo.py",
+            "tests/test_campanhas.py"
+          ],
+          "apagar": [],
+          "tree_antes": "5c27f6d30081bb7b939cecdb4e3f30fca3287a71",
+          "tree_depois": "cd9f9349c2b8a7e2d148a95cc4ea41c696a21bc0"
+        },
+        {
+          "numero": 7,
+          "mensagem": "docs: documentar a lista, os detalhes e a eliminação de campanhas",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/utilizacao.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "cd9f9349c2b8a7e2d148a95cc4ea41c696a21bc0",
+          "tree_depois": "529cb5c4bb6f2b18a8ec87f8a44866a465009252"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CHANGELOG.md": "20249ef6ca7caea9fdf24e0d6d50440bcf34bdd8",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "2c0dd705c48edcb3b0992b44da756e9b4475e878",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "6cebc779ccc1d7e33ba4c759e17be660edd235f5",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "6f9d97c926eaee44c3495fe5e894b7127e55c29e",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "e3e78c8d7998a5106c58237ddffa056ed8c8f477",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "2dfe36c85de435d814113dbb8566755d9546225f",
+        "gestor_campanhas/__init__.py": "3c3b9647f049293e27ba704d4ab75c20f84770d9",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "844529f0ecaf8ce05ef79bc7c98e7cf3518b7aba",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/admin.py": "97779095815a8b5a283fb216e04487e8269d4dca",
+        "gestor_campanhas/cli/campanhas.py": "80fb27969a1205f179610cb0f168c9f6f6ec398e",
+        "gestor_campanhas/cli/comum.py": "908af101e4c841c9f5708bd96a66725af6689255",
+        "gestor_campanhas/cli/conta.py": "f8cbd345e07f1d479795b7c92a0484e2773d6db6",
+        "gestor_campanhas/cli/gestao.py": "d8272a7ce90f50e13136538aaebebfa78a381566",
+        "gestor_campanhas/cli/perfis.py": "1c3cc5336c38003e00f431995532900657cd0912",
+        "gestor_campanhas/cli/principal.py": "9206d99581c210bead0fc9ddb6a4679f42ffba51",
+        "gestor_campanhas/cli/recuperacao.py": "35d3ad9d38d27a70368805a9d5cce44c628ee72a",
+        "gestor_campanhas/config.py": "29b2f796bc6d174ff11e41d8719071b2dc70a099",
+        "gestor_campanhas/dados_demo.py": "0174d832771a31e4af6a44971489c9df236bb780",
+        "gestor_campanhas/dinheiro.py": "fe66dfab72a9e32fc46f72409e4378a3f094301b",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "7bbab62b478bfe5530e06ef1b1005c4df8260d5c",
+        "gestor_campanhas/relogio.py": "26062304ddcbf9746707b563650f4f0c2354001d",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/campanhas.py": "e7d7cf63c44c3ec4d5bf27da2655d0acac8b08bc",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/recuperacoes.py": "3656e4685566b47c72bd0360e750a2e97c6921a1",
+        "gestor_campanhas/repositorios/sessoes.py": "6e195e3188dc3d7b65bfeae6e550081e1c109008",
+        "gestor_campanhas/repositorios/utilizadores.py": "be2a1545ced47e0dd9163b9445b1073c1bf15c6a",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/campanhas.py": "86a67f4772b1876a963f8ad180531a63b952ded7",
+        "gestor_campanhas/servicos/contas.py": "baccbbe23792e28e81159b6ac536f6cd7081f804",
+        "gestor_campanhas/servicos/correio.py": "554f1d9db479e2c0eba2cf60b57d00eb5b7fa0c5",
+        "gestor_campanhas/servicos/gestao.py": "29dba8fb2b55b7718433c70bb32cfa0bbebf9bb2",
+        "gestor_campanhas/servicos/recuperacao.py": "9b39b627ca52770938f8ed8b334cbab0849dd37e",
+        "gestor_campanhas/servicos/sessoes.py": "ee60345e898dba35df5ed331c2409464183e945e",
+        "gestor_campanhas/servicos/validacao.py": "0051947c712ebae5f72d29c44e3618e6f44534e5",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "d42760bc1da0a5936c956f18ff5baf2470927236",
+        "tests/test_autenticacao.py": "15af5b14c4d062af8db8ca2a84c2422a336ea664",
+        "tests/test_bd.py": "90c33c8f5830918029d795bc59bf408f3dcb6a3a",
+        "tests/test_campanhas.py": "632c6822ccb0c61c9ab95fa5eaee2d2623e23811",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_contas.py": "9a58332943d7189ed2f457bb846326426a6c510b",
+        "tests/test_dinheiro.py": "727ffe2316380c7f5abb93b2fa19b905d84c1749",
+        "tests/test_gestao.py": "34e0df47814a51081ce6065321669837373b2739",
+        "tests/test_horarios.py": "33d6c456d87c5d69a2ce5e8a71bc7f5b82c9fb39",
+        "tests/test_recuperacao.py": "8c7ee312c1e5288374021d73d422d82409a2bc14",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528",
+        "tests/test_validacao.py": "db521e688569432d9fead22d17009292199b1203"
+      }
+    },
+    {
+      "id": "3.3",
+      "titulo": "Pedidos de nova campanha",
+      "ramo": "feature/3.3-pedidos-de-campanha",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(bd): criar a tabela dos pedidos de campanha",
+          "ficheiros": [
+            "gestor_campanhas/bd.py",
+            "tests/test_bd.py"
+          ],
+          "apagar": [],
+          "tree_antes": "529cb5c4bb6f2b18a8ec87f8a44866a465009252",
+          "tree_depois": "bc20200eac56467028211608fa9cc4a61691bc9a"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(modelos): acrescentar a classe PedidoCampanha",
+          "ficheiros": [
+            "gestor_campanhas/modelos.py"
+          ],
+          "apagar": [],
+          "tree_antes": "bc20200eac56467028211608fa9cc4a61691bc9a",
+          "tree_depois": "da70cc11b5e0a4ed4c910859548bbb3a4441a69a"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(repositorios): guardar e ler pedidos de campanha",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/pedidos.py",
+            "tests/test_pedidos.py"
+          ],
+          "apagar": [],
+          "tree_antes": "da70cc11b5e0a4ed4c910859548bbb3a4441a69a",
+          "tree_depois": "2d63a45d97d97b0b33aa037b17bad414c0be3a34"
+        },
+        {
+          "numero": 4,
+          "mensagem": "feat(pedidos): pedir uma campanha nova",
+          "ficheiros": [
+            "gestor_campanhas/servicos/pedidos.py",
+            "tests/test_pedidos.py"
+          ],
+          "apagar": [],
+          "tree_antes": "2d63a45d97d97b0b33aa037b17bad414c0be3a34",
+          "tree_depois": "da99cbd7ed194ea23b2ba91011d2d41914d6e68e"
+        },
+        {
+          "numero": 5,
+          "mensagem": "feat(pedidos): cancelar um pedido pendente",
+          "ficheiros": [
+            "gestor_campanhas/servicos/pedidos.py",
+            "tests/test_pedidos.py"
+          ],
+          "apagar": [],
+          "tree_antes": "da99cbd7ed194ea23b2ba91011d2d41914d6e68e",
+          "tree_depois": "8c7493c2455aea0ea5cef5e6004c742b1e2fe86e"
+        },
+        {
+          "numero": 6,
+          "mensagem": "feat(cli): menu de pedidos de campanha do cliente",
+          "ficheiros": [
+            "gestor_campanhas/cli/pedidos.py",
+            "gestor_campanhas/cli/perfis.py",
+            "tests/test_pedidos.py"
+          ],
+          "apagar": [],
+          "tree_antes": "8c7493c2455aea0ea5cef5e6004c742b1e2fe86e",
+          "tree_depois": "f573facd85028968f9da074b3fb9c2672a98db93"
+        },
+        {
+          "numero": 7,
+          "mensagem": "feat(cli): ver e cancelar um pedido de campanha",
+          "ficheiros": [
+            "gestor_campanhas/cli/pedidos.py",
+            "tests/test_pedidos.py"
+          ],
+          "apagar": [],
+          "tree_antes": "f573facd85028968f9da074b3fb9c2672a98db93",
+          "tree_depois": "30168f5932945048557e1e1ba9a95fffbd22f48f"
+        },
+        {
+          "numero": 8,
+          "mensagem": "feat(demo): acrescentar pedidos de campanha de demonstração",
+          "ficheiros": [
+            "gestor_campanhas/dados_demo.py",
+            "tests/test_pedidos.py"
+          ],
+          "apagar": [],
+          "tree_antes": "30168f5932945048557e1e1ba9a95fffbd22f48f",
+          "tree_depois": "27693c7fbb29c537152e711d37d09f85955ca13d"
+        },
+        {
+          "numero": 9,
+          "mensagem": "docs: documentar os pedidos de campanha do cliente",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/referencia.rst",
+            "docs/utilizacao.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "27693c7fbb29c537152e711d37d09f85955ca13d",
+          "tree_depois": "aa429a0f33e6c01d0faf0cb619cd63661c656d2e"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CHANGELOG.md": "20249ef6ca7caea9fdf24e0d6d50440bcf34bdd8",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "2c0dd705c48edcb3b0992b44da756e9b4475e878",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "7a5cff68837ce7bf25f762ac3183fd386b0d8e48",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "6f9d97c926eaee44c3495fe5e894b7127e55c29e",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "aa1cba45b61da3ca067596ef2999f6353cbaf0d4",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "2573e5b5c8d33b3808a0c342ea1d90c2e90ae7ff",
+        "gestor_campanhas/__init__.py": "3c3b9647f049293e27ba704d4ab75c20f84770d9",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "78de2b7e7b544173e793d1f74350920d06293e69",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/admin.py": "97779095815a8b5a283fb216e04487e8269d4dca",
+        "gestor_campanhas/cli/campanhas.py": "80fb27969a1205f179610cb0f168c9f6f6ec398e",
+        "gestor_campanhas/cli/comum.py": "908af101e4c841c9f5708bd96a66725af6689255",
+        "gestor_campanhas/cli/conta.py": "f8cbd345e07f1d479795b7c92a0484e2773d6db6",
+        "gestor_campanhas/cli/gestao.py": "d8272a7ce90f50e13136538aaebebfa78a381566",
+        "gestor_campanhas/cli/pedidos.py": "d1859a328ce2b8e359e8fa70a8813a0917d17904",
+        "gestor_campanhas/cli/perfis.py": "de29bf6c91ff825b9ec3599fa1fe79fdc34a3d8e",
+        "gestor_campanhas/cli/principal.py": "9206d99581c210bead0fc9ddb6a4679f42ffba51",
+        "gestor_campanhas/cli/recuperacao.py": "35d3ad9d38d27a70368805a9d5cce44c628ee72a",
+        "gestor_campanhas/config.py": "29b2f796bc6d174ff11e41d8719071b2dc70a099",
+        "gestor_campanhas/dados_demo.py": "e133e408e72049cace1962480f9ba0c75b9cee78",
+        "gestor_campanhas/dinheiro.py": "fe66dfab72a9e32fc46f72409e4378a3f094301b",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "bc6806fef3155171390a12433d2245dfb6987ded",
+        "gestor_campanhas/relogio.py": "26062304ddcbf9746707b563650f4f0c2354001d",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/campanhas.py": "e7d7cf63c44c3ec4d5bf27da2655d0acac8b08bc",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/pedidos.py": "8b9a36a46fffb81838d7a0a0a0aa95a30ccfd05c",
+        "gestor_campanhas/repositorios/recuperacoes.py": "3656e4685566b47c72bd0360e750a2e97c6921a1",
+        "gestor_campanhas/repositorios/sessoes.py": "6e195e3188dc3d7b65bfeae6e550081e1c109008",
+        "gestor_campanhas/repositorios/utilizadores.py": "be2a1545ced47e0dd9163b9445b1073c1bf15c6a",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/campanhas.py": "86a67f4772b1876a963f8ad180531a63b952ded7",
+        "gestor_campanhas/servicos/contas.py": "baccbbe23792e28e81159b6ac536f6cd7081f804",
+        "gestor_campanhas/servicos/correio.py": "554f1d9db479e2c0eba2cf60b57d00eb5b7fa0c5",
+        "gestor_campanhas/servicos/gestao.py": "29dba8fb2b55b7718433c70bb32cfa0bbebf9bb2",
+        "gestor_campanhas/servicos/pedidos.py": "01ad0a5d15baca59a3e896ac473a434c76a35505",
+        "gestor_campanhas/servicos/recuperacao.py": "9b39b627ca52770938f8ed8b334cbab0849dd37e",
+        "gestor_campanhas/servicos/sessoes.py": "ee60345e898dba35df5ed331c2409464183e945e",
+        "gestor_campanhas/servicos/validacao.py": "0051947c712ebae5f72d29c44e3618e6f44534e5",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "d42760bc1da0a5936c956f18ff5baf2470927236",
+        "tests/test_autenticacao.py": "15af5b14c4d062af8db8ca2a84c2422a336ea664",
+        "tests/test_bd.py": "a7663f6fd9f6205f5cfe46c3122b66460973d074",
+        "tests/test_campanhas.py": "632c6822ccb0c61c9ab95fa5eaee2d2623e23811",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_contas.py": "9a58332943d7189ed2f457bb846326426a6c510b",
+        "tests/test_dinheiro.py": "727ffe2316380c7f5abb93b2fa19b905d84c1749",
+        "tests/test_gestao.py": "34e0df47814a51081ce6065321669837373b2739",
+        "tests/test_horarios.py": "33d6c456d87c5d69a2ce5e8a71bc7f5b82c9fb39",
+        "tests/test_pedidos.py": "0e15167397e3d16a918698f52ee79427637d13be",
+        "tests/test_recuperacao.py": "8c7ee312c1e5288374021d73d422d82409a2bc14",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528",
+        "tests/test_validacao.py": "db521e688569432d9fead22d17009292199b1203"
+      }
+    },
+    {
+      "id": "3.4",
+      "titulo": "Decidir pedidos, budget e marketeer responsável",
+      "ramo": "feature/3.4-decisao-budget-marketeer",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(repositorios): ler todos os pedidos e alterar o budget e o marketeer",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/campanhas.py",
+            "gestor_campanhas/repositorios/pedidos.py",
+            "tests/conftest.py",
+            "tests/test_administracao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "aa429a0f33e6c01d0faf0cb619cd63661c656d2e",
+          "tree_depois": "2e6d82c16b1132f1cf744b7628c76a832b148411"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(campanhas): definir o budget de uma campanha",
+          "ficheiros": [
+            "gestor_campanhas/servicos/campanhas.py",
+            "tests/test_administracao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "2e6d82c16b1132f1cf744b7628c76a832b148411",
+          "tree_depois": "c9df5ae638d77d4369d12fcf5a31461f4263a6c7"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(campanhas): atribuir um marketeer a uma campanha",
+          "ficheiros": [
+            "gestor_campanhas/servicos/campanhas.py",
+            "tests/test_administracao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "c9df5ae638d77d4369d12fcf5a31461f4263a6c7",
+          "tree_depois": "cf49944d9de86a0a10a03e16cd2bd5a25519ad29"
+        },
+        {
+          "numero": 4,
+          "mensagem": "feat(pedidos): analisar, aprovar e rejeitar pedidos de campanha",
+          "ficheiros": [
+            "gestor_campanhas/servicos/pedidos.py",
+            "tests/test_administracao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "cf49944d9de86a0a10a03e16cd2bd5a25519ad29",
+          "tree_depois": "8377dc73034a28ae978212d687bdf83f8db81664"
+        },
+        {
+          "numero": 5,
+          "mensagem": "feat(cli): pedidos de campanha no menu do administrador",
+          "ficheiros": [
+            "gestor_campanhas/cli/pedidos.py",
+            "gestor_campanhas/cli/perfis.py",
+            "tests/test_administracao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "8377dc73034a28ae978212d687bdf83f8db81664",
+          "tree_depois": "3c573be55c76fe23b161cd5642c2a55b28f3ae69"
+        },
+        {
+          "numero": 6,
+          "mensagem": "feat(cli): campanhas no menu do administrador",
+          "ficheiros": [
+            "gestor_campanhas/cli/campanhas.py",
+            "gestor_campanhas/cli/perfis.py",
+            "tests/test_administracao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "3c573be55c76fe23b161cd5642c2a55b28f3ae69",
+          "tree_depois": "1edc82683441cf7daed0f2ae49da1e599413c91e"
+        },
+        {
+          "numero": 7,
+          "mensagem": "feat(gestao): mostrar as campanhas ativas de cada cliente e marketeer",
+          "ficheiros": [
+            "gestor_campanhas/cli/gestao.py",
+            "gestor_campanhas/modelos.py",
+            "gestor_campanhas/servicos/campanhas.py",
+            "tests/test_administracao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "1edc82683441cf7daed0f2ae49da1e599413c91e",
+          "tree_depois": "ff530f3d936726f88a75df5fee85084b10081841"
+        },
+        {
+          "numero": 8,
+          "mensagem": "feat(gestao): impedir desativar um marketeer com campanhas por terminar",
+          "ficheiros": [
+            "gestor_campanhas/cli/gestao.py",
+            "gestor_campanhas/servicos/gestao.py",
+            "tests/test_administracao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "ff530f3d936726f88a75df5fee85084b10081841",
+          "tree_depois": "1f3a2a94a66e82d8baeaae5fbe8e6c8ff709595c"
+        },
+        {
+          "numero": 9,
+          "mensagem": "docs: documentar as decisões do administrador sobre pedidos e campanhas",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/referencia.rst",
+            "docs/utilizacao.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "1f3a2a94a66e82d8baeaae5fbe8e6c8ff709595c",
+          "tree_depois": "b0d0c8877f72f6f6786168f1546f3a8c6f4e7d36"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CHANGELOG.md": "20249ef6ca7caea9fdf24e0d6d50440bcf34bdd8",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "2c0dd705c48edcb3b0992b44da756e9b4475e878",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "727e3ae288a503ad9f483f0f89449521b9f31d7d",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "6f9d97c926eaee44c3495fe5e894b7127e55c29e",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "d0209cf11955411e2e06a918b2f711f9e9729102",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "781b73a241b89e80d2b87b96503c94980bfd3275",
+        "gestor_campanhas/__init__.py": "3c3b9647f049293e27ba704d4ab75c20f84770d9",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "78de2b7e7b544173e793d1f74350920d06293e69",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/admin.py": "97779095815a8b5a283fb216e04487e8269d4dca",
+        "gestor_campanhas/cli/campanhas.py": "1e7639c882137e5518bcc72cd2df0da95dc62159",
+        "gestor_campanhas/cli/comum.py": "908af101e4c841c9f5708bd96a66725af6689255",
+        "gestor_campanhas/cli/conta.py": "f8cbd345e07f1d479795b7c92a0484e2773d6db6",
+        "gestor_campanhas/cli/gestao.py": "792b1a25923af895dfc3fb46836810fe87974075",
+        "gestor_campanhas/cli/pedidos.py": "004fb87edbf1be4413f5e1ce78bc668cc8204fe4",
+        "gestor_campanhas/cli/perfis.py": "3c9e08ffeadfd8b89db5b7e261d19dacf3fff3c4",
+        "gestor_campanhas/cli/principal.py": "9206d99581c210bead0fc9ddb6a4679f42ffba51",
+        "gestor_campanhas/cli/recuperacao.py": "35d3ad9d38d27a70368805a9d5cce44c628ee72a",
+        "gestor_campanhas/config.py": "29b2f796bc6d174ff11e41d8719071b2dc70a099",
+        "gestor_campanhas/dados_demo.py": "e133e408e72049cace1962480f9ba0c75b9cee78",
+        "gestor_campanhas/dinheiro.py": "fe66dfab72a9e32fc46f72409e4378a3f094301b",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "c1ed896ea8baf0102831fe57b6ac425a50d642db",
+        "gestor_campanhas/relogio.py": "26062304ddcbf9746707b563650f4f0c2354001d",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/campanhas.py": "0c9fb6dd16ccda1557a4474052014cc7042b347f",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/pedidos.py": "4edfb4da831dc246d929d57f4c00326cd9c8d8f4",
+        "gestor_campanhas/repositorios/recuperacoes.py": "3656e4685566b47c72bd0360e750a2e97c6921a1",
+        "gestor_campanhas/repositorios/sessoes.py": "6e195e3188dc3d7b65bfeae6e550081e1c109008",
+        "gestor_campanhas/repositorios/utilizadores.py": "be2a1545ced47e0dd9163b9445b1073c1bf15c6a",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/campanhas.py": "37b947bb62a306dd3a6714a9b02708484d7f3a00",
+        "gestor_campanhas/servicos/contas.py": "baccbbe23792e28e81159b6ac536f6cd7081f804",
+        "gestor_campanhas/servicos/correio.py": "554f1d9db479e2c0eba2cf60b57d00eb5b7fa0c5",
+        "gestor_campanhas/servicos/gestao.py": "d57f9518195a9b0a818ecf05fb1866b63d4d752b",
+        "gestor_campanhas/servicos/pedidos.py": "a181f7591e4db28d48251311a4426e67d4350f12",
+        "gestor_campanhas/servicos/recuperacao.py": "9b39b627ca52770938f8ed8b334cbab0849dd37e",
+        "gestor_campanhas/servicos/sessoes.py": "ee60345e898dba35df5ed331c2409464183e945e",
+        "gestor_campanhas/servicos/validacao.py": "0051947c712ebae5f72d29c44e3618e6f44534e5",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "ca5a2dcc2f57067c0a98a9a95878268b50a44b85",
+        "tests/test_administracao.py": "b22b9aaa21fe9c09cb08eb63096b52e0c887da3e",
+        "tests/test_autenticacao.py": "15af5b14c4d062af8db8ca2a84c2422a336ea664",
+        "tests/test_bd.py": "a7663f6fd9f6205f5cfe46c3122b66460973d074",
+        "tests/test_campanhas.py": "632c6822ccb0c61c9ab95fa5eaee2d2623e23811",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_contas.py": "9a58332943d7189ed2f457bb846326426a6c510b",
+        "tests/test_dinheiro.py": "727ffe2316380c7f5abb93b2fa19b905d84c1749",
+        "tests/test_gestao.py": "34e0df47814a51081ce6065321669837373b2739",
+        "tests/test_horarios.py": "33d6c456d87c5d69a2ce5e8a71bc7f5b82c9fb39",
+        "tests/test_pedidos.py": "0e15167397e3d16a918698f52ee79427637d13be",
+        "tests/test_recuperacao.py": "8c7ee312c1e5288374021d73d422d82409a2bc14",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528",
+        "tests/test_validacao.py": "db521e688569432d9fead22d17009292199b1203"
+      }
+    },
+    {
+      "id": "3.5",
+      "titulo": "Campanhas do cliente e marketeer responsável",
+      "ramo": "feature/3.5-campanhas-do-cliente",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "feat(repositorios): listar as campanhas de um cliente",
+          "ficheiros": [
+            "gestor_campanhas/repositorios/campanhas.py",
+            "tests/test_campanhas_cliente.py"
+          ],
+          "apagar": [],
+          "tree_antes": "b0d0c8877f72f6f6786168f1546f3a8c6f4e7d36",
+          "tree_depois": "77f9824f438b9001ccf4bd0a00d8dc49210cf0c9"
+        },
+        {
+          "numero": 2,
+          "mensagem": "feat(campanhas): campanhas do cliente e marketeer responsável",
+          "ficheiros": [
+            "gestor_campanhas/servicos/campanhas.py",
+            "tests/test_campanhas_cliente.py"
+          ],
+          "apagar": [],
+          "tree_antes": "77f9824f438b9001ccf4bd0a00d8dc49210cf0c9",
+          "tree_depois": "8a305870a0bc0d5d7223a74e9950d939358db229"
+        },
+        {
+          "numero": 3,
+          "mensagem": "feat(cli): lista das campanhas do cliente, com o budget",
+          "ficheiros": [
+            "gestor_campanhas/cli/campanhas.py",
+            "gestor_campanhas/cli/perfis.py",
+            "tests/test_campanhas_cliente.py"
+          ],
+          "apagar": [],
+          "tree_antes": "8a305870a0bc0d5d7223a74e9950d939358db229",
+          "tree_depois": "50d5e7ccf321b4377fa9af6d20c69c594ce2db8e"
+        },
+        {
+          "numero": 4,
+          "mensagem": "feat(cli): mostrar ao cliente o marketeer responsável e os contactos",
+          "ficheiros": [
+            "gestor_campanhas/cli/campanhas.py",
+            "tests/test_campanhas_cliente.py"
+          ],
+          "apagar": [],
+          "tree_antes": "50d5e7ccf321b4377fa9af6d20c69c594ce2db8e",
+          "tree_depois": "98899cec281e4f08a78d0797eabba2552b19b0e4"
+        },
+        {
+          "numero": 5,
+          "mensagem": "docs: documentar as campanhas vistas pelo cliente",
+          "ficheiros": [
+            "docs/arquitetura.rst",
+            "docs/utilizacao.rst"
+          ],
+          "apagar": [],
+          "tree_antes": "98899cec281e4f08a78d0797eabba2552b19b0e4",
+          "tree_depois": "aafadb3a865b6a97eb94c1ab79b621cfcc5eb2b8"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CHANGELOG.md": "20249ef6ca7caea9fdf24e0d6d50440bcf34bdd8",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "2c0dd705c48edcb3b0992b44da756e9b4475e878",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "c30f0185e27207f486a5f2249578fcb6eb9ebd18",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "6f9d97c926eaee44c3495fe5e894b7127e55c29e",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "d0209cf11955411e2e06a918b2f711f9e9729102",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "76300790cdda5c8b6c0df3c23c47c52d042d3704",
+        "gestor_campanhas/__init__.py": "3c3b9647f049293e27ba704d4ab75c20f84770d9",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "78de2b7e7b544173e793d1f74350920d06293e69",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/admin.py": "97779095815a8b5a283fb216e04487e8269d4dca",
+        "gestor_campanhas/cli/campanhas.py": "910d20b009c25efc9be3f02aa25e146ae14d8925",
+        "gestor_campanhas/cli/comum.py": "908af101e4c841c9f5708bd96a66725af6689255",
+        "gestor_campanhas/cli/conta.py": "f8cbd345e07f1d479795b7c92a0484e2773d6db6",
+        "gestor_campanhas/cli/gestao.py": "792b1a25923af895dfc3fb46836810fe87974075",
+        "gestor_campanhas/cli/pedidos.py": "004fb87edbf1be4413f5e1ce78bc668cc8204fe4",
+        "gestor_campanhas/cli/perfis.py": "49afb9169563f4d784e3480ef8c7396373ec25c4",
+        "gestor_campanhas/cli/principal.py": "9206d99581c210bead0fc9ddb6a4679f42ffba51",
+        "gestor_campanhas/cli/recuperacao.py": "35d3ad9d38d27a70368805a9d5cce44c628ee72a",
+        "gestor_campanhas/config.py": "29b2f796bc6d174ff11e41d8719071b2dc70a099",
+        "gestor_campanhas/dados_demo.py": "e133e408e72049cace1962480f9ba0c75b9cee78",
+        "gestor_campanhas/dinheiro.py": "fe66dfab72a9e32fc46f72409e4378a3f094301b",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "c1ed896ea8baf0102831fe57b6ac425a50d642db",
+        "gestor_campanhas/relogio.py": "26062304ddcbf9746707b563650f4f0c2354001d",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/campanhas.py": "466fbe14369a9e909d9f085748a283e5d3aa41ca",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/pedidos.py": "4edfb4da831dc246d929d57f4c00326cd9c8d8f4",
+        "gestor_campanhas/repositorios/recuperacoes.py": "3656e4685566b47c72bd0360e750a2e97c6921a1",
+        "gestor_campanhas/repositorios/sessoes.py": "6e195e3188dc3d7b65bfeae6e550081e1c109008",
+        "gestor_campanhas/repositorios/utilizadores.py": "be2a1545ced47e0dd9163b9445b1073c1bf15c6a",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/campanhas.py": "2f134d1955eb02e47c94babf186a8531b98b09b9",
+        "gestor_campanhas/servicos/contas.py": "baccbbe23792e28e81159b6ac536f6cd7081f804",
+        "gestor_campanhas/servicos/correio.py": "554f1d9db479e2c0eba2cf60b57d00eb5b7fa0c5",
+        "gestor_campanhas/servicos/gestao.py": "d57f9518195a9b0a818ecf05fb1866b63d4d752b",
+        "gestor_campanhas/servicos/pedidos.py": "a181f7591e4db28d48251311a4426e67d4350f12",
+        "gestor_campanhas/servicos/recuperacao.py": "9b39b627ca52770938f8ed8b334cbab0849dd37e",
+        "gestor_campanhas/servicos/sessoes.py": "ee60345e898dba35df5ed331c2409464183e945e",
+        "gestor_campanhas/servicos/validacao.py": "0051947c712ebae5f72d29c44e3618e6f44534e5",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "ca5a2dcc2f57067c0a98a9a95878268b50a44b85",
+        "tests/test_administracao.py": "b22b9aaa21fe9c09cb08eb63096b52e0c887da3e",
+        "tests/test_autenticacao.py": "15af5b14c4d062af8db8ca2a84c2422a336ea664",
+        "tests/test_bd.py": "a7663f6fd9f6205f5cfe46c3122b66460973d074",
+        "tests/test_campanhas.py": "632c6822ccb0c61c9ab95fa5eaee2d2623e23811",
+        "tests/test_campanhas_cliente.py": "3f02bfe1d974549409fbcedab0fdac96247c8e81",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_contas.py": "9a58332943d7189ed2f457bb846326426a6c510b",
+        "tests/test_dinheiro.py": "727ffe2316380c7f5abb93b2fa19b905d84c1749",
+        "tests/test_gestao.py": "34e0df47814a51081ce6065321669837373b2739",
+        "tests/test_horarios.py": "33d6c456d87c5d69a2ce5e8a71bc7f5b82c9fb39",
+        "tests/test_pedidos.py": "0e15167397e3d16a918698f52ee79427637d13be",
+        "tests/test_recuperacao.py": "8c7ee312c1e5288374021d73d422d82409a2bc14",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528",
+        "tests/test_validacao.py": "db521e688569432d9fead22d17009292199b1203"
+      }
+    },
+    {
+      "id": "3.6",
+      "titulo": "Release v0.3.0",
+      "ramo": "release/v0.3.0",
+      "commits": [
+        {
+          "numero": 1,
+          "mensagem": "fix(cli): corrigir a mensagem de atribuição de marketeer",
+          "ficheiros": [
+            "gestor_campanhas/cli/campanhas.py",
+            "tests/test_administracao.py"
+          ],
+          "apagar": [],
+          "tree_antes": "aafadb3a865b6a97eb94c1ab79b621cfcc5eb2b8",
+          "tree_depois": "196681e1883087afb9fb9514b646974edc6ab201"
+        },
+        {
+          "numero": 2,
+          "mensagem": "chore(release): passar a versão para 0.3.0",
+          "ficheiros": [
+            "gestor_campanhas/__init__.py"
+          ],
+          "apagar": [],
+          "tree_antes": "196681e1883087afb9fb9514b646974edc6ab201",
+          "tree_depois": "dd98162924dc1b0d0ccdb20ba9578e2786df887c"
+        },
+        {
+          "numero": 3,
+          "mensagem": "docs(release): registar as alterações da versão 0.3.0",
+          "ficheiros": [
+            "CHANGELOG.md"
+          ],
+          "apagar": [],
+          "tree_antes": "dd98162924dc1b0d0ccdb20ba9578e2786df887c",
+          "tree_depois": "0410f7d661fc506ab3324bad258934c320412fda"
+        },
+        {
+          "numero": 4,
+          "mensagem": "docs(release): atualizar o README para a versão 0.3.0",
+          "ficheiros": [
+            "README.md"
+          ],
+          "apagar": [],
+          "tree_antes": "0410f7d661fc506ab3324bad258934c320412fda",
+          "tree_depois": "71eefabf6c64c36e7a636b2763177112c21c7294"
+        }
+      ],
+      "ficheiros_finais": {
+        ".gitattributes": "fc5bed71da0144e349423ba449c6a5379941bc5d",
+        ".github/ISSUE_TEMPLATE/bug.md": "ea317bc66dc0036e36890a91e4a5858da24b6980",
+        ".github/ISSUE_TEMPLATE/tarefa.md": "aceb0a786be05fe66a78af92a371af9e251f3323",
+        ".github/ISSUE_TEMPLATE/user_story.md": "19d3d079e697e1ba9d75a0ab1c46d9752ad28be2",
+        ".github/pull_request_template.md": "2783808f2e825a26114d85cfa81933f537e040b3",
+        ".github/workflows/docs.yml": "39c39be9feb9966e2c4587cadbdf4c0e8502bb12",
+        ".github/workflows/testes.yml": "a5800f4d098f3a1f1ad780438e8371363b8eb130",
+        ".gitignore": "4676bc832f7bc38b518f53e2bda6920853ce6c5e",
+        "CHANGELOG.md": "579885eb788bb7393438805cdd971664350294f0",
+        "CONTRIBUTING.md": "e14e7ddf99cbf9c302f7b1786ea869d28b94adeb",
+        "README.md": "a6cd3afaf65b75546d80c6b67bcea045372c1cb1",
+        "docs/Makefile": "d4bb2cbb9eddb1bb1b4f366623044af8e4830919",
+        "docs/arquitetura.rst": "c30f0185e27207f486a5f2249578fcb6eb9ebd18",
+        "docs/conf.py": "96dfe4cab570b4b45ae1fd13c156601cbbf8744d",
+        "docs/index.rst": "63fce884402806f26fb5e24541161a457381a058",
+        "docs/instalacao.rst": "6f9d97c926eaee44c3495fe5e894b7127e55c29e",
+        "docs/make.bat": "954237b9b9f2b248bb1397a15c055c0af1cad03e",
+        "docs/referencia.rst": "d0209cf11955411e2e06a918b2f711f9e9729102",
+        "docs/testes.rst": "e8b3b204ffd6e198ba658196898696cadd5486e2",
+        "docs/utilizacao.rst": "76300790cdda5c8b6c0df3c23c47c52d042d3704",
+        "gestor_campanhas/__init__.py": "931cb2205bd5d4ffe354013dce3a7d79bc1a695c",
+        "gestor_campanhas/__main__.py": "6a337cbad42c4af14022e4db8b1995b1aa106e81",
+        "gestor_campanhas/bd.py": "78de2b7e7b544173e793d1f74350920d06293e69",
+        "gestor_campanhas/cli/__init__.py": "f94568152ec9cc8ae6b9dfda445159f00e4cfc11",
+        "gestor_campanhas/cli/admin.py": "97779095815a8b5a283fb216e04487e8269d4dca",
+        "gestor_campanhas/cli/campanhas.py": "5842f2f4396b11f9c19f44961301d014364f9b9a",
+        "gestor_campanhas/cli/comum.py": "908af101e4c841c9f5708bd96a66725af6689255",
+        "gestor_campanhas/cli/conta.py": "f8cbd345e07f1d479795b7c92a0484e2773d6db6",
+        "gestor_campanhas/cli/gestao.py": "792b1a25923af895dfc3fb46836810fe87974075",
+        "gestor_campanhas/cli/pedidos.py": "004fb87edbf1be4413f5e1ce78bc668cc8204fe4",
+        "gestor_campanhas/cli/perfis.py": "49afb9169563f4d784e3480ef8c7396373ec25c4",
+        "gestor_campanhas/cli/principal.py": "9206d99581c210bead0fc9ddb6a4679f42ffba51",
+        "gestor_campanhas/cli/recuperacao.py": "35d3ad9d38d27a70368805a9d5cce44c628ee72a",
+        "gestor_campanhas/config.py": "29b2f796bc6d174ff11e41d8719071b2dc70a099",
+        "gestor_campanhas/dados_demo.py": "e133e408e72049cace1962480f9ba0c75b9cee78",
+        "gestor_campanhas/dinheiro.py": "fe66dfab72a9e32fc46f72409e4378a3f094301b",
+        "gestor_campanhas/erros.py": "452ae447d5212fbd929046daebd5e0ed896713f0",
+        "gestor_campanhas/modelos.py": "c1ed896ea8baf0102831fe57b6ac425a50d642db",
+        "gestor_campanhas/relogio.py": "26062304ddcbf9746707b563650f4f0c2354001d",
+        "gestor_campanhas/repositorios/__init__.py": "4f421ec375ed5f763b64e64eca1810dbfae56ff9",
+        "gestor_campanhas/repositorios/campanhas.py": "466fbe14369a9e909d9f085748a283e5d3aa41ca",
+        "gestor_campanhas/repositorios/configuracoes.py": "969b46f5ff19138e06cfae44cd384f544d519909",
+        "gestor_campanhas/repositorios/pedidos.py": "4edfb4da831dc246d929d57f4c00326cd9c8d8f4",
+        "gestor_campanhas/repositorios/recuperacoes.py": "3656e4685566b47c72bd0360e750a2e97c6921a1",
+        "gestor_campanhas/repositorios/sessoes.py": "6e195e3188dc3d7b65bfeae6e550081e1c109008",
+        "gestor_campanhas/repositorios/utilizadores.py": "be2a1545ced47e0dd9163b9445b1073c1bf15c6a",
+        "gestor_campanhas/seguranca.py": "ecb8e0a92b7b0947f0916a2de5c989f43a55c0e7",
+        "gestor_campanhas/servicos/__init__.py": "486c5b0c483a7b84b7e70d0cdaf4c88c38055eb2",
+        "gestor_campanhas/servicos/autenticacao.py": "e37aceccc40ecad8c74ec9ef6ed2391c93c08461",
+        "gestor_campanhas/servicos/campanhas.py": "2f134d1955eb02e47c94babf186a8531b98b09b9",
+        "gestor_campanhas/servicos/contas.py": "baccbbe23792e28e81159b6ac536f6cd7081f804",
+        "gestor_campanhas/servicos/correio.py": "554f1d9db479e2c0eba2cf60b57d00eb5b7fa0c5",
+        "gestor_campanhas/servicos/gestao.py": "d57f9518195a9b0a818ecf05fb1866b63d4d752b",
+        "gestor_campanhas/servicos/pedidos.py": "a181f7591e4db28d48251311a4426e67d4350f12",
+        "gestor_campanhas/servicos/recuperacao.py": "9b39b627ca52770938f8ed8b334cbab0849dd37e",
+        "gestor_campanhas/servicos/sessoes.py": "ee60345e898dba35df5ed331c2409464183e945e",
+        "gestor_campanhas/servicos/validacao.py": "0051947c712ebae5f72d29c44e3618e6f44534e5",
+        "pyproject.toml": "88253a7bf9396b1245768f94f0a01c67650d561d",
+        "requirements-dev.txt": "0143584b90e94b8c43a53e8f4aa90c70ebe9574a",
+        "tests/conftest.py": "ca5a2dcc2f57067c0a98a9a95878268b50a44b85",
+        "tests/test_administracao.py": "1b37cbaaeb920c6abf6d379c0d2f0abdce2591cb",
+        "tests/test_autenticacao.py": "15af5b14c4d062af8db8ca2a84c2422a336ea664",
+        "tests/test_bd.py": "a7663f6fd9f6205f5cfe46c3122b66460973d074",
+        "tests/test_campanhas.py": "632c6822ccb0c61c9ab95fa5eaee2d2623e23811",
+        "tests/test_campanhas_cliente.py": "3f02bfe1d974549409fbcedab0fdac96247c8e81",
+        "tests/test_cli.py": "1ea55399e2aba82aecf36194b5b03c5c837c1103",
+        "tests/test_contas.py": "9a58332943d7189ed2f457bb846326426a6c510b",
+        "tests/test_dinheiro.py": "727ffe2316380c7f5abb93b2fa19b905d84c1749",
+        "tests/test_gestao.py": "34e0df47814a51081ce6065321669837373b2739",
+        "tests/test_horarios.py": "33d6c456d87c5d69a2ce5e8a71bc7f5b82c9fb39",
+        "tests/test_pedidos.py": "0e15167397e3d16a918698f52ee79427637d13be",
+        "tests/test_recuperacao.py": "8c7ee312c1e5288374021d73d422d82409a2bc14",
+        "tests/test_sessoes.py": "e54460c280a3f742098244aa5ef28e231bc9d528",
+        "tests/test_validacao.py": "db521e688569432d9fead22d17009292199b1203"
+      }
+    }
+  ]
+}

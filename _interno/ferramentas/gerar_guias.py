@@ -392,20 +392,19 @@ def passo_pull_request(u: dict, config: dict) -> tuple[str, str]:
         labels = "`tarefa`"
     if base == "main":
         confirmar_base = (
-            f"**b)** No topo, a base tem de ser `main`, e não `develop`. Clica em **base: develop**, escolhe `main` e "
-            f"confirma que fica **base: main** e **compare: {ramo}**. Uma release vai para o `main`, que é o ramo "
-            "das versões entregues.\n\n"
+            f"**b)** Confirma, no topo, que está **base: main** e **compare: {ramo}**. O link do ponto a) já abre "
+            "com o `main` escolhido. Se estiver **base: develop**, clica aí e escolhe `main`. Uma release vai para "
+            "o `main`, que é o ramo das versões entregues.\n\n"
         )
     else:
         confirmar_base = (
             f"**b)** Confirma, no topo, que está **base: develop** e **compare: {ramo}**. "
-            "Se a base for `main`, muda para `develop`.\n\n"
+            "Se a base for `main`, clica aí e escolhe `develop`.\n\n"
         )
+    n = len(u["commits"])
     corpo = (
         f"O pull request é o pedido para juntar o teu ramo ao `{base}`. É nele que {u['revisor']} vai rever o teu trabalho.\n\n"
-        f"**a)** Abre {b}/pulls. Normalmente aparece uma faixa amarela com o nome do teu ramo e o botão "
-        "**Compare & pull request**: clica nele. Se a faixa não aparecer, clica em **New pull request** e, "
-        f"em *compare*, escolhe `{ramo}`.\n\n"
+        f"**a)** Abre este link, que já traz o destino e o ramo escolhidos: {b}/compare/{base}...{ramo}?expand=1\n\n"
         + confirmar_base
         + "**c)** No título, cola:\n\n"
         + bloco(u["titulo"], "text")
@@ -425,7 +424,8 @@ def passo_pull_request(u: dict, config: dict) -> tuple[str, str]:
     if base == "main":
         corpo += (
             "\n\n**h)** Confirma o destino. Por baixo do título do pull request tem de estar escrito "
-            f"`... wants to merge 3 commits into main from {ramo}`. Se disser `into develop`, **não avises ninguém "
+            f"`... wants to merge {plural(n, 'commit', 'commits')} into main from {ramo}`. "
+            "Se disser `into develop`, **não avises ninguém "
             "ainda**: clica em **Edit**, à direita do título, clica em **base: develop**, escolhe `main`, confirma em "
             "**Change base** e clica em **Save**."
         )
@@ -455,12 +455,22 @@ def passo_arrumar(u: dict, quem_juntou: str) -> tuple[str, str]:
 
 def passos_abrir_e_ler(u: dict, config: dict) -> list[tuple[str, str]]:
     """Primeiros passos de quem revê: abrir o pull request e ler as alterações."""
+    abrir = (
+        f"Faz este passo quando {u['quem']} te avisar que o pull request da unidade {u['id']} está pronto.\n\n"
+        f"Abre {config['repo_b']}/pulls e clica em **{u['titulo']}**."
+    )
+    if u["tipo"] == "stories":
+        n = len(u["stories"].split(","))
+        abrir += (
+            "\n\nAntes de mais, confirma que o pull request está ligado às issues. Na descrição tem de haver "
+            f"{plural(n, 'linha', 'linhas')} `Closes #` seguida de um número, uma por issue ({u['stories']}), e na "
+            "coluna da direita, em **Development**, têm de aparecer essas issues.\n\n"
+            f"Se faltar, **não juntes ainda**. Pede a {u['quem']} para clicar nos três pontos **…** da descrição, em "
+            "**Edit**, e trocar cada `#(número da issue ...)` pelo número verdadeiro. Sem isto, as issues não fecham "
+            "sozinhas quando juntares o pull request."
+        )
     return [
-        (
-            f"Abre o pull request de {u['quem']}",
-            f"Faz este passo quando {u['quem']} te avisar que o pull request da unidade {u['id']} está pronto.\n\n"
-            f"Abre {config['repo_b']}/pulls e clica em **{u['titulo']}**.",
-        ),
+        (f"Abre o pull request de {u['quem']}", abrir),
         (
             "Lê as alterações",
             "Clica no separador **Files changed**. A verde estão as linhas acrescentadas e a vermelho as retiradas.\n\n"
@@ -633,7 +643,7 @@ def vez_release_rever(vez: dict, ctx: dict) -> list[tuple[str, str]]:
             "Este é o único pull request da fase que não vai para o `develop`. Se for junto ao ramo errado, o `main` "
             "fica sem a versão e a tag fica no sítio errado.\n\n"
             "Por baixo do título do pull request tem de estar escrito "
-            f"`... wants to merge 3 commits into main from {ramo}`.\n\n"
+            f"`... wants to merge {plural(len(u['commits']), 'commit', 'commits')} into main from {ramo}`.\n\n"
             f"Se disser `into develop`, **não juntes**. Avisa {u['quem']}, que corrige o destino no botão **Edit**, "
             "à direita do título. Depois de corrigido, atualiza a página e confirma outra vez.",
         ),
@@ -654,10 +664,21 @@ def vez_release_publicar(vez: dict, ctx: dict) -> list[tuple[str, str]]:
     """Release, terceira parte: quem a faz publica a versão e pede o regresso ao ``develop``."""
     u, config = vez["unidade"], ctx["config"]
     b, versao = config["repo_b"], u["versao"]
+    numero = versao.lstrip("v")
     return [
         (
-            f"Publica a release {versao} no GitHub",
+            f"Confirma que o main já tem a versão {numero}",
             f"Faz este passo quando {u['revisor']} te avisar que a release está no `main`.\n\n"
+            "A tag vai ser criada no `main`. Se o `main` ainda não tiver a versão nova, a tag fica a marcar o código "
+            "da versão anterior. Foi o que aconteceu nas duas primeiras fases.\n\n"
+            f"Abre {b}/blob/main/gestor_campanhas/__init__.py\n\n"
+            f'**Deves ver** a linha `__version__ = "{numero}"`.\n\n'
+            f"Se vires outra versão, **não publiques a release**. O pull request foi junto ao `develop` em vez do "
+            f"`main`. Avisa {u['revisor']} e corrijam assim: abre {b}/compare/main...develop?expand=1, cria um pull "
+            f"request com o título `Release {versao}`, {u['revisor']} aprova e junta, e só depois voltas a este passo.",
+        ),
+        (
+            f"Publica a release {versao} no GitHub",
             "Publicar a release cria a **tag**, uma etiqueta que marca para sempre o commit desta versão.\n\n"
             f"**a)** Abre {b}/releases/new\n\n"
             f"**b)** Clica em **Choose a tag**, escreve `{versao}` e clica em **Create new tag: {versao} on publish**.\n\n"
@@ -701,7 +722,10 @@ def vez_release_publicar(vez: dict, ctx: dict) -> list[tuple[str, str]]:
             "já está fechada, e a milestone fica com todas as issues fechadas.\n\n"
             f"**a)** Abre {b}/milestones\n\n"
             f"**b)** Na linha `{u['milestone']}`, confirma que a barra está a 100% e clica em **Close**.\n\n"
-            "Se a barra não estiver a 100%, clica no nome da milestone para ver que issues estão abertas e avisa o grupo.",
+            "Se a barra não estiver a 100%, clica no nome da milestone para ver que issues estão abertas. Uma issue "
+            "fica aberta quando o pull request dela foi junto sem `Closes #número`. Para a fechar à mão, abre a issue, "
+            "escreve na caixa de comentário `Resolvida pelo pull request #N` (com o número do pull request) e clica em "
+            "**Close with comment**. Depois volta a este passo.",
         ),
     ]
 
@@ -715,9 +739,11 @@ def vez_release_juntar(vez: dict, ctx: dict) -> list[tuple[str, str]]:
             "Aprova o pull request que leva a release para o develop",
             f"Faz este passo quando {u['quem']} te avisar.\n\n"
             f"**a)** Abre {config['repo_b']}/pulls e clica em **Juntar a release {u['versao']} ao develop**.\n\n"
-            "**b)** No separador **Files changed**, confirma que as alterações são as da release: o número da versão, "
+            "**b)** Confirma que na descrição está `Closes #` seguido do número da issue da release, e não `#N`. "
+            f"Se estiver `#N`, pede a {u['quem']} para editar a descrição antes de juntares.\n\n"
+            "**c)** No separador **Files changed**, confirma que as alterações são as da release: o número da versão, "
             "o `CHANGELOG.md` e o `README.md`.\n\n"
-            "**c)** Clica em **Review changes**, escolhe **Approve** e clica em **Submit review**.",
+            "**d)** Clica em **Review changes**, escolhe **Approve** e clica em **Submit review**.",
         ),
         passo_merge("develop", False, " A issue da release fica fechada sozinha."),
         passo_atualizar_e_verificar(u, config, None),

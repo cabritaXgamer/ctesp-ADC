@@ -64,11 +64,42 @@ O que correu mal e como se resolveu:
 
 - **Release da Fase 1 junta ao ramo errado.** O pull request da release v0.1.0 foi junto ao `develop` em vez do `main`, e a tag ficou num commit sem código. Corrigiu-se com um pull request do `develop` para o `main` e refazendo a tag. O guia de trabalho passou a ter dois passos de confirmação do destino.
 
+## Fase 3 — Campanhas e pedidos
+
+Release: **v0.3.0**.
+
+| Unidade | User stories | Quem fez | Quem reviu |
+|---|---|---|---|
+| 3.1 Criar e editar campanhas | M02, M03 | Ricardo | Fabio |
+| 3.2 Campanhas atribuídas e eliminar campanha | M04, M05 | Fabio | Tomas |
+| 3.3 Pedidos de nova campanha | C05, C06, C07 | Tomas | Ricardo |
+| 3.4 Decidir pedidos, budget e marketeer responsável | A11, A12, A13 | Ricardo | Tomas |
+| 3.5 Campanhas do cliente e marketeer responsável | C08, C09 | Fabio | Ricardo |
+| 3.6 Release v0.3.0 | — | Ricardo | Fabio |
+
+Resultado: 12 user stories concluídas (27 no total); 382 testes automáticos; terceira versão publicada.
+
+Decisões tomadas nesta fase:
+
+- **Duas maneiras de criar uma campanha.** O Marketeer cria-a diretamente, ou o Cliente pede-a e o Administrador aprova o pedido. Nos dois casos o budget é definido pelo Administrador.
+- **Dinheiro em cêntimos.** O budget e o orçamento são guardados como números inteiros de cêntimos, para evitar os erros de arredondamento dos números decimais.
+- **O estado da campanha é calculado.** Por começar, em curso e terminada resultam das datas, e não de uma coluna que alguém tivesse de atualizar.
+- **O prazo do pedido passa a data de fim.** A campanha criada a partir de um pedido fica com o prazo como data de fim; o marketeer pode ajustar as datas.
+- **Um pedido aberto deixa de poder ser cancelado.** Quando o Administrador abre um pedido, ele passa a "Em análise", e o cliente só pode cancelar pedidos pendentes.
+- **Cada um só vê o que é seu.** O marketeer só vê as campanhas que lhe estão atribuídas; o cliente só vê as suas campanhas e os seus pedidos.
+- **Partes da Fase 2 fechadas.** A lista de clientes ganhou o número de campanhas ativas (A04), e um marketeer com campanhas por terminar deixou de poder ser desativado (A10).
+- **Partes adiadas.** O budget restante e os criativos por estado (M04) e a verificação "sem criativos" antes de eliminar (M05) ficam para a Fase 4; os pedidos de alteração de budget (C06, C08) ficam para a Fase 5.
+
+O que correu mal e como se resolveu:
+
+- **Release da Fase 2 junta outra vez ao ramo errado.** Apesar dos passos de confirmação, o pull request da release v0.2.0 foi junto ao `develop`, e a tag ficou no código da v0.1.0. Corrigiu-se como na Fase 1. O guia passou a dar um link que já abre o pull request com o `main` como destino, e a ter um passo, antes de criar a tag, para confirmar que o `main` já tem a versão nova.
+- **Issues que ficaram abertas.** Dois pull requests foram abertos sem `Closes #número`, e as issues não fecharam sozinhas. Foram fechadas à mão, com um comentário a indicar o pull request.
+- **Mensagem com o género errado.** A mensagem de atribuição de marketeer dizia "foi avisado" também para uma marketeer. Foi corrigida no ramo da release, com um commit do tipo `fix`.
+
 ## Fases seguintes
 
 | Fase | Tema | User stories | Release |
 |---|---|---|---|
-| 3 | Campanhas e pedidos de campanha | 12 | v0.3.0 |
 | 4 | Criativos | 15 | v0.4.0 |
 | 5 | Budget | 6 | v0.5.0 |
 | 6 | Comentários, notificações, monitorização e relatórios | 9 | v0.6.0 |

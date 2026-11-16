@@ -2,6 +2,7 @@
 numero: 2
 titulo: Clientes e marketeers
 testes: 194
+fechada: sim
 ---
 
 @@ entrega

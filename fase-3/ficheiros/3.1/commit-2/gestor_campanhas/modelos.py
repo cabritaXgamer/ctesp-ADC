@@ -1,0 +1,109 @@
+"""Classes de dados da aplicação.
+
+Cada classe representa uma linha de uma tabela da base de dados, já com os
+valores nos tipos certos do Python.
+
+Os valores em dinheiro são guardados em cêntimos, como números inteiros, para
+as contas darem sempre certo: ``150050`` são 1500,50 €.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import date, datetime
+
+#: Perfil de quem gere a plataforma.
+ADMINISTRADOR = "administrador"
+#: Perfil de quem cria campanhas e criativos.
+MARKETEER = "marketeer"
+#: Perfil de quem pede campanhas e acompanha o trabalho.
+CLIENTE = "cliente"
+
+#: Motivo de saída de uma sessão terminada pelo próprio utilizador.
+LOGOUT = "logout"
+#: Motivo de saída de uma sessão terminada por falta de atividade.
+INATIVIDADE = "inatividade"
+
+#: Todos os perfis, com o nome que é mostrado nos menus.
+NOMES_PERFIS = {
+    ADMINISTRADOR: "Administrador",
+    MARKETEER: "Marketeer",
+    CLIENTE: "Cliente",
+}
+
+
+@dataclass
+class Utilizador:
+    """Uma conta de acesso à aplicação.
+
+    :param id: Identificador na base de dados.
+    :param nome: Nome da pessoa.
+    :param email: Email, usado para entrar. É único.
+    :param perfil: :data:`ADMINISTRADOR`, :data:`MARKETEER` ou :data:`CLIENTE`.
+    :param ativo: ``False`` quando a conta foi desativada e já não pode entrar.
+    :param telefone: Contacto telefónico. Pode estar vazio.
+    :param empresa: Nome da empresa. Só se usa nos clientes.
+    :param nif: Número de contribuinte da empresa. Só se usa nos clientes.
+    """
+
+    id: int
+    nome: str
+    email: str
+    perfil: str
+    ativo: bool = True
+    telefone: str = ""
+    empresa: str = ""
+    nif: str = ""
+
+    @property
+    def nome_perfil(self) -> str:
+        """Nome do perfil tal como aparece nos menus, por exemplo ``"Marketeer"``."""
+        return NOMES_PERFIS[self.perfil]
+
+
+@dataclass
+class Sessao:
+    """Um período em que um utilizador esteve dentro da aplicação.
+
+    :param id: Identificador na base de dados.
+    :param utilizador_id: Identificador do utilizador que entrou.
+    :param entrada: Data e hora em que entrou.
+    :param saida: Data e hora em que saiu, ou ``None`` se ainda não saiu.
+    :param motivo_saida: :data:`LOGOUT` ou :data:`INATIVIDADE`; ``None``
+        enquanto a sessão está aberta.
+    """
+
+    id: int
+    utilizador_id: int
+    entrada: datetime
+    saida: datetime | None = None
+    motivo_saida: str | None = None
+
+
+@dataclass
+class Campanha:
+    """Uma campanha de marketing de um cliente.
+
+    :param id: Identificador na base de dados.
+    :param nome: Nome da campanha.
+    :param objetivo: O que se pretende com a campanha. Pode estar vazio.
+    :param cliente_id: Identificador do cliente a quem a campanha pertence.
+    :param marketeer_id: Identificador do marketeer responsável.
+    :param budget_centimos: Budget atribuído, em cêntimos, ou ``None`` se o
+        Administrador ainda não o definiu.
+    :param data_inicio: Primeiro dia da campanha, ou ``None`` se não foi indicado.
+    :param data_fim: Último dia da campanha, ou ``None`` se não foi indicado.
+    :param cliente_nome: Nome do cliente, para mostrar nas listas.
+    :param marketeer_nome: Nome do marketeer responsável, para mostrar nas listas.
+    """
+
+    id: int
+    nome: str
+    objetivo: str
+    cliente_id: int
+    marketeer_id: int
+    budget_centimos: int | None = None
+    data_inicio: date | None = None
+    data_fim: date | None = None
+    cliente_nome: str = ""
+    marketeer_nome: str = ""
