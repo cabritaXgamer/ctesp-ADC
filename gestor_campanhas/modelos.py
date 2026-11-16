@@ -9,7 +9,7 @@ as contas darem sempre certo: ``150050`` são 1500,50 €.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 
 #: Perfil de quem gere a plataforma.
@@ -30,6 +30,29 @@ POR_COMECAR = "Por começar"
 EM_CURSO = "Em curso"
 #: Estado de uma campanha cuja data de fim já passou.
 TERMINADA = "Terminada"
+
+#: Estado de um pedido que ainda ninguém analisou. É o único que o cliente pode cancelar.
+PENDENTE = "pendente"
+#: Estado de um pedido que o Administrador já abriu, mas ainda não decidiu.
+EM_ANALISE = "em_analise"
+#: Estado de um pedido aceite, que deu origem a uma campanha.
+APROVADO = "aprovado"
+#: Estado de um pedido recusado pelo Administrador.
+REJEITADO = "rejeitado"
+#: Estado de um pedido de que o cliente desistiu.
+CANCELADO = "cancelado"
+
+#: Todos os estados de um pedido, com o nome que é mostrado nas listas.
+NOMES_ESTADOS_PEDIDO = {
+    PENDENTE: "Pendente",
+    EM_ANALISE: "Em análise",
+    APROVADO: "Aprovado",
+    REJEITADO: "Rejeitado",
+    CANCELADO: "Cancelado",
+}
+
+#: Plataformas onde se pode anunciar, pela ordem em que aparecem nos menus.
+PLATAFORMAS = ("Facebook", "Instagram", "Google Ads", "LinkedIn", "TikTok", "YouTube")
 
 #: Todos os perfis, com o nome que é mostrado nos menus.
 NOMES_PERFIS = {
@@ -114,3 +137,41 @@ class Campanha:
     data_fim: date | None = None
     cliente_nome: str = ""
     marketeer_nome: str = ""
+
+
+@dataclass
+class PedidoCampanha:
+    """Um pedido de nova campanha, feito por um cliente.
+
+    :param id: Identificador na base de dados.
+    :param cliente_id: Identificador do cliente que fez o pedido.
+    :param objetivo: O que o cliente pretende com a campanha.
+    :param orcamento_centimos: Quanto o cliente quer investir, em cêntimos.
+    :param prazo: Dia até ao qual o cliente quer a campanha.
+    :param plataformas: Nomes das plataformas onde quer anunciar.
+    :param estado: :data:`PENDENTE`, :data:`EM_ANALISE`, :data:`APROVADO`,
+        :data:`REJEITADO` ou :data:`CANCELADO`.
+    :param criado_em: Data e hora em que o pedido foi feito.
+    :param motivo_rejeicao: Motivo indicado pelo Administrador. Só existe
+        nos pedidos rejeitados.
+    :param campanha_id: Identificador da campanha criada a partir do pedido.
+        Só existe nos pedidos aprovados.
+    :param cliente_nome: Nome do cliente, para mostrar nas listas.
+    """
+
+    id: int
+    cliente_id: int
+    objetivo: str
+    orcamento_centimos: int
+    prazo: date
+    plataformas: list[str] = field(default_factory=list)
+    estado: str = PENDENTE
+    criado_em: datetime | None = None
+    motivo_rejeicao: str = ""
+    campanha_id: int | None = None
+    cliente_nome: str = ""
+
+    @property
+    def nome_estado(self) -> str:
+        """Nome do estado tal como aparece nas listas, por exemplo ``"Em análise"``."""
+        return NOMES_ESTADOS_PEDIDO[self.estado]
