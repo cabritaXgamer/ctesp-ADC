@@ -75,3 +75,49 @@ def criar(
         raise ErroValidacao("Este cliente tem a conta desativada.")
     nome, objetivo, inicio, fim = _dados_validados(nome, objetivo, data_inicio, data_fim)
     return campanhas.criar(ligacao, nome, objetivo, cliente.id, marketeer.id, inicio, fim)
+
+
+def obter_do_marketeer(ligacao: sqlite3.Connection, marketeer: Utilizador, identificador: int) -> Campanha:
+    """Procura uma campanha pelo número, confirmando que é do marketeer.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a consultar.
+    :param identificador: Número da campanha, mostrado na primeira coluna da lista.
+    :return: A campanha.
+    :raises ErroValidacao: Se o marketeer não for responsável por nenhuma
+        campanha com esse número.
+    """
+    campanha = campanhas.obter_por_id(ligacao, identificador)
+    if campanha is None or campanha.marketeer_id != marketeer.id:
+        raise ErroValidacao(f"Não tem nenhuma campanha com o número {identificador}.")
+    return campanha
+
+
+def editar(
+    ligacao: sqlite3.Connection,
+    marketeer: Utilizador,
+    identificador: int,
+    nome: str,
+    objetivo: str,
+    data_inicio: str = "",
+    data_fim: str = "",
+) -> Campanha:
+    """Altera o nome, o objetivo e as datas de uma campanha do marketeer.
+
+    O cliente e o budget não são alterados: o budget é definido pelo
+    Administrador. Nada é guardado se algum dos valores não for válido.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a editar.
+    :param identificador: Número da campanha.
+    :param nome: Nome novo. Obrigatório.
+    :param objetivo: Objetivo novo. Pode ficar vazio.
+    :param data_inicio: Primeiro dia novo (``AAAA-MM-DD``), ou vazio para ficar sem data.
+    :param data_fim: Último dia novo (``AAAA-MM-DD``), ou vazio para ficar sem data.
+    :return: A campanha, já com os dados novos.
+    :raises ErroValidacao: Se a campanha não for do marketeer ou se algum dos
+        valores não respeitar as regras.
+    """
+    campanha = obter_do_marketeer(ligacao, marketeer, identificador)
+    nome, objetivo, inicio, fim = _dados_validados(nome, objetivo, data_inicio, data_fim)
+    return campanhas.atualizar(ligacao, campanha.id, nome, objetivo, inicio, fim)

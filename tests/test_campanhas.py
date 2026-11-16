@@ -157,3 +157,50 @@ def test_clientes_disponiveis_sao_os_ativos_por_ordem_alfabetica(ligacao, contas
     utilizadores.definir_ativo(ligacao, jose.id, False)
 
     assert [cliente.nome for cliente in servico.clientes_disponiveis(ligacao)] == ["Beatriz Lopes", "Carla Cliente"]
+
+
+# --- editar ------------------------------------------------------------------
+
+
+@pytest.fixture
+def natal(ligacao, contas):
+    """Uma campanha do Miguel para a Carla."""
+    return servico.criar(
+        ligacao, contas[modelos.MARKETEER], "Natal", "Vender mais", contas[modelos.CLIENTE].id, "2026-12-01", "2026-12-24"
+    )
+
+
+def test_marketeer_edita_a_sua_campanha(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+
+    alterada = servico.editar(ligacao, miguel, natal.id, "Natal 2026", "Outro objetivo", "", "2026-12-31")
+
+    assert alterada.nome == "Natal 2026"
+    assert alterada.objetivo == "Outro objetivo"
+    assert alterada.data_inicio is None
+    assert alterada.data_fim == date(2026, 12, 31)
+    assert alterada.cliente_id == natal.cliente_id
+    assert servico.obter_do_marketeer(ligacao, miguel, natal.id) == alterada
+
+
+def test_marketeer_nao_edita_campanhas_de_outro(ligacao, contas, natal, marta):
+    with pytest.raises(ErroValidacao, match=f"Não tem nenhuma campanha com o número {natal.id}"):
+        servico.editar(ligacao, marta, natal.id, "Roubada", "", "", "")
+
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+def test_editar_campanha_que_nao_existe_da_erro(ligacao, contas):
+    with pytest.raises(ErroValidacao, match="Não tem nenhuma campanha com o número 999"):
+        servico.editar(ligacao, contas[modelos.MARKETEER], 999, "Natal", "", "", "")
+
+
+@pytest.mark.parametrize(
+    ("nome", "inicio", "fim"),
+    [("", "2026-12-01", "2026-12-24"), ("Natal", "ontem", ""), ("Natal", "2026-12-24", "2026-12-01")],
+)
+def test_edicao_invalida_nao_altera_nada(ligacao, contas, natal, nome, inicio, fim):
+    with pytest.raises(ErroValidacao):
+        servico.editar(ligacao, contas[modelos.MARKETEER], natal.id, nome, "Mudou", inicio, fim)
+
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
