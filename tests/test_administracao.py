@@ -6,6 +6,7 @@ import pytest
 
 from gestor_campanhas import modelos, relogio, seguranca
 from gestor_campanhas.cli import campanhas as menu_campanhas
+from gestor_campanhas.cli import gestao as menu_gestao
 from gestor_campanhas.cli import pedidos as menu_pedidos
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -495,3 +496,51 @@ def test_opcao_campanhas_do_administrador_abre_o_menu_certo():
 
     assert opcoes["Campanhas"] is menu_campanhas.do_administrador
     assert dict(perfis.OPCOES[modelos.MARKETEER])["Campanhas"] is menu_campanhas.do_marketeer
+
+
+# --- campanhas ativas de cada conta ------------------------------------------
+
+
+@pytest.fixture
+def varias(ligacao, contas, natal, marta):
+    """Além da ``natal`` (por começar), uma campanha em curso e outra terminada."""
+    carla, miguel = contas[modelos.CLIENTE], contas[modelos.MARKETEER]
+    jose = utilizadores.criar(ligacao, "José Padeiro", "jose@padaria.pt", "x", modelos.CLIENTE)
+    campanhas_bd.criar(ligacao, "Saldos", "", carla.id, marta.id)
+    campanhas_bd.criar(ligacao, "Verão", "", jose.id, miguel.id, None, date(2026, 8, 31))
+    return jose
+
+
+def test_campanha_so_esta_terminada_depois_da_data_de_fim(natal):
+    assert not natal.terminada(date(2026, 12, 24))
+    assert natal.terminada(date(2026, 12, 25))
+    natal.data_fim = None
+    assert not natal.terminada(date(2030, 1, 1))
+
+
+def test_conta_as_campanhas_ativas_por_cliente_e_por_marketeer(ligacao, contas, varias, marta):
+    carla, miguel = contas[modelos.CLIENTE], contas[modelos.MARKETEER]
+
+    assert campanhas.contar_ativas(ligacao, modelos.CLIENTE) == {carla.id: 2}
+    assert campanhas.contar_ativas(ligacao, modelos.MARKETEER) == {miguel.id: 1, marta.id: 1}
+
+
+def test_lista_de_clientes_mostra_as_campanhas_ativas(teclado, ligacao, contas, varias, capsys):
+    teclado("0")
+
+    menu_gestao.clientes(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "Email             Telefone  Estado  Campanhas ativas" in saida
+    assert "carla@empresa.pt            Ativa   2" in saida
+    assert "jose@padaria.pt             Ativa   0" in saida
+
+
+def test_lista_de_marketeers_mostra_as_campanhas_ativas(teclado, ligacao, contas, varias, capsys):
+    teclado("0")
+
+    menu_gestao.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "marta@agencia.pt             Ativa   1" in saida
+    assert "miguel@agencia.pt            Ativa   1" in saida

@@ -137,7 +137,7 @@ def estado(campanha: Campanha, hoje: date | None = None) -> str:
     hoje = hoje or relogio.hoje()
     if campanha.data_inicio and campanha.data_inicio > hoje:
         return modelos.POR_COMECAR
-    if campanha.data_fim and campanha.data_fim < hoje:
+    if campanha.terminada(hoje):
         return modelos.TERMINADA
     return modelos.EM_CURSO
 
@@ -266,3 +266,26 @@ def atribuir_marketeer(ligacao: sqlite3.Connection, identificador: int, marketee
     campanha = campanhas.definir_marketeer(ligacao, campanha.id, marketeer.id)
     avisar_marketeer(marketeer, campanha)
     return campanha
+
+
+def contar_ativas(ligacao: sqlite3.Connection, perfil: str) -> dict[int, int]:
+    """Conta as campanhas ativas de cada cliente ou de cada marketeer.
+
+    Uma campanha está ativa enquanto não terminar: conta se estiver em curso
+    ou por começar.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param perfil: :data:`~gestor_campanhas.modelos.CLIENTE` para contar por
+        cliente, :data:`~gestor_campanhas.modelos.MARKETEER` para contar por
+        marketeer responsável.
+    :return: Dicionário do número da conta para o número de campanhas ativas.
+        As contas sem campanhas ativas não aparecem.
+    """
+    hoje = relogio.hoje()
+    totais: dict[int, int] = {}
+    for campanha in campanhas.listar_todas(ligacao):
+        if campanha.terminada(hoje):
+            continue
+        conta = campanha.cliente_id if perfil == modelos.CLIENTE else campanha.marketeer_id
+        totais[conta] = totais.get(conta, 0) + 1
+    return totais
