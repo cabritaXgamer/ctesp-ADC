@@ -140,3 +140,17 @@ def estado(campanha: Campanha, hoje: date | None = None) -> str:
     if campanha.data_fim and campanha.data_fim < hoje:
         return modelos.TERMINADA
     return modelos.EM_CURSO
+
+
+def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador, identificador: int) -> Campanha:
+    """Elimina uma campanha do marketeer. Não pode ser desfeito.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a eliminar.
+    :param identificador: Número da campanha.
+    :return: A campanha que foi eliminada, para se poder mostrar o nome.
+    :raises ErroValidacao: Se a campanha não for do marketeer.
+    """
+    campanha = obter_do_marketeer(ligacao, marketeer, identificador)
+    campanhas.eliminar(ligacao, campanha.id)
+    return campanha
