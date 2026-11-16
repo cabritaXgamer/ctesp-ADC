@@ -138,6 +138,14 @@ class Campanha:
     cliente_nome: str = ""
     marketeer_nome: str = ""
 
+    def terminada(self, hoje: date) -> bool:
+        """Diz se a campanha já terminou.
+
+        :param hoje: Dia de referência.
+        :return: ``True`` se a campanha tem data de fim e essa data já passou.
+        """
+        return self.data_fim is not None and self.data_fim < hoje
+
 
 @dataclass
 class PedidoCampanha:

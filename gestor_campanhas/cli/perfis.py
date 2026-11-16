@@ -26,6 +26,8 @@ OPCOES: dict[str, list] = {
     modelos.ADMINISTRADOR: [
         ("Clientes", gestao.clientes),
         ("Marketeers", gestao.marketeers),
+        ("Pedidos de campanha", pedidos.do_administrador),
+        ("Campanhas", campanhas.do_administrador),
         ("Horários de entrada e saída dos marketeers", admin.horarios),
         *OPCOES_DA_CONTA,
     ],

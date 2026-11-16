@@ -13,7 +13,7 @@ from gestor_campanhas import modelos
 from gestor_campanhas.cli import comum
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Utilizador
-from gestor_campanhas.servicos import gestao
+from gestor_campanhas.servicos import campanhas, gestao
 
 #: Nome de cada perfil gerido, no singular e no plural, para as mensagens.
 NOMES = {
@@ -31,18 +31,30 @@ def estado(conta: Utilizador) -> str:
     return "Ativa" if conta.ativo else "Desativada"
 
 
-def mostrar_contas(perfil: str, contas: list[Utilizador]) -> None:
+def mostrar_contas(perfil: str, contas: list[Utilizador], campanhas_ativas: dict[int, int] | None = None) -> None:
     """Mostra uma tabela de contas de um perfil, com o total no fim.
 
     A coluna da empresa só aparece nos clientes.
 
     :param perfil: Perfil das contas.
     :param contas: Contas a mostrar.
+    :param campanhas_ativas: Número de campanhas ativas de cada conta, pelo
+        número da conta. Quem não aparece tem zero.
     """
     singular, plural = NOMES[perfil]
-    cabecalhos = ["N.º", "Nome", "Empresa", "Email", "Telefone", "Estado"]
+    campanhas_ativas = campanhas_ativas or {}
+    cabecalhos = ["N.º", "Nome", "Empresa", "Email", "Telefone", "Estado", "Campanhas ativas"]
     linhas = [
-        [str(conta.id), conta.nome, conta.empresa, conta.email, conta.telefone, estado(conta)] for conta in contas
+        [
+            str(conta.id),
+            conta.nome,
+            conta.empresa,
+            conta.email,
+            conta.telefone,
+            estado(conta),
+            str(campanhas_ativas.get(conta.id, 0)),
+        ]
+        for conta in contas
     ]
     if perfil != modelos.CLIENTE:
         coluna = cabecalhos.index("Empresa")
@@ -149,12 +161,16 @@ def alterar_estado(ligacao: sqlite3.Connection, perfil: str) -> None:
     print(f"\n{conta.nome} ({conta.email}) tem a conta {estado(conta).lower()}.")
     if conta.ativo:
         print("Com a conta desativada, deixa de poder entrar. Os dados e o histórico mantêm-se.")
-    if comum.confirmar("Desativar a conta?" if conta.ativo else "Reativar a conta?"):
-        gestao.definir_estado(ligacao, perfil, conta.id, not conta.ativo)
-        print("\nConta desativada." if conta.ativo else "\nConta reativada.")
-        print(f"Foi enviado um aviso para {conta.email}.")
-    else:
+    if not comum.confirmar("Desativar a conta?" if conta.ativo else "Reativar a conta?"):
         print("\nNada foi alterado.")
+    else:
+        try:
+            gestao.definir_estado(ligacao, perfil, conta.id, not conta.ativo)
+        except ErroValidacao as erro:
+            print(f"\n{erro} Nada foi alterado.")
+        else:
+            print("\nConta desativada." if conta.ativo else "\nConta reativada.")
+            print(f"Foi enviado um aviso para {conta.email}.")
     comum.pausa()
 
 
@@ -194,7 +210,7 @@ def gerir(ligacao: sqlite3.Connection, perfil: str) -> None:
         comum.titulo(f'{plural.capitalize()} com "{pesquisa}" no nome' if pesquisa else plural.capitalize())
         contas = gestao.listar(ligacao, perfil, pesquisa)
         if contas:
-            mostrar_contas(perfil, contas)
+            mostrar_contas(perfil, contas, campanhas.contar_ativas(ligacao, perfil))
         elif pesquisa:
             print(f'Não há {plural} com "{pesquisa}" no nome.')
         else:

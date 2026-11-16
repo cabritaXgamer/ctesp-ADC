@@ -126,3 +126,13 @@ def definir_estado(
     )
     ligacao.commit()
     return obter_por_id(ligacao, identificador)
+
+
+def listar_todos(ligacao: sqlite3.Connection) -> list[PedidoCampanha]:
+    """Devolve os pedidos de todos os clientes.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Pedidos, do mais antigo para o mais recente.
+    """
+    linhas = ligacao.execute(f"{_SELECIONAR} ORDER BY pedidos_campanha.id").fetchall()
+    return [_de_linha(linha) for linha in linhas]

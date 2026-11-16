@@ -1,4 +1,9 @@
-"""Pedidos de nova campanha, no menu do Cliente."""
+"""Pedidos de nova campanha, nos menus do Cliente e do Administrador.
+
+O Cliente faz pedidos, acompanha o estado deles e pode cancelar os que ainda
+estão pendentes. O Administrador vê os pedidos de todos os clientes e decide
+cada um.
+"""
 
 from __future__ import annotations
 
@@ -8,7 +13,7 @@ from gestor_campanhas import dinheiro, modelos
 from gestor_campanhas.cli import comum
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import PedidoCampanha, Utilizador
-from gestor_campanhas.servicos import pedidos
+from gestor_campanhas.servicos import campanhas, pedidos
 
 #: Número máximo de caracteres do objetivo que cabem na lista de pedidos.
 LARGURA_OBJETIVO = 40
@@ -88,15 +93,19 @@ def novo(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
     comum.pausa()
 
 
-def mostrar_detalhes(pedido: PedidoCampanha) -> None:
+def mostrar_detalhes(pedido: PedidoCampanha, com_cliente: bool = False) -> None:
     """Mostra todos os dados de um pedido, um por linha.
 
     O motivo só aparece nos pedidos rejeitados e o número da campanha só
     aparece nos aprovados.
 
     :param pedido: Pedido a mostrar.
+    :param com_cliente: ``True`` para mostrar também o nome do cliente, como
+        no menu do Administrador.
     """
     print(f"Pedido n.º {pedido.id}")
+    if com_cliente:
+        print(f"  Cliente:      {pedido.cliente_nome}")
     print(f"  Feito em:     {pedido.criado_em.strftime('%Y-%m-%d %H:%M')}")
     print(f"  Objetivo:     {pedido.objetivo}")
     print(f"  Orçamento:    {dinheiro.formatar(pedido.orcamento_centimos)}")
@@ -202,3 +211,133 @@ def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
             return
         _, funcao = ACOES[int(escolha) - 1]
         funcao(ligacao, utilizador)
+
+
+def mostrar_todos(lista: list[PedidoCampanha]) -> None:
+    """Mostra uma tabela com os pedidos de todos os clientes, com o total no fim.
+
+    :param lista: Pedidos a mostrar.
+    """
+    comum.mostrar_tabela(
+        ["N.º", "Feito em", "Cliente", "Objetivo", "Orçamento", "Prazo", "Estado"],
+        [
+            [
+                str(pedido.id),
+                pedido.criado_em.strftime("%Y-%m-%d"),
+                pedido.cliente_nome,
+                resumir(pedido.objetivo),
+                dinheiro.formatar(pedido.orcamento_centimos),
+                pedido.prazo.isoformat(),
+                pedido.nome_estado,
+            ]
+            for pedido in lista
+        ],
+    )
+    por_decidir = sum(1 for pedido in lista if pedido.estado in pedidos.POR_DECIDIR)
+    print(f"\n{len(lista)} {'pedido' if len(lista) == 1 else 'pedidos'}, {por_decidir} por decidir.")
+
+
+def aprovar(ligacao: sqlite3.Connection, pedido: PedidoCampanha) -> None:
+    """Pede os dados da campanha a criar e aprova o pedido.
+
+    O budget inicial proposto é o orçamento do pedido; com Enter, mantém-se.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param pedido: Pedido a aprovar.
+    """
+    comum.titulo("Aprovar pedido")
+    marketeers = campanhas.marketeers_disponiveis(ligacao)
+    if not marketeers:
+        print("Não há marketeers com a conta ativa. Adicione um marketeer antes de aprovar o pedido.")
+        return
+    nome = comum.ler_texto("Nome da campanha")
+    budget = comum.ler_texto_com_valor("Budget inicial em euros", dinheiro.formatar(pedido.orcamento_centimos))
+    print()
+    comum.mostrar_tabela(
+        ["N.º", "Marketeer", "Email"],
+        [[str(marketeer.id), marketeer.nome, marketeer.email] for marketeer in marketeers],
+    )
+    print()
+    marketeer_id = comum.ler_numero("Número do marketeer responsável (Enter para cancelar)")
+    if marketeer_id is None:
+        print("\nO pedido não foi aprovado.")
+        return
+    try:
+        aprovado = pedidos.aprovar(ligacao, pedido.id, nome, budget, marketeer_id)
+    except ErroValidacao as erro:
+        print(f"\n{erro} O pedido não foi aprovado.")
+    else:
+        print(f"\nPedido aprovado. Foi criada a campanha n.º {aprovado.campanha_id}.")
+        print("O cliente e o marketeer foram avisados por email.")
+
+
+def rejeitar(ligacao: sqlite3.Connection, pedido: PedidoCampanha) -> None:
+    """Pede o motivo e rejeita o pedido, depois de pedir confirmação.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param pedido: Pedido a rejeitar.
+    """
+    comum.titulo("Rejeitar pedido")
+    motivo = comum.ler_texto("Motivo da rejeição")
+    if not comum.confirmar("Rejeitar este pedido?"):
+        print("\nO pedido não foi rejeitado.")
+        return
+    pedidos.rejeitar(ligacao, pedido.id, motivo)
+    print("\nPedido rejeitado. O cliente foi avisado por email.")
+
+
+def decidir(ligacao: sqlite3.Connection) -> None:
+    """Pede o número de um pedido, mostra-o e deixa aprová-lo ou rejeitá-lo.
+
+    Ao ser aberto, um pedido pendente passa a estar em análise.
+
+    :param ligacao: Ligação aberta à base de dados.
+    """
+    comum.titulo("Analisar pedido")
+    numero = comum.ler_numero("Número do pedido (Enter para cancelar)")
+    if numero is None:
+        return
+    try:
+        pedido = pedidos.analisar(ligacao, numero)
+    except ErroValidacao as erro:
+        print(f"\n{erro}")
+        comum.pausa()
+        return
+    print()
+    mostrar_detalhes(pedido, com_cliente=True)
+    if pedido.estado not in pedidos.POR_DECIDIR:
+        print("\nEste pedido já não pode ser decidido.")
+        comum.pausa()
+        return
+    escolha = comum.escolher_opcao(
+        "Decisão", [("1", "Aprovar e criar a campanha"), ("2", "Rejeitar"), ("0", "Decidir mais tarde")]
+    )
+    if escolha == "1":
+        aprovar(ligacao, pedido)
+    elif escolha == "2":
+        rejeitar(ligacao, pedido)
+    else:
+        print("\nO pedido fica em análise.")
+    comum.pausa()
+
+
+def do_administrador(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
+    """Opção "Pedidos de campanha" do menu do Administrador.
+
+    Mostra os pedidos de todos os clientes, com os que estão por decidir em
+    primeiro lugar. A lista volta a aparecer depois de cada decisão.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param utilizador: Administrador que está a usar o menu.
+    """
+    while True:
+        comum.titulo("Pedidos de campanha de todos os clientes")
+        lista = pedidos.listar_todos(ligacao)
+        if lista:
+            mostrar_todos(lista)
+        else:
+            print("Ainda não há pedidos de campanha.")
+        escolha = comum.escolher_opcao("Pedidos de campanha", [("1", "Analisar pedido"), ("0", "Voltar")])
+        if escolha == "0":
+            return
+        decidir(ligacao)

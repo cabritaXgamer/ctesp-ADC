@@ -143,7 +143,8 @@ Clientes
 ~~~~~~~~
 
 Mostra todos os clientes, por ordem alfabética do nome, com a empresa, o
-email, o telefone e o estado da conta. As contas desativadas também aparecem.
+email, o telefone, o estado da conta e o número de campanhas ativas. As
+contas desativadas também aparecem.
 
 Por baixo da lista aparecem as opções de gestão. Depois de cada uma, a lista
 volta a ser mostrada, já com as alterações.
@@ -154,15 +155,18 @@ escrito, em qualquer posição. A pesquisa não distingue maiúsculas nem acento
 
 .. code-block:: text
 
-   N.º  Nome           Empresa                  Email                  Telefone   Estado
-   ---  -------------  -----------------------  ---------------------  ---------  ------
-   5    Beatriz Lopes  Bicicletas do Sul, Lda.  beatriz@bicicletas.pt  910000005  Ativa
-   3    Carla Cliente  Empresa Exemplo, Lda.    cliente@empresa.pt     910000003  Ativa
-   4    José Padeiro   Padaria Central, Lda.    jose@padaria.pt        910000004  Ativa
+   N.º  Nome           Empresa                  Email                  Telefone   Estado  Campanhas ativas
+   ---  -------------  -----------------------  ---------------------  ---------  ------  ----------------
+   5    Beatriz Lopes  Bicicletas do Sul, Lda.  beatriz@bicicletas.pt  910000005  Ativa   1
+   3    Carla Cliente  Empresa Exemplo, Lda.    cliente@empresa.pt     910000003  Ativa   1
+   4    José Padeiro   Padaria Central, Lda.    jose@padaria.pt        910000004  Ativa   0
 
    3 clientes.
 
 O número da primeira coluna identifica o cliente nas outras opções de gestão.
+
+Uma campanha conta como ativa enquanto não terminar: conta se estiver em
+curso ou por começar.
 
 Adicionar cliente
 ^^^^^^^^^^^^^^^^^
@@ -228,10 +232,10 @@ alfabética do nome, e por baixo as opções de gestão.
 
 .. code-block:: text
 
-   N.º  Nome              Email                 Telefone   Estado
-   ---  ----------------  --------------------  ---------  ------
-   6    Marta Marques     marta@agencia.pt      910000006  Ativa
-   2    Miguel Marketeer  marketeer@agencia.pt  910000002  Ativa
+   N.º  Nome              Email                 Telefone   Estado  Campanhas ativas
+   ---  ----------------  --------------------  ---------  ------  ----------------
+   6    Marta Marques     marta@agencia.pt      910000006  Ativa   1
+   2    Miguel Marketeer  marketeer@agencia.pt  910000002  Ativa   1
 
    2 marketeers.
 
@@ -246,6 +250,71 @@ cliente novo.
 confirmação, a conta desativada deixa de poder entrar e o marketeer é avisado
 por email. As sessões que o marketeer já fez continuam a aparecer nos
 horários de entrada e saída.
+
+Um marketeer que seja responsável por campanhas ativas não pode ser
+desativado. A aplicação diz quantas campanhas são; primeiro atribui-se cada
+uma a outro marketeer, na opção **Campanhas**, e só depois se desativa a
+conta.
+
+Pedidos de campanha
+~~~~~~~~~~~~~~~~~~~
+
+Mostra os pedidos de nova campanha de todos os clientes. Os que estão por
+decidir (``Pendente`` e ``Em análise``) aparecem primeiro, do mais antigo
+para o mais recente.
+
+.. code-block:: text
+
+   N.º  Feito em    Cliente        Objetivo                            Orçamento   Prazo       Estado
+   ---  ----------  -------------  ----------------------------------  ----------  ----------  --------
+   1    2026-11-16  José Padeiro   Divulgar o bolo-rei no Natal        600,00 €    2026-12-15  Pendente
+   2    2026-11-16  Beatriz Lopes  Dar a conhecer a loja nova de Faro  1 200,00 €  2027-02-28  Pendente
+
+   2 pedidos, 2 por decidir.
+
+Analisar pedido
+^^^^^^^^^^^^^^^
+
+Pede o número do pedido e mostra todos os dados dele. Um pedido ``Pendente``
+passa a ``Em análise`` assim que é aberto, e o cliente deixa de o poder
+cancelar. Depois, a aplicação pergunta a decisão:
+
+**Aprovar e criar a campanha** pede o nome da campanha, o budget inicial e o
+marketeer responsável. O budget proposto é o orçamento do pedido; com Enter,
+mantém-se. O marketeer escolhe-se pelo número, na lista dos marketeers com a
+conta ativa. A campanha é criada com o objetivo do pedido e com o prazo do
+pedido como data de fim. O cliente e o marketeer são avisados por email.
+
+**Rejeitar** pede o motivo, que é obrigatório, e uma confirmação. O cliente é
+avisado por email, com o motivo, e passa a vê-lo na opção **Ver pedido**.
+
+**Decidir mais tarde** deixa o pedido ``Em análise``.
+
+Um pedido aprovado, rejeitado ou cancelado já não pode ser decidido.
+
+Campanhas
+~~~~~~~~~
+
+Mostra as campanhas de todos os marketeers, com o cliente, o marketeer
+responsável, as datas, o budget e o estado.
+
+.. code-block:: text
+
+   N.º  Nome                     Cliente        Marketeer         Início      Fim         Budget       Estado
+   ---  -----------------------  -------------  ----------------  ----------  ----------  -----------  -----------
+   1    Natal 2026               Carla Cliente  Miguel Marketeer  2026-12-01  2026-12-24  1 500,00 €   Por começar
+   2    Regresso às aulas        José Padeiro   Miguel Marketeer  2026-09-01  2026-09-30  800,00 €     Terminada
+   3    Bicicletas de primavera  Beatriz Lopes  Marta Marques     -           -           Por definir  Em curso
+
+   3 campanhas.
+
+**Definir budget** pede o número da campanha e o valor em euros, que tem de
+ser maior do que zero. Serve para as campanhas criadas pelos marketeers, que
+começam sem budget, e para corrigir um budget já atribuído.
+
+**Atribuir marketeer** pede o número da campanha e o do marketeer que passa
+a ser responsável, escolhido na lista dos marketeers com a conta ativa. O
+marketeer anterior deixa de ver a campanha e o novo é avisado por email.
 
 Horários de entrada e saída dos marketeers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -274,8 +343,8 @@ Marketeer
 Campanhas
 ~~~~~~~~~
 
-Mostra as campanhas de que o marketeer é responsável e, por baixo, as opções
-para as gerir. Depois de cada opção, a lista volta a ser mostrada, já com as
+Mostra as campanhas de que o marketeer é responsável (as que criou e as que
+o Administrador lhe atribuiu) e, por baixo, as opções para as gerir. Depois de cada opção, a lista volta a ser mostrada, já com as
 alterações. Um marketeer só vê e só altera as suas campanhas.
 
 .. code-block:: text

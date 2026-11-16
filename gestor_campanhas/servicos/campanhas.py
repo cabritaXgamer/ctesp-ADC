@@ -10,11 +10,11 @@ from __future__ import annotations
 import sqlite3
 from datetime import date
 
-from gestor_campanhas import modelos, relogio
+from gestor_campanhas import dinheiro, modelos, relogio
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Campanha, Utilizador
 from gestor_campanhas.repositorios import campanhas, utilizadores
-from gestor_campanhas.servicos import gestao, validacao
+from gestor_campanhas.servicos import correio, gestao, validacao
 
 
 def clientes_disponiveis(ligacao: sqlite3.Connection) -> list[Utilizador]:
@@ -137,7 +137,7 @@ def estado(campanha: Campanha, hoje: date | None = None) -> str:
     hoje = hoje or relogio.hoje()
     if campanha.data_inicio and campanha.data_inicio > hoje:
         return modelos.POR_COMECAR
-    if campanha.data_fim and campanha.data_fim < hoje:
+    if campanha.terminada(hoje):
         return modelos.TERMINADA
     return modelos.EM_CURSO
 
@@ -154,3 +154,138 @@ def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador, identificador: 
     campanha = obter_do_marketeer(ligacao, marketeer, identificador)
     campanhas.eliminar(ligacao, campanha.id)
     return campanha
+
+
+def listar_todas(ligacao: sqlite3.Connection) -> list[Campanha]:
+    """Lista todas as campanhas, para o Administrador.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Campanhas de todos os clientes, pela ordem em que foram criadas.
+    """
+    return campanhas.listar_todas(ligacao)
+
+
+def obter(ligacao: sqlite3.Connection, identificador: int) -> Campanha:
+    """Procura uma campanha pelo número, seja de quem for.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número da campanha.
+    :return: A campanha.
+    :raises ErroValidacao: Se não existir nenhuma campanha com esse número.
+    """
+    campanha = campanhas.obter_por_id(ligacao, identificador)
+    if campanha is None:
+        raise ErroValidacao(f"Não existe nenhuma campanha com o número {identificador}.")
+    return campanha
+
+
+def budget_validado(valor: str) -> int:
+    """Converte um budget escrito em euros e confirma que é maior do que zero.
+
+    :param valor: Budget tal como foi escrito, por exemplo ``"1500"`` ou ``"1500,50"``.
+    :return: O budget em cêntimos.
+    :raises ErroValidacao: Se não for um valor em euros ou não for maior do que zero.
+    """
+    centimos = dinheiro.para_centimos(valor)
+    if centimos <= 0:
+        raise ErroValidacao("O budget tem de ser maior do que zero.")
+    return centimos
+
+
+def definir_budget(ligacao: sqlite3.Connection, identificador: int, valor: str) -> Campanha:
+    """Define o budget de uma campanha. Só o Administrador o faz.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número da campanha.
+    :param valor: Budget em euros, tal como foi escrito.
+    :return: A campanha, já com o budget novo.
+    :raises ErroValidacao: Se a campanha não existir ou o valor não for válido.
+    """
+    campanha = obter(ligacao, identificador)
+    return campanhas.definir_budget(ligacao, campanha.id, budget_validado(valor))
+
+
+def marketeers_disponiveis(ligacao: sqlite3.Connection) -> list[Utilizador]:
+    """Lista os marketeers a quem se pode atribuir uma campanha.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Marketeers com a conta ativa, por ordem alfabética do nome.
+    """
+    return [marketeer for marketeer in gestao.listar(ligacao, modelos.MARKETEER) if marketeer.ativo]
+
+
+def marketeer_ativo(ligacao: sqlite3.Connection, identificador: int) -> Utilizador:
+    """Procura um marketeer pelo número, confirmando que tem a conta ativa.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número do marketeer.
+    :return: O marketeer.
+    :raises ErroValidacao: Se não existir um marketeer com esse número ou se
+        tiver a conta desativada.
+    """
+    marketeer = utilizadores.obter_por_id(ligacao, identificador)
+    if marketeer is None or marketeer.perfil != modelos.MARKETEER:
+        raise ErroValidacao(f"Não existe nenhum marketeer com o número {identificador}.")
+    if not marketeer.ativo:
+        raise ErroValidacao("Este marketeer tem a conta desativada.")
+    return marketeer
+
+
+def avisar_marketeer(marketeer: Utilizador, campanha: Campanha) -> None:
+    """Envia um email ao marketeer a dizer que passou a ser responsável por uma campanha.
+
+    :param marketeer: Marketeer que recebe o aviso.
+    :param campanha: Campanha que lhe foi atribuída.
+    """
+    correio.enviar(
+        marketeer.email,
+        "Foi-lhe atribuída uma campanha",
+        f"Olá, {marketeer.nome}.\n\n"
+        f"Passou a ser responsável pela campanha {campanha.nome}, do cliente {campanha.cliente_nome}.\n"
+        'Pode consultá-la na opção "Campanhas" do seu menu.',
+    )
+
+
+def atribuir_marketeer(ligacao: sqlite3.Connection, identificador: int, marketeer_id: int) -> Campanha:
+    """Atribui uma campanha a um marketeer, que passa a ser o responsável.
+
+    O marketeer anterior deixa de ver a campanha. O marketeer novo é avisado
+    por email.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número da campanha.
+    :param marketeer_id: Número do marketeer que passa a ser responsável.
+    :return: A campanha, já com o marketeer novo.
+    :raises ErroValidacao: Se a campanha não existir, se o marketeer não
+        existir ou tiver a conta desativada, ou se já for o responsável.
+    """
+    campanha = obter(ligacao, identificador)
+    marketeer = marketeer_ativo(ligacao, marketeer_id)
+    if campanha.marketeer_id == marketeer.id:
+        raise ErroValidacao(f"{marketeer.nome} já é responsável por esta campanha.")
+    campanha = campanhas.definir_marketeer(ligacao, campanha.id, marketeer.id)
+    avisar_marketeer(marketeer, campanha)
+    return campanha
+
+
+def contar_ativas(ligacao: sqlite3.Connection, perfil: str) -> dict[int, int]:
+    """Conta as campanhas ativas de cada cliente ou de cada marketeer.
+
+    Uma campanha está ativa enquanto não terminar: conta se estiver em curso
+    ou por começar.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param perfil: :data:`~gestor_campanhas.modelos.CLIENTE` para contar por
+        cliente, :data:`~gestor_campanhas.modelos.MARKETEER` para contar por
+        marketeer responsável.
+    :return: Dicionário do número da conta para o número de campanhas ativas.
+        As contas sem campanhas ativas não aparecem.
+    """
+    hoje = relogio.hoje()
+    totais: dict[int, int] = {}
+    for campanha in campanhas.listar_todas(ligacao):
+        if campanha.terminada(hoje):
+            continue
+        conta = campanha.cliente_id if perfil == modelos.CLIENTE else campanha.marketeer_id
+        totais[conta] = totais.get(conta, 0) + 1
+    return totais

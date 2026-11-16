@@ -6,10 +6,10 @@ import secrets
 import sqlite3
 import unicodedata
 
-from gestor_campanhas import modelos, seguranca
+from gestor_campanhas import modelos, relogio, seguranca
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Utilizador
-from gestor_campanhas.repositorios import utilizadores
+from gestor_campanhas.repositorios import campanhas, utilizadores
 from gestor_campanhas.servicos import correio, validacao
 
 #: Perfis cujas contas o Administrador pode gerir.
@@ -179,18 +179,37 @@ def definir_estado(ligacao: sqlite3.Connection, perfil: str, identificador: int,
     password. A conta não é apagada: os dados e o histórico mantêm-se, e
     pode ser reativada mais tarde. A pessoa é avisada por email da alteração.
 
+    Um marketeer só pode ser desativado quando já não for responsável por
+    campanhas por terminar: primeiro o Administrador atribui-as a outro.
+
     :param ligacao: Ligação aberta à base de dados.
     :param perfil: Perfil da conta: um dos :data:`PERFIS_GERIDOS`.
     :param identificador: Número da conta.
     :param ativo: ``False`` para desativar, ``True`` para reativar.
     :return: A conta, já com o estado novo.
-    :raises ErroValidacao: Se a conta não existir ou já estiver nesse estado.
+    :raises ErroValidacao: Se a conta não existir, se já estiver nesse estado
+        ou se for de um marketeer com campanhas por terminar.
     """
     if perfil not in PERFIS_GERIDOS:
         raise ValueError(f"O perfil {perfil!r} não é gerido pelo Administrador.")
     conta = obter(ligacao, perfil, identificador)
     if conta.ativo == ativo:
         raise ErroValidacao("Esta conta já está ativa." if ativo else "Esta conta já está desativada.")
+    if not ativo and perfil == modelos.MARKETEER:
+        hoje = relogio.hoje()
+        por_terminar = [
+            campanha for campanha in campanhas.listar_por_marketeer(ligacao, conta.id) if not campanha.terminada(hoje)
+        ]
+        if por_terminar:
+            quantas = (
+                "1 campanha que ainda não terminou"
+                if len(por_terminar) == 1
+                else f"{len(por_terminar)} campanhas que ainda não terminaram"
+            )
+            raise ErroValidacao(
+                f"{conta.nome} é responsável por {quantas}. "
+                "Atribua-as a outro marketeer antes de desativar a conta."
+            )
     conta = utilizadores.definir_ativo(ligacao, conta.id, ativo)
     if ativo:
         assunto = "A sua conta foi reativada"

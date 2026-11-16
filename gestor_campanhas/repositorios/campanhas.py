@@ -151,3 +151,40 @@ def eliminar(ligacao: sqlite3.Connection, identificador: int) -> None:
     """
     ligacao.execute("DELETE FROM campanhas WHERE id = ?", (identificador,))
     ligacao.commit()
+
+
+def listar_todas(ligacao: sqlite3.Connection) -> list[Campanha]:
+    """Devolve todas as campanhas, de todos os clientes e marketeers.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Campanhas, pela ordem em que foram criadas.
+    """
+    linhas = ligacao.execute(f"{_SELECIONAR} ORDER BY campanhas.id").fetchall()
+    return [_de_linha(linha) for linha in linhas]
+
+
+def definir_budget(ligacao: sqlite3.Connection, identificador: int, budget_centimos: int) -> Campanha:
+    """Altera o budget de uma campanha.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Identificador da campanha.
+    :param budget_centimos: Budget novo, em cêntimos.
+    :return: A campanha, já com o budget novo.
+    """
+    ligacao.execute("UPDATE campanhas SET budget_centimos = ? WHERE id = ?", (budget_centimos, identificador))
+    ligacao.commit()
+    return obter_por_id(ligacao, identificador)
+
+
+def definir_marketeer(ligacao: sqlite3.Connection, identificador: int, marketeer_id: int) -> Campanha:
+    """Altera o marketeer responsável por uma campanha.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Identificador da campanha.
+    :param marketeer_id: Identificador do marketeer que passa a ser responsável.
+    :return: A campanha, já com o marketeer novo.
+    :raises sqlite3.IntegrityError: Se o marketeer não existir.
+    """
+    ligacao.execute("UPDATE campanhas SET marketeer_id = ? WHERE id = ?", (marketeer_id, identificador))
+    ligacao.commit()
+    return obter_por_id(ligacao, identificador)
