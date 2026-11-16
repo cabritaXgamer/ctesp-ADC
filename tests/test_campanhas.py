@@ -1,10 +1,10 @@
 """Testes das campanhas."""
 
-from datetime import date
+from datetime import date, datetime
 
 import pytest
 
-from gestor_campanhas import modelos, seguranca
+from gestor_campanhas import dados_demo, modelos, relogio, seguranca
 from gestor_campanhas.cli import campanhas as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -324,3 +324,177 @@ def test_opcao_campanhas_esta_no_menu_do_marketeer():
     descricoes = [descricao for descricao, _ in perfis.OPCOES[modelos.MARKETEER]]
 
     assert descricoes[0] == "Campanhas"
+
+
+# --- estado ------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("inicio", "fim", "esperado"),
+    [
+        ("", "", modelos.EM_CURSO),
+        ("2026-11-16", "2026-11-16", modelos.EM_CURSO),
+        ("2026-11-01", "", modelos.EM_CURSO),
+        ("", "2026-12-24", modelos.EM_CURSO),
+        ("2026-11-17", "2026-12-24", modelos.POR_COMECAR),
+        ("2026-10-01", "2026-11-15", modelos.TERMINADA),
+        ("", "2026-11-15", modelos.TERMINADA),
+    ],
+)
+def test_estado_depende_das_datas(ligacao, contas, inicio, fim, esperado):
+    campanha = servico.criar(ligacao, contas[modelos.MARKETEER], "Natal", "", contas[modelos.CLIENTE].id, inicio, fim)
+
+    assert servico.estado(campanha, date(2026, 11, 16)) == esperado
+
+
+def test_estado_usa_o_dia_atual_por_omissao(ligacao, contas, natal, monkeypatch):
+    monkeypatch.setattr(relogio, "agora", lambda: datetime(2026, 12, 25, 9, 0))
+
+    assert relogio.hoje() == date(2026, 12, 25)
+    assert servico.estado(natal) == modelos.TERMINADA
+
+
+# --- lista completa e detalhes -----------------------------------------------
+
+
+@pytest.fixture
+def dia_16_de_novembro(monkeypatch):
+    """Fixa o dia atual em 16 de novembro de 2026."""
+    monkeypatch.setattr(relogio, "agora", lambda: datetime(2026, 11, 16, 10, 0))
+
+
+def test_lista_mostra_o_budget_e_o_estado(teclado, ligacao, contas, natal, dia_16_de_novembro, capsys):
+    cliente, miguel = contas[modelos.CLIENTE], contas[modelos.MARKETEER]
+    repositorio.criar(ligacao, "Outono", "", cliente.id, miguel.id, None, date(2026, 10, 31), budget_centimos=150050)
+    teclado("0")
+
+    menu.do_marketeer(ligacao, miguel)
+
+    saida = capsys.readouterr().out
+    assert "N.º  Nome    Cliente        Início      Fim         Budget       Estado" in saida
+    assert "Natal   Carla Cliente  2026-12-01  2026-12-24  Por definir  Por começar" in saida
+    assert "Outono  Carla Cliente  -           2026-10-31  1 500,50 €   Terminada" in saida
+    assert "2 campanhas." in saida
+
+
+def test_menu_mostra_os_detalhes_de_uma_campanha(teclado, ligacao, contas, natal, dia_16_de_novembro, capsys):
+    teclado("3", str(natal.id), "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    saida = capsys.readouterr().out
+    assert f"Campanha n.º {natal.id}" in saida
+    assert "  Nome:      Natal" in saida
+    assert "  Cliente:   Carla Cliente" in saida
+    assert "  Objetivo:  Vender mais" in saida
+    assert "  Início:    2026-12-01" in saida
+    assert "  Fim:       2026-12-24" in saida
+    assert "  Budget:    Por definir" in saida
+    assert "  Estado:    Por começar" in saida
+
+
+def test_detalhes_mostram_um_traco_quando_nao_ha_objetivo(ligacao, contas, capsys):
+    campanha = servico.criar(ligacao, contas[modelos.MARKETEER], "Natal", "", contas[modelos.CLIENTE].id)
+
+    menu.mostrar_detalhes(campanha)
+
+    assert "  Objetivo:  -" in capsys.readouterr().out
+
+
+def test_menu_nao_mostra_detalhes_de_campanhas_de_outro(teclado, ligacao, contas, natal, marta, capsys):
+    teclado("3", str(natal.id), "", "0")
+
+    menu.do_marketeer(ligacao, marta)
+
+    saida = capsys.readouterr().out
+    assert f"Não tem nenhuma campanha com o número {natal.id}." in saida
+    assert "Vender mais" not in saida
+
+
+def test_budget_por_palavras(ligacao, contas, natal):
+    assert menu.budget(natal) == "Por definir"
+    natal.budget_centimos = 0
+    assert menu.budget(natal) == "0,00 €"
+
+
+# --- eliminar ----------------------------------------------------------------
+
+
+def test_marketeer_elimina_a_sua_campanha(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+
+    eliminada = servico.eliminar(ligacao, miguel, natal.id)
+
+    assert eliminada == natal
+    assert repositorio.obter_por_id(ligacao, natal.id) is None
+    assert servico.listar_do_marketeer(ligacao, miguel) == []
+
+
+def test_marketeer_nao_elimina_campanhas_de_outro(ligacao, contas, natal, marta):
+    with pytest.raises(ErroValidacao, match="Não tem nenhuma campanha"):
+        servico.eliminar(ligacao, marta, natal.id)
+
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+def test_eliminar_nao_apaga_as_outras_campanhas(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    outra = servico.criar(ligacao, miguel, "Saldos", "", contas[modelos.CLIENTE].id)
+
+    servico.eliminar(ligacao, miguel, natal.id)
+
+    assert servico.listar_do_marketeer(ligacao, miguel) == [outra]
+
+
+def test_menu_elimina_campanha_depois_de_confirmar(teclado, ligacao, contas, natal, capsys):
+    teclado("4", str(natal.id), "s", "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    saida = capsys.readouterr().out
+    assert "Uma campanha eliminada não pode ser recuperada." in saida
+    assert "A campanha Natal foi eliminada." in saida
+    assert "Ainda não tem campanhas." in saida
+    assert repositorio.obter_por_id(ligacao, natal.id) is None
+
+
+def test_menu_nao_elimina_sem_confirmacao(teclado, ligacao, contas, natal, capsys):
+    teclado("4", str(natal.id), "n", "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    assert "Nada foi alterado." in capsys.readouterr().out
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+def test_menu_eliminar_pode_ser_cancelado_com_enter(teclado, ligacao, contas, natal):
+    teclado("4", "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+# --- dados de demonstração ---------------------------------------------------
+
+
+def test_dados_demo_criam_campanhas_para_os_dois_marketeers(ligacao):
+    dados_demo.criar_contas(ligacao)
+
+    criadas = dados_demo.criar_campanhas(ligacao)
+
+    assert criadas == ["Natal 2026", "Regresso às aulas", "Bicicletas de primavera"]
+    miguel = utilizadores.obter_por_email(ligacao, "marketeer@agencia.pt")
+    marta = utilizadores.obter_por_email(ligacao, "marta@agencia.pt")
+    natal, aulas = servico.listar_do_marketeer(ligacao, miguel)
+    assert natal.cliente_nome == "Carla Cliente"
+    assert natal.budget_centimos == 150000
+    assert aulas.cliente_nome == "José Padeiro"
+    assert nomes(servico.listar_do_marketeer(ligacao, marta)) == ["Bicicletas de primavera"]
+
+
+def test_dados_demo_nao_repetem_campanhas(ligacao):
+    dados_demo.criar_contas(ligacao)
+    dados_demo.criar_campanhas(ligacao)
+
+    assert dados_demo.criar_campanhas(ligacao) == []

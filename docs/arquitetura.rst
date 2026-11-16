@@ -19,7 +19,8 @@ Estrutura de pastas
      erros.py             erros que os menus mostram ao utilizador
      relogio.py           data e hora atuais
      seguranca.py         hash das passwords
-     dados_demo.py        cria as contas de demonstração
+     dinheiro.py          conversão de valores em euros para cêntimos e vice-versa
+     dados_demo.py        cria as contas e as campanhas de demonstração
      repositorios/        leitura e escrita na base de dados, uma tabela por módulo
      servicos/            regras de negócio, um assunto por módulo
      cli/                 menus da linha de comandos

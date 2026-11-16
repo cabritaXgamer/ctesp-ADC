@@ -1,10 +1,16 @@
-"""Campanhas, no menu do Marketeer."""
+"""Campanhas, no menu do Marketeer.
+
+O marketeer vê as campanhas que lhe estão atribuídas, com o cliente, as
+datas, o budget e o estado, e pode criar, editar, consultar e eliminar
+cada uma.
+"""
 
 from __future__ import annotations
 
 import sqlite3
 from datetime import date
 
+from gestor_campanhas import dinheiro
 from gestor_campanhas.cli import comum
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Campanha, Utilizador
@@ -23,19 +29,53 @@ def data(valor: date | None) -> str:
     return valor.isoformat() if valor else "-"
 
 
+def budget(campanha: Campanha) -> str:
+    """Escreve o budget de uma campanha como é mostrado nas listas.
+
+    :param campanha: Campanha a descrever.
+    :return: O valor em euros, ou ``"Por definir"`` se ainda não foi atribuído.
+    """
+    if campanha.budget_centimos is None:
+        return "Por definir"
+    return dinheiro.formatar(campanha.budget_centimos)
+
+
 def mostrar_campanhas(lista: list[Campanha]) -> None:
     """Mostra uma tabela de campanhas, com o total no fim.
 
     :param lista: Campanhas a mostrar.
     """
     comum.mostrar_tabela(
-        ["N.º", "Nome", "Cliente", "Início", "Fim"],
+        ["N.º", "Nome", "Cliente", "Início", "Fim", "Budget", "Estado"],
         [
-            [str(campanha.id), campanha.nome, campanha.cliente_nome, data(campanha.data_inicio), data(campanha.data_fim)]
+            [
+                str(campanha.id),
+                campanha.nome,
+                campanha.cliente_nome,
+                data(campanha.data_inicio),
+                data(campanha.data_fim),
+                budget(campanha),
+                campanhas.estado(campanha),
+            ]
             for campanha in lista
         ],
     )
     print(f"\n{len(lista)} {'campanha' if len(lista) == 1 else 'campanhas'}.")
+
+
+def mostrar_detalhes(campanha: Campanha) -> None:
+    """Mostra todos os dados de uma campanha, um por linha.
+
+    :param campanha: Campanha a mostrar.
+    """
+    print(f"Campanha n.º {campanha.id}")
+    print(f"  Nome:      {campanha.nome}")
+    print(f"  Cliente:   {campanha.cliente_nome}")
+    print(f"  Objetivo:  {campanha.objetivo or '-'}")
+    print(f"  Início:    {data(campanha.data_inicio)}")
+    print(f"  Fim:       {data(campanha.data_fim)}")
+    print(f"  Budget:    {budget(campanha)}")
+    print(f"  Estado:    {campanhas.estado(campanha)}")
 
 
 def pedir_campanha(ligacao: sqlite3.Connection, marketeer: Utilizador) -> Campanha | None:
@@ -127,12 +167,50 @@ def editar(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
     comum.pausa()
 
 
+def ver(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
+    """Pede o número de uma campanha e mostra todos os dados dela.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a consultar.
+    """
+    comum.titulo("Ver campanha")
+    campanha = pedir_campanha(ligacao, marketeer)
+    if campanha is None:
+        return
+    print()
+    mostrar_detalhes(campanha)
+    comum.pausa()
+
+
+def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
+    """Pede o número de uma campanha e elimina-a, depois de pedir confirmação.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a eliminar.
+    """
+    comum.titulo("Eliminar campanha")
+    campanha = pedir_campanha(ligacao, marketeer)
+    if campanha is None:
+        return
+    print()
+    mostrar_detalhes(campanha)
+    print("\nUma campanha eliminada não pode ser recuperada.")
+    if comum.confirmar("Eliminar esta campanha?"):
+        campanhas.eliminar(ligacao, marketeer, campanha.id)
+        print(f"\nA campanha {campanha.nome} foi eliminada.")
+    else:
+        print("\nNada foi alterado.")
+    comum.pausa()
+
+
 #: Opções do menu de campanhas do Marketeer. Cada opção é um par
 #: ``(descrição, função)``; a função recebe a ligação à base de dados e o
 #: marketeer.
 ACOES = [
     ("Criar campanha", criar),
     ("Editar campanha", editar),
+    ("Ver campanha", ver),
+    ("Eliminar campanha", eliminar),
 ]
 
 

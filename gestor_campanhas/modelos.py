@@ -24,6 +24,13 @@ LOGOUT = "logout"
 #: Motivo de saída de uma sessão terminada por falta de atividade.
 INATIVIDADE = "inatividade"
 
+#: Estado de uma campanha cuja data de início ainda não chegou.
+POR_COMECAR = "Por começar"
+#: Estado de uma campanha que está a decorrer.
+EM_CURSO = "Em curso"
+#: Estado de uma campanha cuja data de fim já passou.
+TERMINADA = "Terminada"
+
 #: Todos os perfis, com o nome que é mostrado nos menus.
 NOMES_PERFIS = {
     ADMINISTRADOR: "Administrador",

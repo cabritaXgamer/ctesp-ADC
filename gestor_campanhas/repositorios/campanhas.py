@@ -141,3 +141,13 @@ def atualizar(
     )
     ligacao.commit()
     return obter_por_id(ligacao, identificador)
+
+
+def eliminar(ligacao: sqlite3.Connection, identificador: int) -> None:
+    """Apaga uma campanha.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Identificador da campanha.
+    """
+    ligacao.execute("DELETE FROM campanhas WHERE id = ?", (identificador,))
+    ligacao.commit()
