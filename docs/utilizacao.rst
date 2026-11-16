@@ -41,8 +41,10 @@ Estas passwords são públicas e servem só para demonstração.
 
 São também criadas três campanhas: ``Natal 2026`` e ``Regresso às aulas``, do
 marketeer ``marketeer@agencia.pt``, e ``Bicicletas de primavera``, da
-marketeer ``marta@agencia.pt``. O comando pode ser repetido: só acrescenta o
-que faltar.
+marketeer ``marta@agencia.pt``. Ficam também dois pedidos de campanha
+pendentes, um do cliente ``jose@padaria.pt`` e outro da cliente
+``beatriz@bicicletas.pt``. O comando pode ser repetido: só acrescenta o que
+faltar.
 
 Entrar e sair
 -------------
@@ -354,3 +356,80 @@ Eliminar campanha
 Pede o número da campanha, mostra os dados dela e pede confirmação. Uma
 campanha eliminada não pode ser recuperada. Um marketeer só pode eliminar as
 suas campanhas.
+
+Cliente
+-------
+
+Pedidos de campanha
+~~~~~~~~~~~~~~~~~~~
+
+Mostra os pedidos de nova campanha feitos pelo cliente, do mais recente para
+o mais antigo, e por baixo as opções para os gerir. Um cliente só vê os seus
+pedidos.
+
+.. code-block:: text
+
+   N.º  Feito em    Objetivo                      Orçamento  Prazo       Estado
+   ---  ----------  ----------------------------  ---------  ----------  --------
+   1    2026-11-16  Divulgar o bolo-rei no Natal  600,00 €   2026-12-15  Pendente
+
+   1 pedido.
+
+Um objetivo com mais de 40 caracteres aparece cortado na lista; a opção
+**Ver pedido** mostra-o completo.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Estado
+     - Significado
+   * - ``Pendente``
+     - Ainda ninguém analisou o pedido. É o único estado em que o cliente o
+       pode cancelar.
+   * - ``Em análise``
+     - O Administrador já abriu o pedido, mas ainda não decidiu.
+   * - ``Aprovado``
+     - O pedido foi aceite e deu origem a uma campanha.
+   * - ``Rejeitado``
+     - O pedido foi recusado. O motivo aparece em **Ver pedido**.
+   * - ``Cancelado``
+     - O cliente desistiu do pedido.
+
+Novo pedido
+^^^^^^^^^^^
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Dado
+     - Regras
+   * - Objetivo
+     - Obrigatório.
+   * - Orçamento
+     - Obrigatório, em euros e maior do que zero. Aceita ``1500``,
+       ``1500,50`` e ``1500.50``.
+   * - Prazo pretendido
+     - Obrigatório, no formato ``AAAA-MM-DD``. Não pode ser um dia que já
+       passou.
+   * - Plataformas
+     - Pelo menos uma. A aplicação mostra as plataformas numeradas e
+       escreve-se os números das escolhidas, separados por vírgulas
+       (por exemplo ``1,2``).
+
+O pedido fica no estado ``Pendente``. Se algum valor não respeitar as regras,
+o pedido não é registado.
+
+Ver pedido
+^^^^^^^^^^
+
+Pede o número do pedido e mostra todos os dados dele. Num pedido rejeitado
+aparece o motivo; num pedido aprovado aparece o número da campanha criada.
+
+Cancelar pedido
+^^^^^^^^^^^^^^^
+
+Pede o número do pedido, mostra os dados dele e pede confirmação. Só um
+pedido ``Pendente`` pode ser cancelado. O pedido cancelado não é apagado:
+continua na lista, com o estado ``Cancelado``.

@@ -15,12 +15,12 @@ Estrutura de pastas
      __main__.py          ponto de entrada (python -m gestor_campanhas)
      config.py            caminhos da pasta de dados e da base de dados
      bd.py                ligação SQLite e criação das tabelas
-     modelos.py           classes de dados (Utilizador, Campanha) e perfis
+     modelos.py           classes de dados (Utilizador, Campanha, PedidoCampanha), perfis e estados
      erros.py             erros que os menus mostram ao utilizador
      relogio.py           data e hora atuais
      seguranca.py         hash das passwords
      dinheiro.py          conversão de valores em euros para cêntimos e vice-versa
-     dados_demo.py        cria as contas e as campanhas de demonstração
+     dados_demo.py        cria as contas, as campanhas e os pedidos de demonstração
      repositorios/        leitura e escrita na base de dados, uma tabela por módulo
      servicos/            regras de negócio, um assunto por módulo
      cli/                 menus da linha de comandos
@@ -30,6 +30,7 @@ Estrutura de pastas
        admin.py           opções do menu do Administrador
        gestao.py          gestão de clientes e marketeers, pelo Administrador
        campanhas.py       campanhas, no menu do Marketeer
+       pedidos.py         pedidos de campanha, no menu do Cliente
        conta.py           opções da conta, comuns a todos os perfis
        recuperacao.py     recuperação da password
    tests/                 testes automáticos (pytest)
@@ -191,3 +192,8 @@ executadas em todos os arranques sem apagar dados.
      - Uma linha por campanha: nome, objetivo, cliente a quem pertence,
        marketeer responsável, budget em cêntimos (vazio enquanto não for
        definido) e datas de início e de fim.
+   * - ``pedidos_campanha``
+     - Uma linha por pedido de nova campanha: cliente, objetivo, orçamento em
+       cêntimos, prazo, plataformas, estado (``pendente``, ``em_analise``,
+       ``aprovado``, ``rejeitado`` ou ``cancelado``), motivo da rejeição e
+       campanha a que deu origem.
