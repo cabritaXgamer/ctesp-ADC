@@ -188,3 +188,16 @@ def definir_marketeer(ligacao: sqlite3.Connection, identificador: int, marketeer
     ligacao.execute("UPDATE campanhas SET marketeer_id = ? WHERE id = ?", (marketeer_id, identificador))
     ligacao.commit()
     return obter_por_id(ligacao, identificador)
+
+
+def listar_por_cliente(ligacao: sqlite3.Connection, cliente_id: int) -> list[Campanha]:
+    """Devolve as campanhas de um cliente.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente_id: Identificador do cliente.
+    :return: Campanhas desse cliente, pela ordem em que foram criadas.
+    """
+    linhas = ligacao.execute(
+        f"{_SELECIONAR} WHERE campanhas.cliente_id = ? ORDER BY campanhas.id", (cliente_id,)
+    ).fetchall()
+    return [_de_linha(linha) for linha in linhas]
