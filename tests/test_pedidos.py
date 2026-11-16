@@ -136,3 +136,38 @@ def test_cliente_so_ve_os_seus_pedidos(ligacao, contas, jose):
         servico.obter_do_cliente(ligacao, jose, pedido.id)
     with pytest.raises(ErroValidacao, match="Não tem nenhum pedido com o número 999"):
         servico.obter_do_cliente(ligacao, carla, 999)
+
+
+# --- cancelar ----------------------------------------------------------------
+
+
+@pytest.fixture
+def pedido(ligacao, contas):
+    """Um pedido pendente da Carla."""
+    return servico.criar(ligacao, contas[modelos.CLIENTE], "Vender mais", "1500", "2026-12-20", ["Facebook", "Instagram"])
+
+
+def test_cliente_cancela_um_pedido_pendente(ligacao, contas, pedido):
+    carla = contas[modelos.CLIENTE]
+
+    cancelado = servico.cancelar(ligacao, carla, pedido.id)
+
+    assert cancelado.estado == modelos.CANCELADO
+    assert servico.listar_do_cliente(ligacao, carla) == [cancelado]
+
+
+@pytest.mark.parametrize("estado", [modelos.EM_ANALISE, modelos.APROVADO, modelos.REJEITADO, modelos.CANCELADO])
+def test_so_um_pedido_pendente_pode_ser_cancelado(ligacao, contas, pedido, estado):
+    repositorio.definir_estado(ligacao, pedido.id, estado)
+
+    with pytest.raises(ErroValidacao, match="Só é possível cancelar um pedido pendente"):
+        servico.cancelar(ligacao, contas[modelos.CLIENTE], pedido.id)
+
+    assert repositorio.obter_por_id(ligacao, pedido.id).estado == estado
+
+
+def test_cliente_nao_cancela_pedidos_de_outro(ligacao, contas, pedido, jose):
+    with pytest.raises(ErroValidacao, match="Não tem nenhum pedido"):
+        servico.cancelar(ligacao, jose, pedido.id)
+
+    assert repositorio.obter_por_id(ligacao, pedido.id).estado == modelos.PENDENTE

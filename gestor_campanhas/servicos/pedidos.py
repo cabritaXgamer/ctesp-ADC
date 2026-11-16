@@ -85,3 +85,22 @@ def obter_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador, identific
     if pedido is None or pedido.cliente_id != cliente.id:
         raise ErroValidacao(f"Não tem nenhum pedido com o número {identificador}.")
     return pedido
+
+
+def cancelar(ligacao: sqlite3.Connection, cliente: Utilizador, identificador: int) -> PedidoCampanha:
+    """Cancela um pedido do cliente que ainda esteja pendente.
+
+    O pedido não é apagado: fica na lista, com o estado cancelado.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a cancelar.
+    :param identificador: Número do pedido.
+    :return: O pedido, já cancelado.
+    :raises ErroValidacao: Se o pedido não for do cliente ou já não estiver pendente.
+    """
+    pedido = obter_do_cliente(ligacao, cliente, identificador)
+    if pedido.estado != modelos.PENDENTE:
+        raise ErroValidacao(
+            f"Só é possível cancelar um pedido pendente. Este pedido está no estado {pedido.nome_estado}."
+        )
+    return pedidos.definir_estado(ligacao, pedido.id, modelos.CANCELADO)
