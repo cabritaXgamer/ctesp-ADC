@@ -5,6 +5,8 @@ from datetime import date, datetime
 import pytest
 
 from gestor_campanhas import modelos, relogio, seguranca
+from gestor_campanhas.cli import pedidos as menu
+from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import pedidos as repositorio
 from gestor_campanhas.repositorios import utilizadores
@@ -171,3 +173,76 @@ def test_cliente_nao_cancela_pedidos_de_outro(ligacao, contas, pedido, jose):
         servico.cancelar(ligacao, jose, pedido.id)
 
     assert repositorio.obter_por_id(ligacao, pedido.id).estado == modelos.PENDENTE
+
+
+# --- menu do cliente: lista e novo pedido ------------------------------------
+
+
+def test_menu_avisa_quando_o_cliente_nao_tem_pedidos(teclado, ligacao, contas, capsys):
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Os meus pedidos de campanha" in saida
+    assert "Ainda não fez nenhum pedido." in saida
+    assert "1. Novo pedido" in saida
+
+
+def test_menu_mostra_so_os_pedidos_do_cliente(teclado, ligacao, contas, pedido, jose, capsys):
+    servico.criar(ligacao, jose, "Do José", "100", "2026-12-01", ["Facebook"])
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "N.º  Feito em    Objetivo     Orçamento   Prazo       Estado" in saida
+    assert f"{pedido.id}    2026-11-16  Vender mais  1 500,00 €  2026-12-20  Pendente" in saida
+    assert "Do José" not in saida
+    assert "1 pedido." in saida
+
+
+def test_menu_regista_um_pedido_novo(teclado, ligacao, contas, capsys):
+    carla = contas[modelos.CLIENTE]
+    teclado("1", "Vender mais no Natal", "1500,50", "2026-12-20", "2, 1", "", "0")
+
+    menu.do_cliente(ligacao, carla)
+
+    saida = capsys.readouterr().out
+    (registado,) = servico.listar_do_cliente(ligacao, carla)
+    assert "  1. Facebook" in saida
+    assert "  6. YouTube" in saida
+    assert f"Pedido registado com o número {registado.id}. Fica pendente até ser analisado." in saida
+    assert registado.objetivo == "Vender mais no Natal"
+    assert registado.orcamento_centimos == 150050
+    assert registado.plataformas == ["Facebook", "Instagram"]
+
+
+def test_menu_repete_as_plataformas_ate_a_resposta_ser_valida(teclado, capsys):
+    teclado("", "sete", "1,9", "3")
+
+    assert menu.ler_plataformas() == ["Google Ads"]
+    assert capsys.readouterr().out.count("Escreva números entre 1 e 6, separados por vírgulas.") == 3
+
+
+def test_menu_mostra_o_erro_e_nao_regista(teclado, ligacao, contas, capsys):
+    carla = contas[modelos.CLIENTE]
+    teclado("1", "Vender", "100", "2026-01-01", "1", "", "0")
+
+    menu.do_cliente(ligacao, carla)
+
+    assert "O prazo não pode ser um dia que já passou. O pedido não foi registado." in capsys.readouterr().out
+    assert servico.listar_do_cliente(ligacao, carla) == []
+
+
+def test_resumir_corta_os_textos_compridos():
+    assert menu.resumir("Curto") == "Curto"
+    assert menu.resumir("a" * 40) == "a" * 40
+    assert menu.resumir("Aumentar as vendas da loja durante o mês de dezembro") == "Aumentar as vendas da loja durante o..."
+    assert len(menu.resumir("a" * 41)) == 40
+
+
+def test_opcao_pedidos_esta_no_menu_do_cliente():
+    descricoes = [descricao for descricao, _ in perfis.OPCOES[modelos.CLIENTE]]
+
+    assert descricoes[0] == "Pedidos de campanha"
