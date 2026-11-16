@@ -469,7 +469,7 @@ def test_menu_atribui_a_campanha_a_outro_marketeer(teclado, ligacao, contas, nat
 
     saida = capsys.readouterr().out
     assert "Campanha Natal, de Carla Cliente. Responsável atual: Miguel Marketeer." in saida
-    assert "A campanha passou para Marta Marques, que foi avisado por email." in saida
+    assert "A campanha passou para Marta Marques. Foi enviado um aviso por email." in saida
     assert campanhas.obter(ligacao, natal.id).marketeer_id == marta.id
 
 
