@@ -157,13 +157,13 @@ Gestão de clientes e marketeers
 
 .. automodule:: gestor_campanhas.cli.gestao
 
-Campanhas do Marketeer
-~~~~~~~~~~~~~~~~~~~~~~
+Campanhas
+~~~~~~~~~
 
 .. automodule:: gestor_campanhas.cli.campanhas
 
-Pedidos de campanha do Cliente
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Pedidos de campanha
+~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: gestor_campanhas.cli.pedidos
 

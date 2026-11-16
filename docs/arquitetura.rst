@@ -29,8 +29,8 @@ Estrutura de pastas
        perfis.py          menu de cada perfil
        admin.py           opções do menu do Administrador
        gestao.py          gestão de clientes e marketeers, pelo Administrador
-       campanhas.py       campanhas, no menu do Marketeer
-       pedidos.py         pedidos de campanha, no menu do Cliente
+       campanhas.py       campanhas, nos menus do Marketeer e do Administrador
+       pedidos.py         pedidos de campanha, nos menus do Cliente e do Administrador
        conta.py           opções da conta, comuns a todos os perfis
        recuperacao.py     recuperação da password
    tests/                 testes automáticos (pytest)
@@ -107,6 +107,25 @@ passado como argumento. O que muda de um perfil para o outro está em
 :data:`gestor_campanhas.cli.gestao.NOMES` e
 :data:`gestor_campanhas.cli.gestao.ACOES`.
 
+Exemplo: aprovar um pedido de campanha
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. :func:`gestor_campanhas.cli.pedidos.decidir` pede o número do pedido e
+   mostra-o. :func:`gestor_campanhas.servicos.pedidos.analisar` passa-o de
+   pendente para em análise.
+2. :func:`gestor_campanhas.cli.pedidos.aprovar` pede o nome da campanha, o
+   budget inicial e o marketeer responsável.
+3. :func:`gestor_campanhas.servicos.pedidos.aprovar` confirma que o pedido
+   ainda está por decidir, valida os dados, cria a campanha com
+   :func:`gestor_campanhas.repositorios.campanhas.criar` e marca o pedido
+   como aprovado, com o número da campanha.
+4. :func:`gestor_campanhas.servicos.correio.enviar` avisa o cliente e o
+   marketeer.
+
+Se algum dado não for válido, o serviço lança
+:class:`~gestor_campanhas.erros.ErroValidacao` antes de criar a campanha, e o
+pedido continua em análise.
+
 Contas desativadas
 ------------------
 
@@ -115,6 +134,18 @@ Remover um cliente ou um marketeer não apaga a linha da tabela
 registadas (e, nas fases seguintes, as campanhas) continuam ligadas a uma
 conta que existe. Uma conta desativada não pode entrar nem recuperar a
 password, e pode ser reativada.
+
+Um marketeer só pode ser desativado quando já não for responsável por
+campanhas por terminar. A verificação está em
+:func:`gestor_campanhas.servicos.gestao.definir_estado`.
+
+Dinheiro
+--------
+
+Os valores em euros (o budget de uma campanha e o orçamento de um pedido)
+são guardados em cêntimos, como números inteiros. O módulo
+:mod:`gestor_campanhas.dinheiro` converte o que o utilizador escreve em
+cêntimos e os cêntimos no texto que é mostrado.
 
 Passwords
 ---------
