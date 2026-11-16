@@ -3,6 +3,9 @@
 Um cliente pede uma campanha indicando o objetivo, o orçamento, o prazo e as
 plataformas. O pedido começa no estado pendente; enquanto estiver pendente, o
 cliente pode cancelá-lo.
+
+O Administrador analisa os pedidos e decide: se aprovar, é criada a campanha;
+se rejeitar, indica o motivo. Nos dois casos o cliente é avisado por email.
 """
 
 from __future__ import annotations
@@ -12,8 +15,12 @@ import sqlite3
 from gestor_campanhas import dinheiro, modelos, relogio
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import PedidoCampanha, Utilizador
-from gestor_campanhas.repositorios import pedidos
-from gestor_campanhas.servicos import validacao
+from gestor_campanhas.repositorios import campanhas as campanhas_bd
+from gestor_campanhas.repositorios import pedidos, utilizadores
+from gestor_campanhas.servicos import campanhas, correio, validacao
+
+#: Estados em que um pedido ainda espera pela decisão do Administrador.
+POR_DECIDIR = (modelos.PENDENTE, modelos.EM_ANALISE)
 
 
 def _plataformas_validadas(escolhidas: list[str]) -> list[str]:
@@ -104,3 +111,120 @@ def cancelar(ligacao: sqlite3.Connection, cliente: Utilizador, identificador: in
             f"Só é possível cancelar um pedido pendente. Este pedido está no estado {pedido.nome_estado}."
         )
     return pedidos.definir_estado(ligacao, pedido.id, modelos.CANCELADO)
+
+
+def listar_todos(ligacao: sqlite3.Connection) -> list[PedidoCampanha]:
+    """Lista os pedidos de todos os clientes, para o Administrador.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Primeiro os pedidos por decidir, depois os já decididos; dentro
+        de cada grupo, do mais antigo para o mais recente.
+    """
+    todos = pedidos.listar_todos(ligacao)
+    return sorted(todos, key=lambda pedido: (pedido.estado not in POR_DECIDIR, pedido.id))
+
+
+def obter(ligacao: sqlite3.Connection, identificador: int) -> PedidoCampanha:
+    """Procura um pedido pelo número, seja de quem for.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número do pedido.
+    :return: O pedido.
+    :raises ErroValidacao: Se não existir nenhum pedido com esse número.
+    """
+    pedido = pedidos.obter_por_id(ligacao, identificador)
+    if pedido is None:
+        raise ErroValidacao(f"Não existe nenhum pedido com o número {identificador}.")
+    return pedido
+
+
+def analisar(ligacao: sqlite3.Connection, identificador: int) -> PedidoCampanha:
+    """Abre um pedido para o Administrador o analisar.
+
+    Um pedido pendente passa a estar em análise, e o cliente deixa de o poder
+    cancelar. Nos outros estados, o pedido fica como está.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número do pedido.
+    :return: O pedido, já com o estado atualizado.
+    :raises ErroValidacao: Se não existir nenhum pedido com esse número.
+    """
+    pedido = obter(ligacao, identificador)
+    if pedido.estado == modelos.PENDENTE:
+        pedido = pedidos.definir_estado(ligacao, pedido.id, modelos.EM_ANALISE)
+    return pedido
+
+
+def _por_decidir(ligacao: sqlite3.Connection, identificador: int) -> PedidoCampanha:
+    """Devolve um pedido, confirmando que ainda não foi decidido nem cancelado."""
+    pedido = obter(ligacao, identificador)
+    if pedido.estado not in POR_DECIDIR:
+        raise ErroValidacao(f"Este pedido já não pode ser decidido: está no estado {pedido.nome_estado}.")
+    return pedido
+
+
+def aprovar(
+    ligacao: sqlite3.Connection, identificador: int, nome: str, budget: str, marketeer_id: int
+) -> PedidoCampanha:
+    """Aprova um pedido e cria a campanha correspondente.
+
+    A campanha fica com o objetivo do pedido, com o prazo do pedido como data
+    de fim, com o budget inicial indicado e com o marketeer escolhido. O
+    cliente e o marketeer são avisados por email.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número do pedido.
+    :param nome: Nome a dar à campanha. Obrigatório.
+    :param budget: Budget inicial em euros, tal como foi escrito. Maior do que zero.
+    :param marketeer_id: Número do marketeer que fica responsável. Tem de
+        ter a conta ativa.
+    :return: O pedido, já aprovado e com o número da campanha criada.
+    :raises ErroValidacao: Se o pedido não existir ou já tiver sido decidido,
+        ou se algum dos valores não respeitar as regras. Nesse caso nada é criado.
+    """
+    pedido = _por_decidir(ligacao, identificador)
+    nome = validacao.nome(nome)
+    centimos = campanhas.budget_validado(budget)
+    marketeer = campanhas.marketeer_ativo(ligacao, marketeer_id)
+    campanha = campanhas_bd.criar(
+        ligacao, nome, pedido.objetivo, pedido.cliente_id, marketeer.id, None, pedido.prazo, centimos
+    )
+    pedido = pedidos.definir_estado(ligacao, pedido.id, modelos.APROVADO, campanha_id=campanha.id)
+    cliente = utilizadores.obter_por_id(ligacao, pedido.cliente_id)
+    correio.enviar(
+        cliente.email,
+        "O seu pedido de campanha foi aprovado",
+        f"Olá, {cliente.nome}.\n\n"
+        f"O seu pedido n.º {pedido.id} ({pedido.objetivo}) foi aprovado.\n"
+        f"Foi criada a campanha {campanha.nome}, com um budget inicial de {dinheiro.formatar(centimos)}.\n"
+        f"O marketeer responsável é {marketeer.nome}.",
+    )
+    campanhas.avisar_marketeer(marketeer, campanha)
+    return pedido
+
+
+def rejeitar(ligacao: sqlite3.Connection, identificador: int, motivo: str) -> PedidoCampanha:
+    """Rejeita um pedido, indicando o motivo. O cliente é avisado por email.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número do pedido.
+    :param motivo: Porque é que o pedido não avança. Obrigatório.
+    :return: O pedido, já rejeitado.
+    :raises ErroValidacao: Se o pedido não existir ou já tiver sido decidido,
+        ou se o motivo ficar vazio.
+    """
+    pedido = _por_decidir(ligacao, identificador)
+    motivo = motivo.strip()
+    if not motivo:
+        raise ErroValidacao("O motivo da rejeição não pode ficar vazio.")
+    pedido = pedidos.definir_estado(ligacao, pedido.id, modelos.REJEITADO, motivo_rejeicao=motivo)
+    cliente = utilizadores.obter_por_id(ligacao, pedido.cliente_id)
+    correio.enviar(
+        cliente.email,
+        "O seu pedido de campanha foi rejeitado",
+        f"Olá, {cliente.nome}.\n\n"
+        f"O seu pedido n.º {pedido.id} ({pedido.objetivo}) foi rejeitado.\n"
+        f"Motivo: {motivo}\n\n"
+        "Pode fazer um pedido novo quando quiser.",
+    )
+    return pedido

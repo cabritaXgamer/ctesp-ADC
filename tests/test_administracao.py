@@ -9,7 +9,7 @@ from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import campanhas as campanhas_bd
 from gestor_campanhas.repositorios import pedidos as pedidos_bd
 from gestor_campanhas.repositorios import utilizadores
-from gestor_campanhas.servicos import campanhas
+from gestor_campanhas.servicos import campanhas, pedidos
 from tests.conftest import PASSWORD_TESTE
 
 
@@ -161,3 +161,119 @@ def test_marketeers_disponiveis_sao_os_ativos_por_ordem_alfabetica(ligacao, cont
     utilizadores.definir_ativo(ligacao, marta.id, False)
 
     assert [marketeer.nome for marketeer in campanhas.marketeers_disponiveis(ligacao)] == ["Miguel Marketeer"]
+
+
+# --- decisão dos pedidos -----------------------------------------------------
+
+
+def test_administrador_ve_primeiro_os_pedidos_por_decidir(ligacao, contas, pedido):
+    carla = contas[modelos.CLIENTE]
+    segundo = pedidos_bd.criar(ligacao, carla.id, "Segundo", 1000, date(2026, 12, 1), ["Facebook"])
+    terceiro = pedidos_bd.criar(ligacao, carla.id, "Terceiro", 1000, date(2026, 12, 1), ["Facebook"])
+    pedidos_bd.definir_estado(ligacao, pedido.id, modelos.CANCELADO)
+    pedidos_bd.definir_estado(ligacao, segundo.id, modelos.EM_ANALISE)
+
+    assert [encontrado.id for encontrado in pedidos.listar_todos(ligacao)] == [segundo.id, terceiro.id, pedido.id]
+
+
+def test_analisar_poe_o_pedido_em_analise(ligacao, contas, pedido):
+    assert pedidos.analisar(ligacao, pedido.id).estado == modelos.EM_ANALISE
+    assert pedidos.analisar(ligacao, pedido.id).estado == modelos.EM_ANALISE
+
+    with pytest.raises(ErroValidacao, match="Só é possível cancelar um pedido pendente"):
+        pedidos.cancelar(ligacao, contas[modelos.CLIENTE], pedido.id)
+
+
+def test_analisar_nao_altera_um_pedido_ja_decidido(ligacao, pedido):
+    pedidos_bd.definir_estado(ligacao, pedido.id, modelos.CANCELADO)
+
+    assert pedidos.analisar(ligacao, pedido.id).estado == modelos.CANCELADO
+
+
+def test_analisar_pedido_que_nao_existe_da_erro(ligacao):
+    with pytest.raises(ErroValidacao, match="Não existe nenhum pedido com o número 999"):
+        pedidos.analisar(ligacao, 999)
+
+
+def test_aprovar_cria_a_campanha_e_avisa_o_cliente_e_o_marketeer(ligacao, contas, pedido, marta, emails):
+    aprovado = pedidos.aprovar(ligacao, pedido.id, " Natal 2026 ", "1200", marta.id)
+
+    assert aprovado.estado == modelos.APROVADO
+    campanha = campanhas.obter(ligacao, aprovado.campanha_id)
+    assert campanha.nome == "Natal 2026"
+    assert campanha.objetivo == "Vender mais"
+    assert campanha.cliente_id == contas[modelos.CLIENTE].id
+    assert campanha.marketeer_id == marta.id
+    assert campanha.budget_centimos == 120000
+    assert campanha.data_inicio is None
+    assert campanha.data_fim == date(2026, 12, 20)
+    textos = "\n".join(emails())
+    assert "Para: carla@empresa.pt" in textos
+    assert "Assunto: O seu pedido de campanha foi aprovado" in textos
+    assert "Foi criada a campanha Natal 2026, com um budget inicial de 1 200,00 €." in textos
+    assert "O marketeer responsável é Marta Marques." in textos
+    assert "Para: marta@agencia.pt" in textos
+    assert "Passou a ser responsável pela campanha Natal 2026, do cliente Carla Cliente." in textos
+
+
+@pytest.mark.parametrize(
+    ("nome", "budget", "mensagem"),
+    [("  ", "1200", "nome não pode ficar vazio"), ("Natal", "zero", "O valor não é válido"), ("Natal", "0", "maior do que zero")],
+)
+def test_aprovacao_com_dados_invalidos_nao_cria_nada(ligacao, pedido, marta, emails, nome, budget, mensagem):
+    with pytest.raises(ErroValidacao, match=mensagem):
+        pedidos.aprovar(ligacao, pedido.id, nome, budget, marta.id)
+
+    assert pedidos.obter(ligacao, pedido.id).estado == modelos.PENDENTE
+    assert campanhas.listar_todas(ligacao) == []
+    assert emails() == []
+
+
+def test_aprovacao_exige_um_marketeer_ativo(ligacao, pedido, marta):
+    utilizadores.definir_ativo(ligacao, marta.id, False)
+
+    with pytest.raises(ErroValidacao, match="Este marketeer tem a conta desativada"):
+        pedidos.aprovar(ligacao, pedido.id, "Natal", "1200", marta.id)
+
+    assert campanhas.listar_todas(ligacao) == []
+
+
+def test_rejeitar_guarda_o_motivo_e_avisa_o_cliente(ligacao, pedido, emails):
+    rejeitado = pedidos.rejeitar(ligacao, pedido.id, "  Orçamento insuficiente para o prazo ")
+
+    assert rejeitado.estado == modelos.REJEITADO
+    assert rejeitado.motivo_rejeicao == "Orçamento insuficiente para o prazo"
+    assert rejeitado.campanha_id is None
+    (aviso,) = emails()
+    assert "Para: carla@empresa.pt" in aviso
+    assert "Assunto: O seu pedido de campanha foi rejeitado" in aviso
+    assert "Motivo: Orçamento insuficiente para o prazo" in aviso
+    assert campanhas.listar_todas(ligacao) == []
+
+
+def test_rejeitar_sem_motivo_da_erro(ligacao, pedido, emails):
+    with pytest.raises(ErroValidacao, match="O motivo da rejeição não pode ficar vazio"):
+        pedidos.rejeitar(ligacao, pedido.id, "   ")
+
+    assert pedidos.obter(ligacao, pedido.id).estado == modelos.PENDENTE
+    assert emails() == []
+
+
+@pytest.mark.parametrize("estado", [modelos.APROVADO, modelos.REJEITADO, modelos.CANCELADO])
+def test_um_pedido_so_e_decidido_uma_vez(ligacao, pedido, marta, estado):
+    pedidos_bd.definir_estado(ligacao, pedido.id, estado)
+
+    with pytest.raises(ErroValidacao, match="Este pedido já não pode ser decidido"):
+        pedidos.aprovar(ligacao, pedido.id, "Natal", "1200", marta.id)
+    with pytest.raises(ErroValidacao, match="Este pedido já não pode ser decidido"):
+        pedidos.rejeitar(ligacao, pedido.id, "Motivo")
+
+
+def test_eliminar_a_campanha_nao_apaga_o_pedido_aprovado(ligacao, pedido, marta):
+    aprovado = pedidos.aprovar(ligacao, pedido.id, "Natal", "1200", marta.id)
+
+    campanhas.eliminar(ligacao, marta, aprovado.campanha_id)
+
+    depois = pedidos.obter(ligacao, pedido.id)
+    assert depois.estado == modelos.APROVADO
+    assert depois.campanha_id is None
