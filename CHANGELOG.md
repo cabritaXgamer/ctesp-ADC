@@ -2,6 +2,33 @@
 
 Todas as alterações relevantes da aplicação, por versão. Cada versão corresponde a uma fase do projeto.
 
+## v0.3.0 — Campanhas e pedidos de campanha (2026-11-17)
+
+### Acrescentado
+
+- Campanhas: o Marketeer cria campanhas para um cliente, edita o nome, o objetivo e as datas, vê os detalhes e elimina as suas campanhas, com pedido de confirmação.
+- Lista das campanhas atribuídas a cada marketeer, com o cliente, as datas, o budget e o estado (por começar, em curso ou terminada), calculado a partir das datas.
+- Pedidos de nova campanha: o Cliente indica o objetivo, o orçamento, o prazo e as plataformas, acompanha o estado de cada pedido e pode cancelar os que ainda estão pendentes.
+- Decisão dos pedidos pelo Administrador: ao aprovar, é criada a campanha, com o budget inicial e o marketeer responsável; ao rejeitar, é indicado o motivo. O cliente é avisado por email nos dois casos.
+- Opção "Campanhas" no menu do Administrador, com as campanhas de todos os marketeers, para definir o budget e atribuir o marketeer responsável. O marketeer é avisado por email.
+- Opção "Campanhas" no menu do Cliente, com o budget de cada campanha e os contactos do marketeer responsável.
+- Número de campanhas ativas de cada conta, nas listas de clientes e de marketeers.
+- Campanhas e pedidos de demonstração, criados com `python -m gestor_campanhas.dados_demo`.
+
+### Alterado
+
+- Um marketeer só pode ser desativado depois de as suas campanhas por terminar serem atribuídas a outro marketeer.
+- Os valores em euros são guardados em cêntimos, como números inteiros.
+- O menu do Administrador ganhou as opções "Pedidos de campanha" e "Campanhas", a seguir a "Marketeers".
+
+### User stories concluídas
+
+M02, M03, M04, M05, C05, C06, C07, C08, C09, A11, A12 e A13.
+
+Ficam também concluídas as partes de A04 (campanhas ativas de cada cliente) e de A10 (reatribuição das campanhas antes de desativar um marketeer) que tinham sido adiadas na versão 0.2.0.
+
+Três pontos dependem dos criativos e entram na versão 0.4.0: o budget restante e o número de criativos por estado, na lista do marketeer (M04), e a verificação de que uma campanha não tem criativos antes de ser eliminada (M05). Os pedidos de alteração de budget, referidos em C06, entram na versão 0.5.0.
+
 ## v0.2.0 — Clientes e marketeers (2026-11-16)
 
 ### Acrescentado
