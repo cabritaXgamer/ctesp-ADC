@@ -394,11 +394,41 @@ def mostrar_do_cliente(lista: list[Campanha]) -> None:
     print(f"\n{len(lista)} {'campanha' if len(lista) == 1 else 'campanhas'}.")
 
 
+def ver_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
+    """Pede o número de uma campanha do cliente e mostra os dados dela.
+
+    Além dos dados da campanha, mostra o nome e os contactos do marketeer
+    responsável, para o cliente saber a quem se dirigir.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    """
+    comum.titulo("Ver campanha")
+    numero = comum.ler_numero("Número da campanha (Enter para cancelar)")
+    if numero is None:
+        return
+    try:
+        campanha = campanhas.obter_do_cliente(ligacao, cliente, numero)
+    except ErroValidacao as erro:
+        print(f"\n{erro}")
+        comum.pausa()
+        return
+    marketeer = campanhas.responsavel(ligacao, campanha)
+    print()
+    mostrar_detalhes(campanha)
+    print("\nMarketeer responsável")
+    print(f"  Nome:      {marketeer.nome}")
+    print(f"  Email:     {marketeer.email}")
+    print(f"  Telefone:  {marketeer.telefone or '-'}")
+    comum.pausa()
+
+
 def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
     """Opção "Campanhas" do menu do Cliente.
 
-    Mostra as campanhas do cliente, com o budget de cada uma. O cliente não
-    altera nada aqui: o budget é definido pelo Administrador.
+    Mostra as campanhas do cliente, com o budget de cada uma, e deixa ver os
+    detalhes de cada campanha, com os contactos do marketeer responsável. O
+    cliente não altera nada aqui: o budget é definido pelo Administrador.
 
     :param ligacao: Ligação aberta à base de dados.
     :param utilizador: Cliente que está a usar o menu.
@@ -411,6 +441,7 @@ def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
             print("O budget de cada campanha é definido pelo administrador.")
         else:
             print('Ainda não tem campanhas. Pode pedir uma na opção "Pedidos de campanha".')
-        escolha = comum.escolher_opcao("Campanhas", [("0", "Voltar")])
+        escolha = comum.escolher_opcao("Campanhas", [("1", "Ver campanha e marketeer responsável"), ("0", "Voltar")])
         if escolha == "0":
             return
+        ver_do_cliente(ligacao, utilizador)

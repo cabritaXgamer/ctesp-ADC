@@ -127,3 +127,49 @@ def test_opcao_campanhas_esta_no_menu_do_cliente():
     opcoes = dict(perfis.OPCOES[modelos.CLIENTE])
 
     assert opcoes["Campanhas"] is menu.do_cliente
+
+
+# --- menu: detalhes e marketeer responsável ----------------------------------
+
+
+def test_menu_mostra_a_campanha_e_os_contactos_do_marketeer(teclado, ligacao, contas, natal, capsys):
+    teclado("1", str(natal.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert f"Campanha n.º {natal.id}" in saida
+    assert "  Objetivo:  Vender mais" in saida
+    assert "  Budget:    1 500,00 €" in saida
+    assert "Marketeer responsável" in saida
+    assert "  Nome:      Miguel Marketeer" in saida
+    assert "  Email:     miguel@agencia.pt" in saida
+    assert "  Telefone:  910000002" in saida
+
+
+def test_menu_mostra_um_traco_quando_o_marketeer_nao_tem_telefone(teclado, ligacao, contas, natal, capsys):
+    utilizadores.atualizar_dados(ligacao, natal.marketeer_id, "Miguel Marketeer", "", "", "")
+    teclado("1", str(natal.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "  Telefone:  -" in capsys.readouterr().out
+
+
+def test_menu_nao_mostra_campanhas_de_outro_cliente(teclado, ligacao, natal, jose, capsys):
+    teclado("1", str(natal.id), "", "0")
+
+    menu.do_cliente(ligacao, jose)
+
+    saida = capsys.readouterr().out
+    assert f"Não tem nenhuma campanha com o número {natal.id}." in saida
+    assert "Vender mais" not in saida
+    assert "miguel@agencia.pt" not in saida
+
+
+def test_menu_ver_campanha_pode_ser_cancelado_com_enter(teclado, ligacao, contas, natal, capsys):
+    teclado("1", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "Marketeer responsável" not in capsys.readouterr().out.split("Ver campanha\n")[-1]
