@@ -9,7 +9,7 @@ from __future__ import annotations
 import sqlite3
 
 from gestor_campanhas import modelos
-from gestor_campanhas.cli import admin, comum, conta, gestao
+from gestor_campanhas.cli import admin, campanhas, comum, conta, gestao
 from gestor_campanhas.servicos import sessoes
 from gestor_campanhas.servicos.sessoes import SessaoAtiva
 
@@ -29,7 +29,10 @@ OPCOES: dict[str, list] = {
         ("Horários de entrada e saída dos marketeers", admin.horarios),
         *OPCOES_DA_CONTA,
     ],
-    modelos.MARKETEER: [*OPCOES_DA_CONTA],
+    modelos.MARKETEER: [
+        ("Campanhas", campanhas.do_marketeer),
+        *OPCOES_DA_CONTA,
+    ],
     modelos.CLIENTE: [*OPCOES_DA_CONTA],
 }
 

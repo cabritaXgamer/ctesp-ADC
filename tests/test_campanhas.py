@@ -5,6 +5,8 @@ from datetime import date
 import pytest
 
 from gestor_campanhas import modelos, seguranca
+from gestor_campanhas.cli import campanhas as menu
+from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import campanhas as repositorio
 from gestor_campanhas.repositorios import utilizadores
@@ -204,3 +206,121 @@ def test_edicao_invalida_nao_altera_nada(ligacao, contas, natal, nome, inicio, f
         servico.editar(ligacao, contas[modelos.MARKETEER], natal.id, nome, "Mudou", inicio, fim)
 
     assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+# --- menu do marketeer -------------------------------------------------------
+
+
+def test_menu_avisa_quando_o_marketeer_nao_tem_campanhas(teclado, ligacao, contas, capsys):
+    teclado("0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    saida = capsys.readouterr().out
+    assert "As minhas campanhas" in saida
+    assert "Ainda não tem campanhas." in saida
+    assert "1. Criar campanha" in saida
+    assert "2. Editar campanha" in saida
+
+
+def test_menu_mostra_so_as_campanhas_do_marketeer(teclado, ligacao, contas, natal, marta, capsys):
+    servico.criar(ligacao, marta, "Saldos", "", contas[modelos.CLIENTE].id)
+    teclado("0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    saida = capsys.readouterr().out
+    assert "N.º  Nome   Cliente        Início      Fim" in saida
+    assert f"{natal.id}    Natal  Carla Cliente  2026-12-01  2026-12-24" in saida
+    assert "Saldos" not in saida
+    assert "1 campanha." in saida
+
+
+def test_menu_cria_campanha(teclado, ligacao, contas, capsys):
+    cliente, miguel = contas[modelos.CLIENTE], contas[modelos.MARKETEER]
+    teclado("1", str(cliente.id), "Natal", "Vender mais", "2026-12-01", "", "", "0")
+
+    menu.do_marketeer(ligacao, miguel)
+
+    saida = capsys.readouterr().out
+    (campanha,) = servico.listar_do_marketeer(ligacao, miguel)
+    assert f"Campanha criada com o número {campanha.id}, para Carla Cliente." in saida
+    assert campanha.nome == "Natal"
+    assert campanha.data_inicio == date(2026, 12, 1)
+    assert campanha.data_fim is None
+    assert "Natal  Carla Cliente  2026-12-01  -" in saida
+
+
+def test_menu_criar_mostra_os_clientes_ativos(teclado, ligacao, contas, jose, capsys):
+    utilizadores.definir_ativo(ligacao, contas[modelos.CLIENTE].id, False)
+    teclado("1", "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    saida = capsys.readouterr().out
+    assert "José Padeiro  Padaria Central, Lda." in saida
+    assert "Carla Cliente" not in saida
+    assert servico.listar_do_marketeer(ligacao, contas[modelos.MARKETEER]) == []
+
+
+def test_menu_criar_avisa_quando_nao_ha_clientes(teclado, ligacao, capsys):
+    miguel = utilizadores.criar(ligacao, "Miguel", "miguel@agencia.pt", "x", modelos.MARKETEER)
+    teclado("1", "", "0")
+
+    menu.do_marketeer(ligacao, miguel)
+
+    assert "Ainda não há clientes com a conta ativa." in capsys.readouterr().out
+
+
+def test_menu_criar_mostra_o_erro_e_nao_cria(teclado, ligacao, contas, capsys):
+    miguel = contas[modelos.MARKETEER]
+    teclado("1", str(contas[modelos.CLIENTE].id), "Natal", "", "2026-12-24", "2026-12-01", "", "0")
+
+    menu.do_marketeer(ligacao, miguel)
+
+    assert "A data de fim não pode ser anterior à data de início. A campanha não foi criada." in capsys.readouterr().out
+    assert servico.listar_do_marketeer(ligacao, miguel) == []
+
+
+def test_menu_edita_campanha_mantendo_o_que_fica_em_branco(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    teclado("2", str(natal.id), "Natal 2026", "", "", "-", "", "0")
+
+    menu.do_marketeer(ligacao, miguel)
+
+    saida = capsys.readouterr().out
+    alterada = servico.obter_do_marketeer(ligacao, miguel, natal.id)
+    assert "A editar a campanha Natal, de Carla Cliente." in saida
+    assert "Campanha guardada." in saida
+    assert alterada.nome == "Natal 2026"
+    assert alterada.objetivo == "Vender mais"
+    assert alterada.data_inicio == date(2026, 12, 1)
+    assert alterada.data_fim is None
+
+
+def test_menu_editar_recusa_campanha_de_outro_marketeer(teclado, ligacao, contas, natal, marta, capsys):
+    teclado("2", str(natal.id), "", "0")
+
+    menu.do_marketeer(ligacao, marta)
+
+    assert f"Não tem nenhuma campanha com o número {natal.id}." in capsys.readouterr().out
+
+
+def test_menu_editar_mostra_o_erro_e_nao_altera(teclado, ligacao, contas, natal, capsys):
+    teclado("2", str(natal.id), "", "", "2027-01-01", "", "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    assert "A campanha não foi alterada." in capsys.readouterr().out
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+def test_data_e_mostrada_com_um_traco_quando_nao_existe():
+    assert menu.data(date(2026, 12, 1)) == "2026-12-01"
+    assert menu.data(None) == "-"
+
+
+def test_opcao_campanhas_esta_no_menu_do_marketeer():
+    descricoes = [descricao for descricao, _ in perfis.OPCOES[modelos.MARKETEER]]
+
+    assert descricoes[0] == "Campanhas"
