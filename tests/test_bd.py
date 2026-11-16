@@ -84,3 +84,14 @@ def test_campanha_tem_de_ter_um_cliente_que_existe(ligacao):
             "INSERT INTO campanhas (nome, cliente_id, marketeer_id, criada_em) "
             "VALUES ('Natal', 999, 999, '2026-11-16 10:00:00')"
         )
+
+
+def test_pedido_de_campanha_so_aceita_os_estados_previstos(ligacao, contas):
+    cliente = contas["cliente"]
+
+    with pytest.raises(sqlite3.IntegrityError):
+        ligacao.execute(
+            "INSERT INTO pedidos_campanha (cliente_id, objetivo, orcamento_centimos, prazo, estado, criado_em) "
+            "VALUES (?, 'Vender', 1000, '2026-12-01', 'perdido', '2026-11-16 10:00:00')",
+            (cliente.id,),
+        )

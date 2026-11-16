@@ -67,6 +67,11 @@ Campanhas
 
 .. automodule:: gestor_campanhas.repositorios.campanhas
 
+Pedidos de campanha
+~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.repositorios.pedidos
+
 Serviços
 --------
 
@@ -112,6 +117,11 @@ Campanhas
 
 .. automodule:: gestor_campanhas.servicos.campanhas
 
+Pedidos de campanha
+~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.servicos.pedidos
+
 Dados de demonstração
 ---------------------
 
@@ -151,6 +161,11 @@ Campanhas do Marketeer
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: gestor_campanhas.cli.campanhas
+
+Pedidos de campanha do Cliente
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.cli.pedidos
 
 Opções da conta
 ~~~~~~~~~~~~~~~

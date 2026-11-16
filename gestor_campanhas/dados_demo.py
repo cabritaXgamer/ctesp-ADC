@@ -1,7 +1,7 @@
 """Dados de demonstração.
 
-Cria um administrador, dois marketeers, três clientes e três campanhas, para
-se poder experimentar a aplicação logo a seguir a instalá-la. Corre-se a
+Cria um administrador, dois marketeers, três clientes, três campanhas e dois
+pedidos de campanha, para se poder experimentar a aplicação logo a seguir a instalá-la. Corre-se a
 partir da pasta do projeto com::
 
     python -m gestor_campanhas.dados_demo
@@ -19,7 +19,7 @@ from datetime import date
 
 from gestor_campanhas import bd, modelos, seguranca
 from gestor_campanhas.cli import comum
-from gestor_campanhas.repositorios import campanhas, utilizadores
+from gestor_campanhas.repositorios import campanhas, pedidos, utilizadores
 
 #: Contas de demonstração: pelo menos uma de cada perfil.
 CONTAS = [
@@ -105,6 +105,25 @@ CAMPANHAS = [
     },
 ]
 
+#: Pedidos de campanha de demonstração, todos pendentes. O cliente é indicado
+#: pelo email da conta de :data:`CONTAS`. O orçamento está em cêntimos.
+PEDIDOS = [
+    {
+        "cliente": "jose@padaria.pt",
+        "objetivo": "Divulgar o bolo-rei no Natal",
+        "orcamento": 60000,
+        "prazo": date(2026, 12, 15),
+        "plataformas": ["Facebook", "Instagram"],
+    },
+    {
+        "cliente": "beatriz@bicicletas.pt",
+        "objetivo": "Dar a conhecer a loja nova de Faro",
+        "orcamento": 120000,
+        "prazo": date(2027, 2, 28),
+        "plataformas": ["Instagram", "Google Ads"],
+    },
+]
+
 
 def criar_contas(ligacao: sqlite3.Connection) -> list[str]:
     """Cria as contas de demonstração que ainda não existem.
@@ -160,8 +179,30 @@ def criar_campanhas(ligacao: sqlite3.Connection) -> list[str]:
     return criadas
 
 
+def criar_pedidos(ligacao: sqlite3.Connection) -> list[str]:
+    """Cria os pedidos de campanha de demonstração que ainda não existem.
+
+    As contas de demonstração têm de existir (ver :func:`criar_contas`). Um
+    pedido já existe quando o cliente dele tem um pedido com o mesmo objetivo.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Objetivos dos pedidos criados nesta chamada.
+    """
+    criados = []
+    for pedido in PEDIDOS:
+        cliente = utilizadores.obter_por_email(ligacao, pedido["cliente"])
+        existentes = [existente.objetivo for existente in pedidos.listar_por_cliente(ligacao, cliente.id)]
+        if pedido["objetivo"] in existentes:
+            continue
+        pedidos.criar(
+            ligacao, cliente.id, pedido["objetivo"], pedido["orcamento"], pedido["prazo"], pedido["plataformas"]
+        )
+        criados.append(pedido["objetivo"])
+    return criados
+
+
 def main() -> int:
-    """Cria as contas e as campanhas e mostra as credenciais de cada conta.
+    """Cria as contas, as campanhas e os pedidos e mostra as credenciais de cada conta.
 
     :return: Código de saída do processo (``0`` quando termina sem erros).
     """
@@ -170,10 +211,12 @@ def main() -> int:
     try:
         criadas = criar_contas(ligacao)
         campanhas_criadas = criar_campanhas(ligacao)
+        pedidos_criados = criar_pedidos(ligacao)
     finally:
         ligacao.close()
     print(f"Contas criadas: {len(criadas)} (as restantes já existiam).")
     print(f"Campanhas criadas: {len(campanhas_criadas)} (as restantes já existiam).")
+    print(f"Pedidos de campanha criados: {len(pedidos_criados)} (os restantes já existiam).")
     print()
     print("Contas de demonstração:")
     for conta in CONTAS:
