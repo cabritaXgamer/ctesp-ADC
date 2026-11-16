@@ -13,7 +13,7 @@ from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import campanhas as campanhas_bd
 from gestor_campanhas.repositorios import pedidos as pedidos_bd
 from gestor_campanhas.repositorios import utilizadores
-from gestor_campanhas.servicos import campanhas, pedidos
+from gestor_campanhas.servicos import campanhas, gestao, pedidos
 from tests.conftest import PASSWORD_TESTE
 
 
@@ -544,3 +544,54 @@ def test_lista_de_marketeers_mostra_as_campanhas_ativas(teclado, ligacao, contas
     saida = capsys.readouterr().out
     assert "marta@agencia.pt             Ativa   1" in saida
     assert "miguel@agencia.pt            Ativa   1" in saida
+
+
+# --- desativar um marketeer com campanhas ------------------------------------
+
+
+def test_marketeer_com_campanhas_por_terminar_nao_pode_ser_desativado(ligacao, contas, natal, emails):
+    miguel = contas[modelos.MARKETEER]
+
+    with pytest.raises(ErroValidacao, match="Miguel Marketeer é responsável por 1 campanha que ainda não terminou"):
+        gestao.definir_estado(ligacao, modelos.MARKETEER, miguel.id, False)
+
+    assert utilizadores.obter_por_id(ligacao, miguel.id).ativo
+    assert emails() == []
+
+
+def test_mensagem_diz_quantas_campanhas_faltam_reatribuir(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    campanhas_bd.criar(ligacao, "Saldos", "", contas[modelos.CLIENTE].id, miguel.id)
+
+    with pytest.raises(ErroValidacao, match="por 2 campanhas que ainda não terminaram. Atribua-as a outro marketeer"):
+        gestao.definir_estado(ligacao, modelos.MARKETEER, miguel.id, False)
+
+
+def test_marketeer_pode_ser_desativado_depois_de_reatribuir_as_campanhas(ligacao, contas, natal, marta):
+    miguel = contas[modelos.MARKETEER]
+    campanhas.atribuir_marketeer(ligacao, natal.id, marta.id)
+
+    assert not gestao.definir_estado(ligacao, modelos.MARKETEER, miguel.id, False).ativo
+
+
+def test_campanhas_terminadas_nao_impedem_a_desativacao(ligacao, contas):
+    miguel = contas[modelos.MARKETEER]
+    campanhas_bd.criar(ligacao, "Verão", "", contas[modelos.CLIENTE].id, miguel.id, None, date(2026, 8, 31))
+
+    assert not gestao.definir_estado(ligacao, modelos.MARKETEER, miguel.id, False).ativo
+
+
+def test_cliente_com_campanhas_pode_ser_desativado(ligacao, contas, natal):
+    assert not gestao.definir_estado(ligacao, modelos.CLIENTE, contas[modelos.CLIENTE].id, False).ativo
+
+
+def test_menu_explica_porque_nao_desativa_o_marketeer(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    teclado("4", str(miguel.id), "s", "", "0")
+
+    menu_gestao.marketeers(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "Atribua-as a outro marketeer antes de desativar a conta. Nada foi alterado." in saida
+    assert "Conta desativada." not in saida
+    assert utilizadores.obter_por_id(ligacao, miguel.id).ativo

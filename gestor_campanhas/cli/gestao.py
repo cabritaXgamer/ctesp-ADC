@@ -161,12 +161,16 @@ def alterar_estado(ligacao: sqlite3.Connection, perfil: str) -> None:
     print(f"\n{conta.nome} ({conta.email}) tem a conta {estado(conta).lower()}.")
     if conta.ativo:
         print("Com a conta desativada, deixa de poder entrar. Os dados e o histórico mantêm-se.")
-    if comum.confirmar("Desativar a conta?" if conta.ativo else "Reativar a conta?"):
-        gestao.definir_estado(ligacao, perfil, conta.id, not conta.ativo)
-        print("\nConta desativada." if conta.ativo else "\nConta reativada.")
-        print(f"Foi enviado um aviso para {conta.email}.")
-    else:
+    if not comum.confirmar("Desativar a conta?" if conta.ativo else "Reativar a conta?"):
         print("\nNada foi alterado.")
+    else:
+        try:
+            gestao.definir_estado(ligacao, perfil, conta.id, not conta.ativo)
+        except ErroValidacao as erro:
+            print(f"\n{erro} Nada foi alterado.")
+        else:
+            print("\nConta desativada." if conta.ativo else "\nConta reativada.")
+            print(f"Foi enviado um aviso para {conta.email}.")
     comum.pausa()
 
 
