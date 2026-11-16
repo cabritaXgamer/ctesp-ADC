@@ -5,8 +5,10 @@ from datetime import date
 import pytest
 
 from gestor_campanhas import modelos, seguranca
+from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import campanhas as repositorio
 from gestor_campanhas.repositorios import utilizadores
+from gestor_campanhas.servicos import campanhas as servico
 from tests.conftest import PASSWORD_TESTE
 
 
@@ -87,3 +89,71 @@ def test_repositorio_atualiza_os_dados_e_apaga_as_datas(ligacao, contas):
     assert alterada.objetivo == "Novo objetivo"
     assert alterada.data_inicio is None
     assert alterada.data_fim == date(2026, 12, 31)
+
+
+# --- criar -------------------------------------------------------------------
+
+
+def test_marketeer_cria_campanha_e_fica_responsavel(ligacao, contas):
+    cliente, miguel = contas[modelos.CLIENTE], contas[modelos.MARKETEER]
+
+    campanha = servico.criar(ligacao, miguel, "  Natal ", " Vender mais ", cliente.id, "2026-12-01", "2026-12-24")
+
+    assert campanha.nome == "Natal"
+    assert campanha.objetivo == "Vender mais"
+    assert campanha.cliente_id == cliente.id
+    assert campanha.marketeer_id == miguel.id
+    assert campanha.data_inicio == date(2026, 12, 1)
+    assert campanha.data_fim == date(2026, 12, 24)
+    assert campanha.budget_centimos is None
+    assert servico.listar_do_marketeer(ligacao, miguel) == [campanha]
+
+
+def test_campanha_pode_ser_criada_so_com_nome_e_cliente(ligacao, contas):
+    campanha = servico.criar(ligacao, contas[modelos.MARKETEER], "Natal", "", contas[modelos.CLIENTE].id)
+
+    assert campanha.objetivo == ""
+    assert campanha.data_inicio is None
+    assert campanha.data_fim is None
+
+
+@pytest.mark.parametrize(
+    ("nome", "inicio", "fim", "mensagem"),
+    [
+        ("   ", "", "", "nome não pode ficar vazio"),
+        ("Natal", "1 de dezembro", "", "A data de início não é válida"),
+        ("Natal", "", "2026-13-01", "A data de fim não é válida"),
+        ("Natal", "2026-12-24", "2026-12-01", "não pode ser anterior"),
+    ],
+)
+def test_campanha_com_dados_invalidos_nao_e_criada(ligacao, contas, nome, inicio, fim, mensagem):
+    miguel = contas[modelos.MARKETEER]
+
+    with pytest.raises(ErroValidacao, match=mensagem):
+        servico.criar(ligacao, miguel, nome, "", contas[modelos.CLIENTE].id, inicio, fim)
+
+    assert servico.listar_do_marketeer(ligacao, miguel) == []
+
+
+def test_campanha_so_pode_ser_criada_para_um_cliente(ligacao, contas):
+    miguel = contas[modelos.MARKETEER]
+
+    with pytest.raises(ErroValidacao, match="Não existe nenhum cliente com o número 999"):
+        servico.criar(ligacao, miguel, "Natal", "", 999)
+    with pytest.raises(ErroValidacao, match="Não existe nenhum cliente"):
+        servico.criar(ligacao, miguel, "Natal", "", contas[modelos.ADMINISTRADOR].id)
+
+
+def test_campanha_nao_pode_ser_criada_para_cliente_desativado(ligacao, contas):
+    cliente = contas[modelos.CLIENTE]
+    utilizadores.definir_ativo(ligacao, cliente.id, False)
+
+    with pytest.raises(ErroValidacao, match="conta desativada"):
+        servico.criar(ligacao, contas[modelos.MARKETEER], "Natal", "", cliente.id)
+
+
+def test_clientes_disponiveis_sao_os_ativos_por_ordem_alfabetica(ligacao, contas, jose):
+    utilizadores.criar(ligacao, "Beatriz Lopes", "beatriz@bicicletas.pt", "x", modelos.CLIENTE)
+    utilizadores.definir_ativo(ligacao, jose.id, False)
+
+    assert [cliente.nome for cliente in servico.clientes_disponiveis(ligacao)] == ["Beatriz Lopes", "Carla Cliente"]
