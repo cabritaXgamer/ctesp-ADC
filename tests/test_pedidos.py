@@ -246,3 +246,74 @@ def test_opcao_pedidos_esta_no_menu_do_cliente():
     descricoes = [descricao for descricao, _ in perfis.OPCOES[modelos.CLIENTE]]
 
     assert descricoes[0] == "Pedidos de campanha"
+
+
+# --- menu do cliente: ver e cancelar -----------------------------------------
+
+
+def test_menu_mostra_os_detalhes_de_um_pedido(teclado, ligacao, contas, pedido, capsys):
+    teclado("2", str(pedido.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert f"Pedido n.º {pedido.id}" in saida
+    assert "  Feito em:     2026-11-16 10:00" in saida
+    assert "  Objetivo:     Vender mais" in saida
+    assert "  Orçamento:    1 500,00 €" in saida
+    assert "  Prazo:        2026-12-20" in saida
+    assert "  Plataformas:  Facebook, Instagram" in saida
+    assert "  Estado:       Pendente" in saida
+    assert "Motivo:" not in saida
+    assert "Campanha:" not in saida
+
+
+def test_detalhes_de_um_pedido_rejeitado_mostram_o_motivo(ligacao, pedido, capsys):
+    rejeitado = repositorio.definir_estado(ligacao, pedido.id, modelos.REJEITADO, "Orçamento insuficiente")
+
+    menu.mostrar_detalhes(rejeitado)
+
+    saida = capsys.readouterr().out
+    assert "  Estado:       Rejeitado" in saida
+    assert "  Motivo:       Orçamento insuficiente" in saida
+
+
+def test_menu_nao_mostra_pedidos_de_outro_cliente(teclado, ligacao, pedido, jose, capsys):
+    teclado("2", str(pedido.id), "", "0")
+
+    menu.do_cliente(ligacao, jose)
+
+    saida = capsys.readouterr().out
+    assert f"Não tem nenhum pedido com o número {pedido.id}." in saida
+    assert "Vender mais" not in saida
+
+
+def test_menu_cancela_um_pedido_depois_de_confirmar(teclado, ligacao, contas, pedido, capsys):
+    teclado("3", str(pedido.id), "s", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Pedido cancelado." in saida
+    assert "2026-12-20  Cancelado" in saida
+    assert repositorio.obter_por_id(ligacao, pedido.id).estado == modelos.CANCELADO
+
+
+def test_menu_nao_cancela_sem_confirmacao(teclado, ligacao, contas, pedido, capsys):
+    teclado("3", str(pedido.id), "n", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "Nada foi alterado." in capsys.readouterr().out
+    assert repositorio.obter_por_id(ligacao, pedido.id).estado == modelos.PENDENTE
+
+
+def test_menu_nao_pede_confirmacao_quando_o_pedido_ja_nao_esta_pendente(teclado, ligacao, contas, pedido, capsys):
+    repositorio.definir_estado(ligacao, pedido.id, modelos.EM_ANALISE)
+    teclado("3", str(pedido.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Só é possível cancelar um pedido pendente. Este pedido está no estado Em análise." in saida
+    assert "Cancelar este pedido?" not in saida

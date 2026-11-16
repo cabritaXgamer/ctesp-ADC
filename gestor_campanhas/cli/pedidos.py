@@ -88,11 +88,94 @@ def novo(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
     comum.pausa()
 
 
+def mostrar_detalhes(pedido: PedidoCampanha) -> None:
+    """Mostra todos os dados de um pedido, um por linha.
+
+    O motivo só aparece nos pedidos rejeitados e o número da campanha só
+    aparece nos aprovados.
+
+    :param pedido: Pedido a mostrar.
+    """
+    print(f"Pedido n.º {pedido.id}")
+    print(f"  Feito em:     {pedido.criado_em.strftime('%Y-%m-%d %H:%M')}")
+    print(f"  Objetivo:     {pedido.objetivo}")
+    print(f"  Orçamento:    {dinheiro.formatar(pedido.orcamento_centimos)}")
+    print(f"  Prazo:        {pedido.prazo.isoformat()}")
+    print(f"  Plataformas:  {', '.join(pedido.plataformas)}")
+    print(f"  Estado:       {pedido.nome_estado}")
+    if pedido.estado == modelos.REJEITADO:
+        print(f"  Motivo:       {pedido.motivo_rejeicao}")
+    if pedido.campanha_id is not None:
+        print(f"  Campanha:     n.º {pedido.campanha_id}")
+
+
+def pedir_pedido(ligacao: sqlite3.Connection, cliente: Utilizador) -> PedidoCampanha | None:
+    """Pede o número de um pedido do cliente e devolve-o.
+
+    Se o número não for de um pedido dele, mostra o erro e espera por Enter.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a usar o menu.
+    :return: O pedido, ou ``None`` se foi cancelado com Enter ou o número não serve.
+    """
+    numero = comum.ler_numero("Número do pedido (Enter para cancelar)")
+    if numero is None:
+        return None
+    try:
+        return pedidos.obter_do_cliente(ligacao, cliente, numero)
+    except ErroValidacao as erro:
+        print(f"\n{erro}")
+        comum.pausa()
+        return None
+
+
+def ver(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
+    """Pede o número de um pedido e mostra todos os dados dele.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    """
+    comum.titulo("Ver pedido")
+    pedido = pedir_pedido(ligacao, cliente)
+    if pedido is None:
+        return
+    print()
+    mostrar_detalhes(pedido)
+    comum.pausa()
+
+
+def cancelar(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
+    """Pede o número de um pedido e cancela-o, depois de pedir confirmação.
+
+    Só um pedido pendente pode ser cancelado.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a cancelar.
+    """
+    comum.titulo("Cancelar pedido")
+    pedido = pedir_pedido(ligacao, cliente)
+    if pedido is None:
+        return
+    print()
+    mostrar_detalhes(pedido)
+    print()
+    if pedido.estado != modelos.PENDENTE:
+        print(f"Só é possível cancelar um pedido pendente. Este pedido está no estado {pedido.nome_estado}.")
+    elif comum.confirmar("Cancelar este pedido?"):
+        pedidos.cancelar(ligacao, cliente, pedido.id)
+        print("\nPedido cancelado.")
+    else:
+        print("\nNada foi alterado.")
+    comum.pausa()
+
+
 #: Opções do menu de pedidos do Cliente. Cada opção é um par
 #: ``(descrição, função)``; a função recebe a ligação à base de dados e o
 #: cliente.
 ACOES = [
     ("Novo pedido", novo),
+    ("Ver pedido", ver),
+    ("Cancelar pedido", cancelar),
 ]
 
 
