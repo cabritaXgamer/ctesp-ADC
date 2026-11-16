@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 import pytest
 
-from gestor_campanhas import modelos, relogio, seguranca
+from gestor_campanhas import dados_demo, modelos, relogio, seguranca
 from gestor_campanhas.cli import campanhas as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -473,3 +473,28 @@ def test_menu_eliminar_pode_ser_cancelado_com_enter(teclado, ligacao, contas, na
     menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
 
     assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+# --- dados de demonstração ---------------------------------------------------
+
+
+def test_dados_demo_criam_campanhas_para_os_dois_marketeers(ligacao):
+    dados_demo.criar_contas(ligacao)
+
+    criadas = dados_demo.criar_campanhas(ligacao)
+
+    assert criadas == ["Natal 2026", "Regresso às aulas", "Bicicletas de primavera"]
+    miguel = utilizadores.obter_por_email(ligacao, "marketeer@agencia.pt")
+    marta = utilizadores.obter_por_email(ligacao, "marta@agencia.pt")
+    natal, aulas = servico.listar_do_marketeer(ligacao, miguel)
+    assert natal.cliente_nome == "Carla Cliente"
+    assert natal.budget_centimos == 150000
+    assert aulas.cliente_nome == "José Padeiro"
+    assert nomes(servico.listar_do_marketeer(ligacao, marta)) == ["Bicicletas de primavera"]
+
+
+def test_dados_demo_nao_repetem_campanhas(ligacao):
+    dados_demo.criar_contas(ligacao)
+    dados_demo.criar_campanhas(ligacao)
+
+    assert dados_demo.criar_campanhas(ligacao) == []
