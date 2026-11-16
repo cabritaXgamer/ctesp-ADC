@@ -1,4 +1,6 @@
-"""Testes das validações dos dados de uma conta."""
+"""Testes das validações dos dados escritos pelo utilizador."""
+
+from datetime import date
 
 import pytest
 
@@ -56,3 +58,28 @@ def test_nif_vazio_ou_com_nove_algarismos():
 def test_nif_invalido_da_erro(escrito):
     with pytest.raises(ErroValidacao, match="9 algarismos"):
         validacao.nif(escrito)
+
+
+def test_data_valida_e_convertida():
+    assert validacao.data(" 2026-12-24 ") == date(2026, 12, 24)
+
+
+def test_data_vazia_fica_sem_valor():
+    assert validacao.data("   ") is None
+
+
+@pytest.mark.parametrize("escrito", ["24-12-2026", "2026/12/24", "2026-02-30", "amanhã"])
+def test_data_invalida_da_erro_com_o_nome_do_campo(escrito):
+    with pytest.raises(ErroValidacao, match="A data de fim não é válida"):
+        validacao.data(escrito, "data de fim")
+
+
+def test_periodo_aceita_datas_iguais_e_datas_em_falta():
+    validacao.periodo(date(2026, 12, 1), date(2026, 12, 1))
+    validacao.periodo(None, date(2026, 12, 1))
+    validacao.periodo(date(2026, 12, 1), None)
+
+
+def test_periodo_que_acaba_antes_de_comecar_da_erro():
+    with pytest.raises(ErroValidacao, match="não pode ser anterior"):
+        validacao.periodo(date(2026, 12, 2), date(2026, 12, 1))

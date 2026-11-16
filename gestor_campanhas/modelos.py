@@ -2,12 +2,15 @@
 
 Cada classe representa uma linha de uma tabela da base de dados, já com os
 valores nos tipos certos do Python.
+
+Os valores em dinheiro são guardados em cêntimos, como números inteiros, para
+as contas darem sempre certo: ``150050`` são 1500,50 €.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 
 #: Perfil de quem gere a plataforma.
 ADMINISTRADOR = "administrador"
@@ -75,3 +78,32 @@ class Sessao:
     entrada: datetime
     saida: datetime | None = None
     motivo_saida: str | None = None
+
+
+@dataclass
+class Campanha:
+    """Uma campanha de marketing de um cliente.
+
+    :param id: Identificador na base de dados.
+    :param nome: Nome da campanha.
+    :param objetivo: O que se pretende com a campanha. Pode estar vazio.
+    :param cliente_id: Identificador do cliente a quem a campanha pertence.
+    :param marketeer_id: Identificador do marketeer responsável.
+    :param budget_centimos: Budget atribuído, em cêntimos, ou ``None`` se o
+        Administrador ainda não o definiu.
+    :param data_inicio: Primeiro dia da campanha, ou ``None`` se não foi indicado.
+    :param data_fim: Último dia da campanha, ou ``None`` se não foi indicado.
+    :param cliente_nome: Nome do cliente, para mostrar nas listas.
+    :param marketeer_nome: Nome do marketeer responsável, para mostrar nas listas.
+    """
+
+    id: int
+    nome: str
+    objetivo: str
+    cliente_id: int
+    marketeer_id: int
+    budget_centimos: int | None = None
+    data_inicio: date | None = None
+    data_fim: date | None = None
+    cliente_nome: str = ""
+    marketeer_nome: str = ""
