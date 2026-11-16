@@ -4,7 +4,7 @@ from datetime import date, datetime
 
 import pytest
 
-from gestor_campanhas import modelos, relogio, seguranca
+from gestor_campanhas import dados_demo, modelos, relogio, seguranca
 from gestor_campanhas.cli import pedidos as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -317,3 +317,26 @@ def test_menu_nao_pede_confirmacao_quando_o_pedido_ja_nao_esta_pendente(teclado,
     saida = capsys.readouterr().out
     assert "Só é possível cancelar um pedido pendente. Este pedido está no estado Em análise." in saida
     assert "Cancelar este pedido?" not in saida
+
+
+# --- dados de demonstração ---------------------------------------------------
+
+
+def test_dados_demo_criam_pedidos_pendentes(ligacao):
+    dados_demo.criar_contas(ligacao)
+
+    criados = dados_demo.criar_pedidos(ligacao)
+
+    assert criados == ["Divulgar o bolo-rei no Natal", "Dar a conhecer a loja nova de Faro"]
+    jose = utilizadores.obter_por_email(ligacao, "jose@padaria.pt")
+    (pedido_do_jose,) = servico.listar_do_cliente(ligacao, jose)
+    assert pedido_do_jose.estado == modelos.PENDENTE
+    assert pedido_do_jose.orcamento_centimos == 60000
+    assert pedido_do_jose.plataformas == ["Facebook", "Instagram"]
+
+
+def test_dados_demo_nao_repetem_pedidos(ligacao):
+    dados_demo.criar_contas(ligacao)
+    dados_demo.criar_pedidos(ligacao)
+
+    assert dados_demo.criar_pedidos(ligacao) == []
