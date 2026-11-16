@@ -114,3 +114,50 @@ def test_administrador_ve_as_campanhas_de_todos_os_marketeers(ligacao, contas, n
     saldos = campanhas_bd.criar(ligacao, "Saldos", "", contas[modelos.CLIENTE].id, marta.id)
 
     assert campanhas.listar_todas(ligacao) == [natal, saldos]
+
+
+# --- marketeer responsável ---------------------------------------------------
+
+
+def test_administrador_atribui_a_campanha_a_outro_marketeer(ligacao, contas, natal, marta, emails):
+    alterada = campanhas.atribuir_marketeer(ligacao, natal.id, marta.id)
+
+    assert alterada.marketeer_id == marta.id
+    assert campanhas.listar_do_marketeer(ligacao, marta) == [alterada]
+    assert campanhas.listar_do_marketeer(ligacao, contas[modelos.MARKETEER]) == []
+    (aviso,) = emails()
+    assert "Para: marta@agencia.pt" in aviso
+    assert "Assunto: Foi-lhe atribuída uma campanha" in aviso
+    assert "Passou a ser responsável pela campanha Natal, do cliente Carla Cliente." in aviso
+
+
+def test_atribuir_ao_marketeer_que_ja_e_responsavel_da_erro(ligacao, contas, natal, emails):
+    with pytest.raises(ErroValidacao, match="Miguel Marketeer já é responsável por esta campanha"):
+        campanhas.atribuir_marketeer(ligacao, natal.id, contas[modelos.MARKETEER].id)
+
+    assert emails() == []
+
+
+def test_campanha_so_pode_ser_atribuida_a_um_marketeer_ativo(ligacao, contas, natal, marta, emails):
+    utilizadores.definir_ativo(ligacao, marta.id, False)
+
+    with pytest.raises(ErroValidacao, match="Este marketeer tem a conta desativada"):
+        campanhas.atribuir_marketeer(ligacao, natal.id, marta.id)
+    with pytest.raises(ErroValidacao, match="Não existe nenhum marketeer com o número"):
+        campanhas.atribuir_marketeer(ligacao, natal.id, contas[modelos.CLIENTE].id)
+    with pytest.raises(ErroValidacao, match="Não existe nenhum marketeer com o número 999"):
+        campanhas.atribuir_marketeer(ligacao, natal.id, 999)
+
+    assert campanhas.obter(ligacao, natal.id) == natal
+    assert emails() == []
+
+
+def test_marketeers_disponiveis_sao_os_ativos_por_ordem_alfabetica(ligacao, contas, marta):
+    assert [marketeer.nome for marketeer in campanhas.marketeers_disponiveis(ligacao)] == [
+        "Marta Marques",
+        "Miguel Marketeer",
+    ]
+
+    utilizadores.definir_ativo(ligacao, marta.id, False)
+
+    assert [marketeer.nome for marketeer in campanhas.marketeers_disponiveis(ligacao)] == ["Miguel Marketeer"]

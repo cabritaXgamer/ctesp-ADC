@@ -14,7 +14,7 @@ from gestor_campanhas import dinheiro, modelos, relogio
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Campanha, Utilizador
 from gestor_campanhas.repositorios import campanhas, utilizadores
-from gestor_campanhas.servicos import gestao, validacao
+from gestor_campanhas.servicos import correio, gestao, validacao
 
 
 def clientes_disponiveis(ligacao: sqlite3.Connection) -> list[Utilizador]:
@@ -203,3 +203,66 @@ def definir_budget(ligacao: sqlite3.Connection, identificador: int, valor: str) 
     """
     campanha = obter(ligacao, identificador)
     return campanhas.definir_budget(ligacao, campanha.id, budget_validado(valor))
+
+
+def marketeers_disponiveis(ligacao: sqlite3.Connection) -> list[Utilizador]:
+    """Lista os marketeers a quem se pode atribuir uma campanha.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Marketeers com a conta ativa, por ordem alfabética do nome.
+    """
+    return [marketeer for marketeer in gestao.listar(ligacao, modelos.MARKETEER) if marketeer.ativo]
+
+
+def marketeer_ativo(ligacao: sqlite3.Connection, identificador: int) -> Utilizador:
+    """Procura um marketeer pelo número, confirmando que tem a conta ativa.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número do marketeer.
+    :return: O marketeer.
+    :raises ErroValidacao: Se não existir um marketeer com esse número ou se
+        tiver a conta desativada.
+    """
+    marketeer = utilizadores.obter_por_id(ligacao, identificador)
+    if marketeer is None or marketeer.perfil != modelos.MARKETEER:
+        raise ErroValidacao(f"Não existe nenhum marketeer com o número {identificador}.")
+    if not marketeer.ativo:
+        raise ErroValidacao("Este marketeer tem a conta desativada.")
+    return marketeer
+
+
+def avisar_marketeer(marketeer: Utilizador, campanha: Campanha) -> None:
+    """Envia um email ao marketeer a dizer que passou a ser responsável por uma campanha.
+
+    :param marketeer: Marketeer que recebe o aviso.
+    :param campanha: Campanha que lhe foi atribuída.
+    """
+    correio.enviar(
+        marketeer.email,
+        "Foi-lhe atribuída uma campanha",
+        f"Olá, {marketeer.nome}.\n\n"
+        f"Passou a ser responsável pela campanha {campanha.nome}, do cliente {campanha.cliente_nome}.\n"
+        'Pode consultá-la na opção "Campanhas" do seu menu.',
+    )
+
+
+def atribuir_marketeer(ligacao: sqlite3.Connection, identificador: int, marketeer_id: int) -> Campanha:
+    """Atribui uma campanha a um marketeer, que passa a ser o responsável.
+
+    O marketeer anterior deixa de ver a campanha. O marketeer novo é avisado
+    por email.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número da campanha.
+    :param marketeer_id: Número do marketeer que passa a ser responsável.
+    :return: A campanha, já com o marketeer novo.
+    :raises ErroValidacao: Se a campanha não existir, se o marketeer não
+        existir ou tiver a conta desativada, ou se já for o responsável.
+    """
+    campanha = obter(ligacao, identificador)
+    marketeer = marketeer_ativo(ligacao, marketeer_id)
+    if campanha.marketeer_id == marketeer.id:
+        raise ErroValidacao(f"{marketeer.nome} já é responsável por esta campanha.")
+    campanha = campanhas.definir_marketeer(ligacao, campanha.id, marketeer.id)
+    avisar_marketeer(marketeer, campanha)
+    return campanha
