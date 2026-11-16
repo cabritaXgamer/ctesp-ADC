@@ -15,7 +15,7 @@ Estrutura de pastas
      __main__.py          ponto de entrada (python -m gestor_campanhas)
      config.py            caminhos da pasta de dados e da base de dados
      bd.py                ligação SQLite e criação das tabelas
-     modelos.py           classes de dados (Utilizador) e perfis
+     modelos.py           classes de dados (Utilizador, Campanha) e perfis
      erros.py             erros que os menus mostram ao utilizador
      relogio.py           data e hora atuais
      seguranca.py         hash das passwords
@@ -28,6 +28,7 @@ Estrutura de pastas
        perfis.py          menu de cada perfil
        admin.py           opções do menu do Administrador
        gestao.py          gestão de clientes e marketeers, pelo Administrador
+       campanhas.py       campanhas, no menu do Marketeer
        conta.py           opções da conta, comuns a todos os perfis
        recuperacao.py     recuperação da password
    tests/                 testes automáticos (pytest)
@@ -185,3 +186,7 @@ executadas em todos os arranques sem apagar dados.
    * - ``recuperacoes``
      - Uma linha por pedido de recuperação de password: utilizador, hash do
        código, prazo de validade e se já foi usado.
+   * - ``campanhas``
+     - Uma linha por campanha: nome, objetivo, cliente a quem pertence,
+       marketeer responsável, budget em cêntimos (vazio enquanto não for
+       definido) e datas de início e de fim.

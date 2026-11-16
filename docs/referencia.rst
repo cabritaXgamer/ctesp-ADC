@@ -60,6 +60,11 @@ Códigos de recuperação
 
 .. automodule:: gestor_campanhas.repositorios.recuperacoes
 
+Campanhas
+~~~~~~~~~
+
+.. automodule:: gestor_campanhas.repositorios.campanhas
+
 Serviços
 --------
 
@@ -100,6 +105,11 @@ Gestão de clientes e marketeers
 
 .. automodule:: gestor_campanhas.servicos.gestao
 
+Campanhas
+~~~~~~~~~
+
+.. automodule:: gestor_campanhas.servicos.campanhas
+
 Dados de demonstração
 ---------------------
 
@@ -134,6 +144,11 @@ Gestão de clientes e marketeers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: gestor_campanhas.cli.gestao
+
+Campanhas do Marketeer
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.cli.campanhas
 
 Opções da conta
 ~~~~~~~~~~~~~~~

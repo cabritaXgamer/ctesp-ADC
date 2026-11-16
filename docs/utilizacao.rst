@@ -260,3 +260,61 @@ O último dia do período é incluído por inteiro.
 Uma sessão que ainda não terminou aparece com ``(em curso)`` na coluna da
 saída.
 
+
+Marketeer
+---------
+
+Campanhas
+~~~~~~~~~
+
+Mostra as campanhas de que o marketeer é responsável e, por baixo, as opções
+para as gerir. Depois de cada opção, a lista volta a ser mostrada, já com as
+alterações. Um marketeer só vê e só altera as suas campanhas.
+
+.. code-block:: text
+
+   N.º  Nome   Cliente        Início      Fim
+   ---  -----  -------------  ----------  ----------
+   1    Natal  Carla Cliente  2026-12-01  2026-12-24
+
+   1 campanha.
+
+O número da primeira coluna identifica a campanha nas outras opções.
+
+Criar campanha
+^^^^^^^^^^^^^^
+
+Mostra os clientes com a conta ativa e pede os dados da campanha. Quem cria a
+campanha fica responsável por ela.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Dado
+     - Regras
+   * - Cliente
+     - Obrigatório. Escreve-se o número do cliente, que está na lista
+       mostrada. Tem de ser um cliente com a conta ativa.
+   * - Nome
+     - Obrigatório.
+   * - Objetivo
+     - Opcional.
+   * - Data de início
+     - Opcional, no formato ``AAAA-MM-DD``.
+   * - Data de fim
+     - Opcional, no formato ``AAAA-MM-DD``. Não pode ser anterior à data de
+       início.
+
+A campanha começa sem budget, porque o budget é definido pelo Administrador.
+Se algum valor não respeitar as regras, a campanha não é criada.
+
+Editar campanha
+^^^^^^^^^^^^^^^
+
+Pede o número da campanha e mostra o nome, o objetivo e as datas, com o valor
+atual entre parênteses retos. Com Enter, o valor mantém-se. Para apagar uma
+data, escreve-se ``-``.
+
+O cliente e o budget não são alterados aqui. Se algum valor não respeitar as
+regras, nenhum dado é alterado.
