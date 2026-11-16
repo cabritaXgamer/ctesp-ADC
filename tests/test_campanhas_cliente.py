@@ -5,8 +5,10 @@ from datetime import date, datetime
 import pytest
 
 from gestor_campanhas import modelos, relogio
+from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import campanhas as repositorio
 from gestor_campanhas.repositorios import utilizadores
+from gestor_campanhas.servicos import campanhas as servico
 
 
 @pytest.fixture(autouse=True)
@@ -57,3 +59,37 @@ def test_repositorio_lista_so_as_campanhas_do_cliente(ligacao, contas, natal, sa
 
     assert repositorio.listar_por_cliente(ligacao, contas[modelos.CLIENTE].id) == [natal, saldos]
     assert repositorio.listar_por_cliente(ligacao, jose.id) == [do_jose]
+
+
+# --- regras ------------------------------------------------------------------
+
+
+def test_cliente_ve_as_suas_campanhas_com_e_sem_budget(ligacao, contas, natal, saldos):
+    lista = servico.listar_do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert lista == [natal, saldos]
+    assert [campanha.budget_centimos for campanha in lista] == [150000, None]
+
+
+def test_cliente_nao_ve_as_campanhas_de_outro(ligacao, contas, natal, jose):
+    assert servico.listar_do_cliente(ligacao, jose) == []
+    assert servico.obter_do_cliente(ligacao, contas[modelos.CLIENTE], natal.id) == natal
+    with pytest.raises(ErroValidacao, match=f"Não tem nenhuma campanha com o número {natal.id}"):
+        servico.obter_do_cliente(ligacao, jose, natal.id)
+    with pytest.raises(ErroValidacao, match="Não tem nenhuma campanha com o número 999"):
+        servico.obter_do_cliente(ligacao, jose, 999)
+
+
+def test_responsavel_tem_os_contactos_do_marketeer(ligacao, natal):
+    marketeer = servico.responsavel(ligacao, natal)
+
+    assert marketeer.nome == "Miguel Marketeer"
+    assert marketeer.email == "miguel@agencia.pt"
+    assert marketeer.telefone == "910000002"
+
+
+def test_responsavel_muda_quando_a_campanha_e_reatribuida(ligacao, natal, emails):
+    marta = utilizadores.criar(ligacao, "Marta Marques", "marta@agencia.pt", "x", modelos.MARKETEER)
+    alterada = servico.atribuir_marketeer(ligacao, natal.id, marta.id)
+
+    assert servico.responsavel(ligacao, alterada).email == "marta@agencia.pt"
