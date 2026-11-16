@@ -5,6 +5,8 @@ from datetime import date, datetime
 import pytest
 
 from gestor_campanhas import modelos, relogio, seguranca
+from gestor_campanhas.cli import pedidos as menu_pedidos
+from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import campanhas as campanhas_bd
 from gestor_campanhas.repositorios import pedidos as pedidos_bd
@@ -277,3 +279,133 @@ def test_eliminar_a_campanha_nao_apaga_o_pedido_aprovado(ligacao, pedido, marta)
     depois = pedidos.obter(ligacao, pedido.id)
     assert depois.estado == modelos.APROVADO
     assert depois.campanha_id is None
+
+
+# --- menu: pedidos -----------------------------------------------------------
+
+
+def test_menu_avisa_quando_nao_ha_pedidos(teclado, ligacao, contas, capsys):
+    teclado("0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "Ainda não há pedidos de campanha." in capsys.readouterr().out
+
+
+def test_menu_mostra_os_pedidos_de_todos_os_clientes(teclado, ligacao, contas, pedido, capsys):
+    pedidos_bd.definir_estado(ligacao, pedido.id, modelos.CANCELADO)
+    jose = utilizadores.criar(ligacao, "José Padeiro", "jose@padaria.pt", "x", modelos.CLIENTE)
+    pedidos_bd.criar(ligacao, jose.id, "Divulgar o bolo-rei", 60000, date(2026, 12, 15), ["Facebook"])
+    teclado("0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "N.º  Feito em    Cliente        Objetivo             Orçamento   Prazo       Estado" in saida
+    assert "2026-11-16  José Padeiro   Divulgar o bolo-rei  600,00 €    2026-12-15  Pendente" in saida
+    assert "2026-11-16  Carla Cliente  Vender mais          1 500,00 €  2026-12-20  Cancelado" in saida
+    assert saida.index("José Padeiro") < saida.index("Carla Cliente")
+    assert "2 pedidos, 1 por decidir." in saida
+
+
+def test_menu_aprova_um_pedido(teclado, ligacao, contas, pedido, marta, capsys):
+    teclado("1", str(pedido.id), "1", "Natal 2026", "", str(marta.id), "", "0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    aprovado = pedidos.obter(ligacao, pedido.id)
+    campanha = campanhas.obter(ligacao, aprovado.campanha_id)
+    assert "  Cliente:      Carla Cliente" in saida
+    assert "  Estado:       Em análise" in saida
+    assert "Marta Marques     marta@agencia.pt" in saida
+    assert f"Pedido aprovado. Foi criada a campanha n.º {campanha.id}." in saida
+    assert "O cliente e o marketeer foram avisados por email." in saida
+    assert campanha.nome == "Natal 2026"
+    assert campanha.budget_centimos == 150000
+    assert campanha.marketeer_id == marta.id
+
+
+def test_menu_aprova_com_outro_budget(teclado, ligacao, contas, pedido, marta):
+    teclado("1", str(pedido.id), "1", "Natal 2026", "900,50", str(marta.id), "", "0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert campanhas.listar_todas(ligacao)[0].budget_centimos == 90050
+
+
+def test_menu_nao_aprova_sem_marketeer(teclado, ligacao, contas, pedido, capsys):
+    teclado("1", str(pedido.id), "1", "Natal 2026", "", "", "", "0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "O pedido não foi aprovado." in capsys.readouterr().out
+    assert pedidos.obter(ligacao, pedido.id).estado == modelos.EM_ANALISE
+    assert campanhas.listar_todas(ligacao) == []
+
+
+def test_menu_mostra_o_erro_da_aprovacao(teclado, ligacao, contas, pedido, capsys):
+    teclado("1", str(pedido.id), "1", "Natal 2026", "", str(contas[modelos.CLIENTE].id), "", "0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "Não existe nenhum marketeer com o número" in capsys.readouterr().out
+    assert campanhas.listar_todas(ligacao) == []
+
+
+def test_menu_rejeita_um_pedido_com_motivo(teclado, ligacao, contas, pedido, emails, capsys):
+    teclado("1", str(pedido.id), "2", "Orçamento insuficiente", "s", "", "0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    rejeitado = pedidos.obter(ligacao, pedido.id)
+    assert "Pedido rejeitado. O cliente foi avisado por email." in saida
+    assert rejeitado.estado == modelos.REJEITADO
+    assert rejeitado.motivo_rejeicao == "Orçamento insuficiente"
+    assert len(emails()) == 1
+
+
+def test_menu_nao_rejeita_sem_confirmacao(teclado, ligacao, contas, pedido, capsys):
+    teclado("1", str(pedido.id), "2", "Motivo", "n", "", "0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "O pedido não foi rejeitado." in capsys.readouterr().out
+    assert pedidos.obter(ligacao, pedido.id).estado == modelos.EM_ANALISE
+
+
+def test_menu_deixa_a_decisao_para_mais_tarde(teclado, ligacao, contas, pedido, capsys):
+    teclado("1", str(pedido.id), "0", "", "0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "O pedido fica em análise." in capsys.readouterr().out
+    assert pedidos.obter(ligacao, pedido.id).estado == modelos.EM_ANALISE
+
+
+def test_menu_nao_deixa_decidir_um_pedido_ja_decidido(teclado, ligacao, contas, pedido, capsys):
+    pedidos_bd.definir_estado(ligacao, pedido.id, modelos.REJEITADO, "Sem verba")
+    teclado("1", str(pedido.id), "", "0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "  Motivo:       Sem verba" in saida
+    assert "Este pedido já não pode ser decidido." in saida
+    assert "Aprovar e criar a campanha" not in saida
+
+
+def test_menu_avisa_quando_o_pedido_nao_existe(teclado, ligacao, contas, capsys):
+    teclado("1", "999", "", "0")
+
+    menu_pedidos.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "Não existe nenhum pedido com o número 999." in capsys.readouterr().out
+
+
+def test_opcoes_novas_estao_no_menu_do_administrador():
+    descricoes = [descricao for descricao, _ in perfis.OPCOES[modelos.ADMINISTRADOR]]
+
+    assert "Pedidos de campanha" in descricoes
+    assert "Pedidos de campanha" not in [descricao for descricao, _ in perfis.OPCOES[modelos.MARKETEER]]
