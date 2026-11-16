@@ -5,6 +5,7 @@ from datetime import date, datetime
 import pytest
 
 from gestor_campanhas import modelos, relogio, seguranca
+from gestor_campanhas.cli import campanhas as menu_campanhas
 from gestor_campanhas.cli import pedidos as menu_pedidos
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -409,3 +410,88 @@ def test_opcoes_novas_estao_no_menu_do_administrador():
 
     assert "Pedidos de campanha" in descricoes
     assert "Pedidos de campanha" not in [descricao for descricao, _ in perfis.OPCOES[modelos.MARKETEER]]
+
+
+# --- menu: campanhas ---------------------------------------------------------
+
+
+def test_menu_avisa_quando_nao_ha_campanhas(teclado, ligacao, contas, capsys):
+    teclado("0")
+
+    menu_campanhas.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "Ainda não há campanhas." in saida
+    assert "1. Definir budget" in saida
+    assert "2. Atribuir marketeer" in saida
+
+
+def test_menu_mostra_as_campanhas_de_todos_os_marketeers(teclado, ligacao, contas, natal, marta, capsys):
+    campanhas_bd.criar(ligacao, "Saldos", "", contas[modelos.CLIENTE].id, marta.id, budget_centimos=80000)
+    teclado("0")
+
+    menu_campanhas.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "N.º  Nome    Cliente        Marketeer         Início      Fim         Budget       Estado" in saida
+    assert "Natal   Carla Cliente  Miguel Marketeer  2026-12-01  2026-12-24  Por definir  Por começar" in saida
+    assert "Saldos  Carla Cliente  Marta Marques     -           -           800,00 €     Em curso" in saida
+    assert "2 campanhas." in saida
+
+
+def test_menu_define_o_budget(teclado, ligacao, contas, natal, capsys):
+    teclado("1", str(natal.id), "1500,50", "", "0")
+
+    menu_campanhas.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "Campanha Natal, de Carla Cliente. Budget atual: Por definir." in saida
+    assert "Budget definido: 1 500,50 €." in saida
+    assert campanhas.obter(ligacao, natal.id).budget_centimos == 150050
+
+
+def test_menu_mostra_o_erro_do_budget(teclado, ligacao, contas, natal, capsys):
+    teclado("1", str(natal.id), "zero", "", "0")
+
+    menu_campanhas.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "O valor não é válido. Exemplos de valores válidos: 1500 ou 1500,50. O budget não foi alterado." in (
+        capsys.readouterr().out
+    )
+    assert campanhas.obter(ligacao, natal.id).budget_centimos is None
+
+
+def test_menu_atribui_a_campanha_a_outro_marketeer(teclado, ligacao, contas, natal, marta, capsys):
+    teclado("2", str(natal.id), str(marta.id), "", "0")
+
+    menu_campanhas.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    saida = capsys.readouterr().out
+    assert "Campanha Natal, de Carla Cliente. Responsável atual: Miguel Marketeer." in saida
+    assert "A campanha passou para Marta Marques, que foi avisado por email." in saida
+    assert campanhas.obter(ligacao, natal.id).marketeer_id == marta.id
+
+
+def test_menu_mostra_o_erro_da_atribuicao(teclado, ligacao, contas, natal, capsys):
+    teclado("2", str(natal.id), str(contas[modelos.MARKETEER].id), "", "0")
+
+    menu_campanhas.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "Miguel Marketeer já é responsável por esta campanha. O responsável não foi alterado." in (
+        capsys.readouterr().out
+    )
+
+
+def test_menu_avisa_quando_a_campanha_nao_existe(teclado, ligacao, contas, capsys):
+    teclado("1", "999", "", "2", "", "0")
+
+    menu_campanhas.do_administrador(ligacao, contas[modelos.ADMINISTRADOR])
+
+    assert "Não existe nenhuma campanha com o número 999." in capsys.readouterr().out
+
+
+def test_opcao_campanhas_do_administrador_abre_o_menu_certo():
+    opcoes = dict(perfis.OPCOES[modelos.ADMINISTRADOR])
+
+    assert opcoes["Campanhas"] is menu_campanhas.do_administrador
+    assert dict(perfis.OPCOES[modelos.MARKETEER])["Campanhas"] is menu_campanhas.do_marketeer

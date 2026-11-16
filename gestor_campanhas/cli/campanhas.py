@@ -1,8 +1,11 @@
-"""Campanhas, no menu do Marketeer.
+"""Campanhas, nos menus do Marketeer e do Administrador.
 
 O marketeer vê as campanhas que lhe estão atribuídas, com o cliente, as
 datas, o budget e o estado, e pode criar, editar, consultar e eliminar
 cada uma.
+
+O Administrador vê as campanhas de todos os marketeers, define o budget de
+cada uma e escolhe o marketeer responsável.
 """
 
 from __future__ import annotations
@@ -237,3 +240,129 @@ def do_marketeer(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
             return
         _, funcao = ACOES[int(escolha) - 1]
         funcao(ligacao, utilizador)
+
+
+def mostrar_todas(lista: list[Campanha]) -> None:
+    """Mostra uma tabela com as campanhas de todos os marketeers, com o total no fim.
+
+    :param lista: Campanhas a mostrar.
+    """
+    comum.mostrar_tabela(
+        ["N.º", "Nome", "Cliente", "Marketeer", "Início", "Fim", "Budget", "Estado"],
+        [
+            [
+                str(campanha.id),
+                campanha.nome,
+                campanha.cliente_nome,
+                campanha.marketeer_nome,
+                data(campanha.data_inicio),
+                data(campanha.data_fim),
+                budget(campanha),
+                campanhas.estado(campanha),
+            ]
+            for campanha in lista
+        ],
+    )
+    print(f"\n{len(lista)} {'campanha' if len(lista) == 1 else 'campanhas'}.")
+
+
+def pedir_qualquer_campanha(ligacao: sqlite3.Connection) -> Campanha | None:
+    """Pede o número de uma campanha, seja de que marketeer for, e devolve-a.
+
+    Se o número não existir, mostra o erro e espera por Enter.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: A campanha, ou ``None`` se o pedido foi cancelado ou o número não existe.
+    """
+    numero = comum.ler_numero("Número da campanha (Enter para cancelar)")
+    if numero is None:
+        return None
+    try:
+        return campanhas.obter(ligacao, numero)
+    except ErroValidacao as erro:
+        print(f"\n{erro}")
+        comum.pausa()
+        return None
+
+
+def definir_budget(ligacao: sqlite3.Connection) -> None:
+    """Pede o número de uma campanha e o budget a atribuir-lhe.
+
+    :param ligacao: Ligação aberta à base de dados.
+    """
+    comum.titulo("Definir budget")
+    campanha = pedir_qualquer_campanha(ligacao)
+    if campanha is None:
+        return
+    print(f"\nCampanha {campanha.nome}, de {campanha.cliente_nome}. Budget atual: {budget(campanha)}.")
+    valor = comum.ler_texto("Budget em euros (por exemplo 1500 ou 1500,50)")
+    try:
+        campanha = campanhas.definir_budget(ligacao, campanha.id, valor)
+    except ErroValidacao as erro:
+        print(f"\n{erro} O budget não foi alterado.")
+    else:
+        print(f"\nBudget definido: {budget(campanha)}.")
+    comum.pausa()
+
+
+def atribuir_marketeer(ligacao: sqlite3.Connection) -> None:
+    """Pede o número de uma campanha e o do marketeer que passa a ser responsável.
+
+    Mostra os marketeers com a conta ativa, para se escolher pelo número.
+
+    :param ligacao: Ligação aberta à base de dados.
+    """
+    comum.titulo("Atribuir marketeer")
+    campanha = pedir_qualquer_campanha(ligacao)
+    if campanha is None:
+        return
+    print(f"\nCampanha {campanha.nome}, de {campanha.cliente_nome}. Responsável atual: {campanha.marketeer_nome}.\n")
+    marketeers = campanhas.marketeers_disponiveis(ligacao)
+    comum.mostrar_tabela(
+        ["N.º", "Marketeer", "Email"],
+        [[str(marketeer.id), marketeer.nome, marketeer.email] for marketeer in marketeers],
+    )
+    print()
+    marketeer_id = comum.ler_numero("Número do marketeer responsável (Enter para cancelar)")
+    if marketeer_id is None:
+        return
+    try:
+        campanha = campanhas.atribuir_marketeer(ligacao, campanha.id, marketeer_id)
+    except ErroValidacao as erro:
+        print(f"\n{erro} O responsável não foi alterado.")
+    else:
+        print(f"\nA campanha passou para {campanha.marketeer_nome}, que foi avisado por email.")
+    comum.pausa()
+
+
+#: Opções do menu de campanhas do Administrador. Cada opção é um par
+#: ``(descrição, função)``; a função recebe a ligação à base de dados.
+ACOES_DO_ADMINISTRADOR = [
+    ("Definir budget", definir_budget),
+    ("Atribuir marketeer", atribuir_marketeer),
+]
+
+
+def do_administrador(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
+    """Opção "Campanhas" do menu do Administrador.
+
+    Mostra as campanhas de todos os marketeers e as opções para definir o
+    budget e o responsável de cada uma.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param utilizador: Administrador que está a usar o menu.
+    """
+    menu = [(str(numero), descricao) for numero, (descricao, _) in enumerate(ACOES_DO_ADMINISTRADOR, start=1)]
+    menu.append(("0", "Voltar"))
+    while True:
+        comum.titulo("Todas as campanhas")
+        lista = campanhas.listar_todas(ligacao)
+        if lista:
+            mostrar_todas(lista)
+        else:
+            print("Ainda não há campanhas.")
+        escolha = comum.escolher_opcao("Campanhas", menu)
+        if escolha == "0":
+            return
+        _, funcao = ACOES_DO_ADMINISTRADOR[int(escolha) - 1]
+        funcao(ligacao)
