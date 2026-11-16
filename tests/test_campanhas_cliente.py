@@ -5,6 +5,8 @@ from datetime import date, datetime
 import pytest
 
 from gestor_campanhas import modelos, relogio
+from gestor_campanhas.cli import campanhas as menu
+from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import campanhas as repositorio
 from gestor_campanhas.repositorios import utilizadores
@@ -93,3 +95,35 @@ def test_responsavel_muda_quando_a_campanha_e_reatribuida(ligacao, natal, emails
     alterada = servico.atribuir_marketeer(ligacao, natal.id, marta.id)
 
     assert servico.responsavel(ligacao, alterada).email == "marta@agencia.pt"
+
+
+# --- menu: lista -------------------------------------------------------------
+
+
+def test_menu_avisa_quando_o_cliente_nao_tem_campanhas(teclado, ligacao, contas, capsys):
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert 'Ainda não tem campanhas. Pode pedir uma na opção "Pedidos de campanha".' in capsys.readouterr().out
+
+
+def test_menu_mostra_as_campanhas_do_cliente_com_o_budget(teclado, ligacao, contas, natal, saldos, jose, miguel, capsys):
+    repositorio.criar(ligacao, "Bolo-rei", "", jose.id, miguel.id)
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "N.º  Nome    Início      Fim         Budget       Estado       Marketeer" in saida
+    assert "Natal   2026-12-01  2026-12-24  1 500,00 €   Por começar  Miguel Marketeer" in saida
+    assert "Saldos  -           -           Por definir  Em curso     Miguel Marketeer" in saida
+    assert "Bolo-rei" not in saida
+    assert "2 campanhas." in saida
+    assert "O budget de cada campanha é definido pelo administrador." in saida
+
+
+def test_opcao_campanhas_esta_no_menu_do_cliente():
+    opcoes = dict(perfis.OPCOES[modelos.CLIENTE])
+
+    assert opcoes["Campanhas"] is menu.do_cliente

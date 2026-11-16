@@ -1,4 +1,4 @@
-"""Campanhas, nos menus do Marketeer e do Administrador.
+"""Campanhas, nos menus dos três perfis.
 
 O marketeer vê as campanhas que lhe estão atribuídas, com o cliente, as
 datas, o budget e o estado, e pode criar, editar, consultar e eliminar
@@ -6,6 +6,9 @@ cada uma.
 
 O Administrador vê as campanhas de todos os marketeers, define o budget de
 cada uma e escolhe o marketeer responsável.
+
+O Cliente vê as suas campanhas, com o budget de cada uma, e os contactos do
+marketeer responsável.
 """
 
 from __future__ import annotations
@@ -366,3 +369,48 @@ def do_administrador(ligacao: sqlite3.Connection, utilizador: Utilizador) -> Non
             return
         _, funcao = ACOES_DO_ADMINISTRADOR[int(escolha) - 1]
         funcao(ligacao)
+
+
+def mostrar_do_cliente(lista: list[Campanha]) -> None:
+    """Mostra uma tabela com as campanhas de um cliente, com o total no fim.
+
+    :param lista: Campanhas a mostrar.
+    """
+    comum.mostrar_tabela(
+        ["N.º", "Nome", "Início", "Fim", "Budget", "Estado", "Marketeer"],
+        [
+            [
+                str(campanha.id),
+                campanha.nome,
+                data(campanha.data_inicio),
+                data(campanha.data_fim),
+                budget(campanha),
+                campanhas.estado(campanha),
+                campanha.marketeer_nome,
+            ]
+            for campanha in lista
+        ],
+    )
+    print(f"\n{len(lista)} {'campanha' if len(lista) == 1 else 'campanhas'}.")
+
+
+def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
+    """Opção "Campanhas" do menu do Cliente.
+
+    Mostra as campanhas do cliente, com o budget de cada uma. O cliente não
+    altera nada aqui: o budget é definido pelo Administrador.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param utilizador: Cliente que está a usar o menu.
+    """
+    while True:
+        comum.titulo("As minhas campanhas")
+        lista = campanhas.listar_do_cliente(ligacao, utilizador)
+        if lista:
+            mostrar_do_cliente(lista)
+            print("O budget de cada campanha é definido pelo administrador.")
+        else:
+            print('Ainda não tem campanhas. Pode pedir uma na opção "Pedidos de campanha".')
+        escolha = comum.escolher_opcao("Campanhas", [("0", "Voltar")])
+        if escolha == "0":
+            return
