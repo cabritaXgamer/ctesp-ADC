@@ -35,6 +35,8 @@ Modelos, erros e utilitários
 
 .. automodule:: gestor_campanhas.seguranca
 
+.. automodule:: gestor_campanhas.dinheiro
+
 Repositórios
 ------------
 
