@@ -5,9 +5,11 @@ from datetime import date, datetime
 import pytest
 
 from gestor_campanhas import modelos, relogio, seguranca
+from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import campanhas as campanhas_bd
 from gestor_campanhas.repositorios import pedidos as pedidos_bd
 from gestor_campanhas.repositorios import utilizadores
+from gestor_campanhas.servicos import campanhas
 from tests.conftest import PASSWORD_TESTE
 
 
@@ -77,3 +79,38 @@ def test_repositorio_lista_os_pedidos_de_todos_os_clientes(ligacao, contas, pedi
     outro = pedidos_bd.criar(ligacao, jose.id, "Do José", 1000, date(2026, 12, 1), ["Facebook"])
 
     assert pedidos_bd.listar_todos(ligacao) == [pedido, outro]
+
+
+# --- budget ------------------------------------------------------------------
+
+
+def test_administrador_define_o_budget_de_uma_campanha(ligacao, natal):
+    alterada = campanhas.definir_budget(ligacao, natal.id, "1500,50")
+
+    assert alterada.budget_centimos == 150050
+    assert campanhas.obter(ligacao, natal.id) == alterada
+
+
+def test_budget_pode_ser_alterado_mais_tarde(ligacao, natal):
+    campanhas.definir_budget(ligacao, natal.id, "1500")
+
+    assert campanhas.definir_budget(ligacao, natal.id, "2000").budget_centimos == 200000
+
+
+@pytest.mark.parametrize(("valor", "mensagem"), [("muito", "O valor não é válido"), ("0", "maior do que zero")])
+def test_budget_invalido_nao_e_guardado(ligacao, natal, valor, mensagem):
+    with pytest.raises(ErroValidacao, match=mensagem):
+        campanhas.definir_budget(ligacao, natal.id, valor)
+
+    assert campanhas.obter(ligacao, natal.id).budget_centimos is None
+
+
+def test_budget_de_campanha_que_nao_existe_da_erro(ligacao):
+    with pytest.raises(ErroValidacao, match="Não existe nenhuma campanha com o número 999"):
+        campanhas.definir_budget(ligacao, 999, "1500")
+
+
+def test_administrador_ve_as_campanhas_de_todos_os_marketeers(ligacao, contas, natal, marta):
+    saldos = campanhas_bd.criar(ligacao, "Saldos", "", contas[modelos.CLIENTE].id, marta.id)
+
+    assert campanhas.listar_todas(ligacao) == [natal, saldos]

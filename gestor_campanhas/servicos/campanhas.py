@@ -10,7 +10,7 @@ from __future__ import annotations
 import sqlite3
 from datetime import date
 
-from gestor_campanhas import modelos, relogio
+from gestor_campanhas import dinheiro, modelos, relogio
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Campanha, Utilizador
 from gestor_campanhas.repositorios import campanhas, utilizadores
@@ -154,3 +154,52 @@ def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador, identificador: 
     campanha = obter_do_marketeer(ligacao, marketeer, identificador)
     campanhas.eliminar(ligacao, campanha.id)
     return campanha
+
+
+def listar_todas(ligacao: sqlite3.Connection) -> list[Campanha]:
+    """Lista todas as campanhas, para o Administrador.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Campanhas de todos os clientes, pela ordem em que foram criadas.
+    """
+    return campanhas.listar_todas(ligacao)
+
+
+def obter(ligacao: sqlite3.Connection, identificador: int) -> Campanha:
+    """Procura uma campanha pelo número, seja de quem for.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número da campanha.
+    :return: A campanha.
+    :raises ErroValidacao: Se não existir nenhuma campanha com esse número.
+    """
+    campanha = campanhas.obter_por_id(ligacao, identificador)
+    if campanha is None:
+        raise ErroValidacao(f"Não existe nenhuma campanha com o número {identificador}.")
+    return campanha
+
+
+def budget_validado(valor: str) -> int:
+    """Converte um budget escrito em euros e confirma que é maior do que zero.
+
+    :param valor: Budget tal como foi escrito, por exemplo ``"1500"`` ou ``"1500,50"``.
+    :return: O budget em cêntimos.
+    :raises ErroValidacao: Se não for um valor em euros ou não for maior do que zero.
+    """
+    centimos = dinheiro.para_centimos(valor)
+    if centimos <= 0:
+        raise ErroValidacao("O budget tem de ser maior do que zero.")
+    return centimos
+
+
+def definir_budget(ligacao: sqlite3.Connection, identificador: int, valor: str) -> Campanha:
+    """Define o budget de uma campanha. Só o Administrador o faz.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Número da campanha.
+    :param valor: Budget em euros, tal como foi escrito.
+    :return: A campanha, já com o budget novo.
+    :raises ErroValidacao: Se a campanha não existir ou o valor não for válido.
+    """
+    campanha = obter(ligacao, identificador)
+    return campanhas.definir_budget(ligacao, campanha.id, budget_validado(valor))
