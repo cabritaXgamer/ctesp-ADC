@@ -1,7 +1,8 @@
 """Campanhas, no menu do Marketeer.
 
 O marketeer vê as campanhas que lhe estão atribuídas, com o cliente, as
-datas, o budget e o estado, e pode criar, editar e consultar cada uma.
+datas, o budget e o estado, e pode criar, editar, consultar e eliminar
+cada uma.
 """
 
 from __future__ import annotations
@@ -181,6 +182,27 @@ def ver(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
     comum.pausa()
 
 
+def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
+    """Pede o número de uma campanha e elimina-a, depois de pedir confirmação.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a eliminar.
+    """
+    comum.titulo("Eliminar campanha")
+    campanha = pedir_campanha(ligacao, marketeer)
+    if campanha is None:
+        return
+    print()
+    mostrar_detalhes(campanha)
+    print("\nUma campanha eliminada não pode ser recuperada.")
+    if comum.confirmar("Eliminar esta campanha?"):
+        campanhas.eliminar(ligacao, marketeer, campanha.id)
+        print(f"\nA campanha {campanha.nome} foi eliminada.")
+    else:
+        print("\nNada foi alterado.")
+    comum.pausa()
+
+
 #: Opções do menu de campanhas do Marketeer. Cada opção é um par
 #: ``(descrição, função)``; a função recebe a ligação à base de dados e o
 #: marketeer.
@@ -188,6 +210,7 @@ ACOES = [
     ("Criar campanha", criar),
     ("Editar campanha", editar),
     ("Ver campanha", ver),
+    ("Eliminar campanha", eliminar),
 ]
 
 

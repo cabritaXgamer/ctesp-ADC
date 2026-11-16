@@ -415,3 +415,61 @@ def test_budget_por_palavras(ligacao, contas, natal):
     assert menu.budget(natal) == "Por definir"
     natal.budget_centimos = 0
     assert menu.budget(natal) == "0,00 €"
+
+
+# --- eliminar ----------------------------------------------------------------
+
+
+def test_marketeer_elimina_a_sua_campanha(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+
+    eliminada = servico.eliminar(ligacao, miguel, natal.id)
+
+    assert eliminada == natal
+    assert repositorio.obter_por_id(ligacao, natal.id) is None
+    assert servico.listar_do_marketeer(ligacao, miguel) == []
+
+
+def test_marketeer_nao_elimina_campanhas_de_outro(ligacao, contas, natal, marta):
+    with pytest.raises(ErroValidacao, match="Não tem nenhuma campanha"):
+        servico.eliminar(ligacao, marta, natal.id)
+
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+def test_eliminar_nao_apaga_as_outras_campanhas(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    outra = servico.criar(ligacao, miguel, "Saldos", "", contas[modelos.CLIENTE].id)
+
+    servico.eliminar(ligacao, miguel, natal.id)
+
+    assert servico.listar_do_marketeer(ligacao, miguel) == [outra]
+
+
+def test_menu_elimina_campanha_depois_de_confirmar(teclado, ligacao, contas, natal, capsys):
+    teclado("4", str(natal.id), "s", "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    saida = capsys.readouterr().out
+    assert "Uma campanha eliminada não pode ser recuperada." in saida
+    assert "A campanha Natal foi eliminada." in saida
+    assert "Ainda não tem campanhas." in saida
+    assert repositorio.obter_por_id(ligacao, natal.id) is None
+
+
+def test_menu_nao_elimina_sem_confirmacao(teclado, ligacao, contas, natal, capsys):
+    teclado("4", str(natal.id), "n", "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    assert "Nada foi alterado." in capsys.readouterr().out
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+def test_menu_eliminar_pode_ser_cancelado_com_enter(teclado, ligacao, contas, natal):
+    teclado("4", "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
