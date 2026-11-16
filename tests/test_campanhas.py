@@ -352,3 +352,66 @@ def test_estado_usa_o_dia_atual_por_omissao(ligacao, contas, natal, monkeypatch)
 
     assert relogio.hoje() == date(2026, 12, 25)
     assert servico.estado(natal) == modelos.TERMINADA
+
+
+# --- lista completa e detalhes -----------------------------------------------
+
+
+@pytest.fixture
+def dia_16_de_novembro(monkeypatch):
+    """Fixa o dia atual em 16 de novembro de 2026."""
+    monkeypatch.setattr(relogio, "agora", lambda: datetime(2026, 11, 16, 10, 0))
+
+
+def test_lista_mostra_o_budget_e_o_estado(teclado, ligacao, contas, natal, dia_16_de_novembro, capsys):
+    cliente, miguel = contas[modelos.CLIENTE], contas[modelos.MARKETEER]
+    repositorio.criar(ligacao, "Outono", "", cliente.id, miguel.id, None, date(2026, 10, 31), budget_centimos=150050)
+    teclado("0")
+
+    menu.do_marketeer(ligacao, miguel)
+
+    saida = capsys.readouterr().out
+    assert "N.º  Nome    Cliente        Início      Fim         Budget       Estado" in saida
+    assert "Natal   Carla Cliente  2026-12-01  2026-12-24  Por definir  Por começar" in saida
+    assert "Outono  Carla Cliente  -           2026-10-31  1 500,50 €   Terminada" in saida
+    assert "2 campanhas." in saida
+
+
+def test_menu_mostra_os_detalhes_de_uma_campanha(teclado, ligacao, contas, natal, dia_16_de_novembro, capsys):
+    teclado("3", str(natal.id), "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    saida = capsys.readouterr().out
+    assert f"Campanha n.º {natal.id}" in saida
+    assert "  Nome:      Natal" in saida
+    assert "  Cliente:   Carla Cliente" in saida
+    assert "  Objetivo:  Vender mais" in saida
+    assert "  Início:    2026-12-01" in saida
+    assert "  Fim:       2026-12-24" in saida
+    assert "  Budget:    Por definir" in saida
+    assert "  Estado:    Por começar" in saida
+
+
+def test_detalhes_mostram_um_traco_quando_nao_ha_objetivo(ligacao, contas, capsys):
+    campanha = servico.criar(ligacao, contas[modelos.MARKETEER], "Natal", "", contas[modelos.CLIENTE].id)
+
+    menu.mostrar_detalhes(campanha)
+
+    assert "  Objetivo:  -" in capsys.readouterr().out
+
+
+def test_menu_nao_mostra_detalhes_de_campanhas_de_outro(teclado, ligacao, contas, natal, marta, capsys):
+    teclado("3", str(natal.id), "", "0")
+
+    menu.do_marketeer(ligacao, marta)
+
+    saida = capsys.readouterr().out
+    assert f"Não tem nenhuma campanha com o número {natal.id}." in saida
+    assert "Vender mais" not in saida
+
+
+def test_budget_por_palavras(ligacao, contas, natal):
+    assert menu.budget(natal) == "Por definir"
+    natal.budget_centimos = 0
+    assert menu.budget(natal) == "0,00 €"
