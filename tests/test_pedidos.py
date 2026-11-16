@@ -5,8 +5,10 @@ from datetime import date, datetime
 import pytest
 
 from gestor_campanhas import modelos, relogio, seguranca
+from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import pedidos as repositorio
 from gestor_campanhas.repositorios import utilizadores
+from gestor_campanhas.servicos import pedidos as servico
 from tests.conftest import PASSWORD_TESTE
 
 
@@ -72,3 +74,65 @@ def test_repositorio_altera_o_estado_e_guarda_o_motivo(ligacao, contas):
     assert rejeitado.estado == modelos.REJEITADO
     assert rejeitado.nome_estado == "Rejeitado"
     assert rejeitado.motivo_rejeicao == "Orçamento insuficiente"
+
+
+# --- pedir -------------------------------------------------------------------
+
+
+def test_cliente_pede_uma_campanha(ligacao, contas):
+    carla = contas[modelos.CLIENTE]
+
+    pedido = servico.criar(ligacao, carla, "  Vender mais ", "1500,50", "2026-12-20", ["TikTok", "Facebook"])
+
+    assert pedido.objetivo == "Vender mais"
+    assert pedido.orcamento_centimos == 150050
+    assert pedido.prazo == date(2026, 12, 20)
+    assert pedido.plataformas == ["Facebook", "TikTok"]
+    assert pedido.estado == modelos.PENDENTE
+    assert servico.listar_do_cliente(ligacao, carla) == [pedido]
+
+
+def test_prazo_pode_ser_o_proprio_dia(ligacao, contas):
+    pedido = servico.criar(ligacao, contas[modelos.CLIENTE], "Vender", "100", "2026-11-16", ["Facebook"])
+
+    assert pedido.prazo == date(2026, 11, 16)
+
+
+def test_plataformas_repetidas_contam_uma_vez(ligacao, contas):
+    pedido = servico.criar(ligacao, contas[modelos.CLIENTE], "Vender", "100", "2026-12-01", ["TikTok", "TikTok"])
+
+    assert pedido.plataformas == ["TikTok"]
+
+
+@pytest.mark.parametrize(
+    ("objetivo", "orcamento", "prazo", "plataformas", "mensagem"),
+    [
+        ("  ", "100", "2026-12-01", ["Facebook"], "O objetivo não pode ficar vazio"),
+        ("Vender", "muito", "2026-12-01", ["Facebook"], "O valor não é válido"),
+        ("Vender", "0", "2026-12-01", ["Facebook"], "tem de ser maior do que zero"),
+        ("Vender", "100", "", ["Facebook"], "O prazo não pode ficar vazio"),
+        ("Vender", "100", "20/12/2026", ["Facebook"], "A data do prazo não é válida"),
+        ("Vender", "100", "2026-11-15", ["Facebook"], "não pode ser um dia que já passou"),
+        ("Vender", "100", "2026-12-01", [], "Escolha pelo menos uma plataforma"),
+        ("Vender", "100", "2026-12-01", ["Facebook", "Rádio"], "A plataforma Rádio não existe"),
+    ],
+)
+def test_pedido_com_dados_invalidos_nao_e_registado(ligacao, contas, objetivo, orcamento, prazo, plataformas, mensagem):
+    carla = contas[modelos.CLIENTE]
+
+    with pytest.raises(ErroValidacao, match=mensagem):
+        servico.criar(ligacao, carla, objetivo, orcamento, prazo, plataformas)
+
+    assert servico.listar_do_cliente(ligacao, carla) == []
+
+
+def test_cliente_so_ve_os_seus_pedidos(ligacao, contas, jose):
+    carla = contas[modelos.CLIENTE]
+    pedido = servico.criar(ligacao, carla, "Da Carla", "100", "2026-12-01", ["Facebook"])
+
+    assert servico.listar_do_cliente(ligacao, jose) == []
+    assert servico.obter_do_cliente(ligacao, carla, pedido.id) == pedido
+    with pytest.raises(ErroValidacao, match=f"Não tem nenhum pedido com o número {pedido.id}"):
+        servico.obter_do_cliente(ligacao, jose, pedido.id)
+    with pytest.raises(ErroValidacao, match="Não tem nenhum pedido com o número 999"):
+        servico.obter_do_cliente(ligacao, carla, 999)
