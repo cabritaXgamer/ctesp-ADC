@@ -5,7 +5,7 @@ sistema. Assim, os testes podem substituir :func:`agora` e simular a passagem
 do tempo sem terem de esperar.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 
 #: Formato em que as datas e horas são guardadas na base de dados.
 FORMATO = "%Y-%m-%d %H:%M:%S"
@@ -17,6 +17,16 @@ def agora() -> datetime:
     :return: Data e hora do sistema.
     """
     return datetime.now().replace(microsecond=0)
+
+
+def hoje() -> date:
+    """Devolve o dia atual.
+
+    Usa :func:`agora`, por isso os testes que simulam a hora também simulam o dia.
+
+    :return: Data do sistema, sem a hora.
+    """
+    return agora().date()
 
 
 def para_texto(momento: datetime) -> str:

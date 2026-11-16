@@ -8,8 +8,9 @@ suas campanhas.
 from __future__ import annotations
 
 import sqlite3
+from datetime import date
 
-from gestor_campanhas import modelos
+from gestor_campanhas import modelos, relogio
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Campanha, Utilizador
 from gestor_campanhas.repositorios import campanhas, utilizadores
@@ -121,3 +122,21 @@ def editar(
     campanha = obter_do_marketeer(ligacao, marketeer, identificador)
     nome, objetivo, inicio, fim = _dados_validados(nome, objetivo, data_inicio, data_fim)
     return campanhas.atualizar(ligacao, campanha.id, nome, objetivo, inicio, fim)
+
+
+def estado(campanha: Campanha, hoje: date | None = None) -> str:
+    """Diz em que estado está uma campanha, a partir das datas dela.
+
+    :param campanha: Campanha a avaliar.
+    :param hoje: Dia de referência. Se for ``None``, usa-se o dia atual.
+    :return: :data:`~gestor_campanhas.modelos.POR_COMECAR` se a data de início
+        ainda não chegou, :data:`~gestor_campanhas.modelos.TERMINADA` se a
+        data de fim já passou, e :data:`~gestor_campanhas.modelos.EM_CURSO`
+        nos outros casos (incluindo quando não tem datas).
+    """
+    hoje = hoje or relogio.hoje()
+    if campanha.data_inicio and campanha.data_inicio > hoje:
+        return modelos.POR_COMECAR
+    if campanha.data_fim and campanha.data_fim < hoje:
+        return modelos.TERMINADA
+    return modelos.EM_CURSO

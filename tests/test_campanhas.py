@@ -1,10 +1,10 @@
 """Testes das campanhas."""
 
-from datetime import date
+from datetime import date, datetime
 
 import pytest
 
-from gestor_campanhas import modelos, seguranca
+from gestor_campanhas import modelos, relogio, seguranca
 from gestor_campanhas.cli import campanhas as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -324,3 +324,31 @@ def test_opcao_campanhas_esta_no_menu_do_marketeer():
     descricoes = [descricao for descricao, _ in perfis.OPCOES[modelos.MARKETEER]]
 
     assert descricoes[0] == "Campanhas"
+
+
+# --- estado ------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("inicio", "fim", "esperado"),
+    [
+        ("", "", modelos.EM_CURSO),
+        ("2026-11-16", "2026-11-16", modelos.EM_CURSO),
+        ("2026-11-01", "", modelos.EM_CURSO),
+        ("", "2026-12-24", modelos.EM_CURSO),
+        ("2026-11-17", "2026-12-24", modelos.POR_COMECAR),
+        ("2026-10-01", "2026-11-15", modelos.TERMINADA),
+        ("", "2026-11-15", modelos.TERMINADA),
+    ],
+)
+def test_estado_depende_das_datas(ligacao, contas, inicio, fim, esperado):
+    campanha = servico.criar(ligacao, contas[modelos.MARKETEER], "Natal", "", contas[modelos.CLIENTE].id, inicio, fim)
+
+    assert servico.estado(campanha, date(2026, 11, 16)) == esperado
+
+
+def test_estado_usa_o_dia_atual_por_omissao(ligacao, contas, natal, monkeypatch):
+    monkeypatch.setattr(relogio, "agora", lambda: datetime(2026, 12, 25, 9, 0))
+
+    assert relogio.hoje() == date(2026, 12, 25)
+    assert servico.estado(natal) == modelos.TERMINADA
