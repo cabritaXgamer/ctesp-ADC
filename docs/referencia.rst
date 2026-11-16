@@ -80,8 +80,8 @@ Conta do utilizador
 
 .. automodule:: gestor_campanhas.servicos.contas
 
-Validação dos dados de uma conta
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Validação dos dados
+~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: gestor_campanhas.servicos.validacao
 
