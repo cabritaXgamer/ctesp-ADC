@@ -29,7 +29,7 @@ Estrutura de pastas
        perfis.py          menu de cada perfil
        admin.py           opções do menu do Administrador
        gestao.py          gestão de clientes e marketeers, pelo Administrador
-       campanhas.py       campanhas, nos menus do Marketeer e do Administrador
+       campanhas.py       campanhas, nos menus dos três perfis
        pedidos.py         pedidos de campanha, nos menus do Cliente e do Administrador
        conta.py           opções da conta, comuns a todos os perfis
        recuperacao.py     recuperação da password

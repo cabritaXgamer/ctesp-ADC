@@ -289,3 +289,38 @@ def contar_ativas(ligacao: sqlite3.Connection, perfil: str) -> dict[int, int]:
         conta = campanha.cliente_id if perfil == modelos.CLIENTE else campanha.marketeer_id
         totais[conta] = totais.get(conta, 0) + 1
     return totais
+
+
+def listar_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> list[Campanha]:
+    """Lista as campanhas de um cliente, incluindo as que ainda não têm budget.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    :return: Campanhas desse cliente, pela ordem em que foram criadas.
+    """
+    return campanhas.listar_por_cliente(ligacao, cliente.id)
+
+
+def obter_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador, identificador: int) -> Campanha:
+    """Procura uma campanha pelo número, confirmando que é do cliente.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    :param identificador: Número da campanha, mostrado na primeira coluna da lista.
+    :return: A campanha.
+    :raises ErroValidacao: Se o cliente não tiver nenhuma campanha com esse número.
+    """
+    campanha = campanhas.obter_por_id(ligacao, identificador)
+    if campanha is None or campanha.cliente_id != cliente.id:
+        raise ErroValidacao(f"Não tem nenhuma campanha com o número {identificador}.")
+    return campanha
+
+
+def responsavel(ligacao: sqlite3.Connection, campanha: Campanha) -> Utilizador:
+    """Devolve o marketeer responsável por uma campanha, com os contactos.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param campanha: Campanha a consultar.
+    :return: A conta do marketeer, com o email e o telefone.
+    """
+    return utilizadores.obter_por_id(ligacao, campanha.marketeer_id)
