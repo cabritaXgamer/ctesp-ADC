@@ -5,7 +5,7 @@ Contas de demonstração
 ----------------------
 
 Uma instalação nova não tem contas. Para experimentar a aplicação, cria-se
-as contas de demonstração com:
+as contas e as campanhas de demonstração com:
 
 .. code-block:: console
 
@@ -38,6 +38,11 @@ as contas de demonstração com:
      - ``beatriz12345``
 
 Estas passwords são públicas e servem só para demonstração.
+
+São também criadas três campanhas: ``Natal 2026`` e ``Regresso às aulas``, do
+marketeer ``marketeer@agencia.pt``, e ``Bicicletas de primavera``, da
+marketeer ``marta@agencia.pt``. O comando pode ser repetido: só acrescenta o
+que faltar.
 
 Entrar e sair
 -------------
@@ -273,13 +278,31 @@ alterações. Um marketeer só vê e só altera as suas campanhas.
 
 .. code-block:: text
 
-   N.º  Nome   Cliente        Início      Fim
-   ---  -----  -------------  ----------  ----------
-   1    Natal  Carla Cliente  2026-12-01  2026-12-24
+   N.º  Nome               Cliente        Início      Fim         Budget      Estado
+   ---  -----------------  -------------  ----------  ----------  ----------  -----------
+   1    Natal 2026         Carla Cliente  2026-12-01  2026-12-24  1 500,00 €  Por começar
+   2    Regresso às aulas  José Padeiro   2026-09-01  2026-09-30  800,00 €    Terminada
 
-   1 campanha.
+   2 campanhas.
 
 O número da primeira coluna identifica a campanha nas outras opções.
+
+O budget aparece como ``Por definir`` enquanto o Administrador não o
+atribuir. O estado é calculado a partir das datas:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Estado
+     - Quando
+   * - ``Por começar``
+     - A data de início ainda não chegou.
+   * - ``Em curso``
+     - Já começou e ainda não terminou. É também o estado de uma campanha
+       sem datas.
+   * - ``Terminada``
+     - A data de fim já passou.
 
 Criar campanha
 ^^^^^^^^^^^^^^
@@ -318,3 +341,16 @@ data, escreve-se ``-``.
 
 O cliente e o budget não são alterados aqui. Se algum valor não respeitar as
 regras, nenhum dado é alterado.
+
+Ver campanha
+^^^^^^^^^^^^
+
+Pede o número da campanha e mostra todos os dados dela, incluindo o objetivo,
+que não cabe na lista.
+
+Eliminar campanha
+^^^^^^^^^^^^^^^^^
+
+Pede o número da campanha, mostra os dados dela e pede confirmação. Uma
+campanha eliminada não pode ser recuperada. Um marketeer só pode eliminar as
+suas campanhas.
