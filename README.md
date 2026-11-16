@@ -22,6 +22,7 @@ O desenvolvimento é feito por fases, cada uma fechada com uma *release*. As fun
 |---|---|
 | v0.1.0 | Autenticação e sessões: entrar e sair, registo de sessões, inatividade, horários dos marketeers, dados da conta, recuperação da password |
 | v0.2.0 | Clientes e marketeers: o Administrador lista, pesquisa, adiciona, edita, desativa e reativa as contas de clientes e de marketeers |
+| v0.3.0 | Campanhas e pedidos de campanha: o Marketeer cria e gere campanhas, o Cliente pede campanhas e acompanha-as, o Administrador decide os pedidos, define o budget e atribui o marketeer |
 
 O detalhe de cada versão está no [registo de alterações](CHANGELOG.md).
 
@@ -51,7 +52,7 @@ A aplicação mostra um menu numerado. Escreve-se o número da opção e prime-s
 
 ```
 ============================================================
-Gestor de Campanhas v0.2.0
+Gestor de Campanhas v0.3.0
 ============================================================
   1. Entrar
   2. Recuperar a password
@@ -63,7 +64,7 @@ No primeiro arranque é criada a pasta `dados`, com a base de dados `app.db`. Es
 
 ### Contas de demonstração
 
-Uma instalação nova não tem contas. Para criar as contas de demonstração:
+Uma instalação nova não tem contas. Para criar as contas, as campanhas e os pedidos de demonstração:
 
 ```bash
 python -m gestor_campanhas.dados_demo
@@ -80,15 +81,32 @@ python -m gestor_campanhas.dados_demo
 
 Estas passwords são públicas e servem só para demonstração.
 
+O mesmo comando cria três campanhas e dois pedidos de campanha pendentes. Pode ser repetido: só acrescenta o que faltar.
+
 ### Clientes e marketeers
 
 O Administrador gere as contas dos clientes e dos marketeers nas opções **Clientes** e **Marketeers** do seu menu. Cada uma mostra a lista das contas e, por baixo, as opções para pesquisar por nome, adicionar, editar e desativar ou reativar.
 
 Uma conta nova começa com uma password aleatória, enviada por email para a pessoa. Uma conta desativada deixa de poder entrar, mas não é apagada e pode ser reativada.
 
+### Campanhas e pedidos de campanha
+
+Uma campanha pertence a um cliente e tem um marketeer responsável. Nasce de duas maneiras:
+
+- o **Marketeer** cria-a na opção **Campanhas** do seu menu, onde também a edita, consulta e elimina;
+- o **Cliente** pede-a na opção **Pedidos de campanha**, indicando o objetivo, o orçamento, o prazo e as plataformas. O **Administrador** analisa o pedido e, se o aprovar, a campanha é criada com o budget inicial e o marketeer que escolher. Se o rejeitar, indica o motivo.
+
+| Perfil | O que faz |
+|---|---|
+| Administrador | Decide os pedidos, define o budget de cada campanha e atribui o marketeer responsável |
+| Marketeer | Cria, edita, consulta e elimina as campanhas que lhe estão atribuídas |
+| Cliente | Faz pedidos, acompanha o estado deles, cancela os pendentes e vê as suas campanhas, com o budget e os contactos do marketeer |
+
+O budget é sempre definido pelo Administrador. Um marketeer só pode ser desativado depois de as suas campanhas por terminar serem atribuídas a outro.
+
 ### Emails
 
-A aplicação não envia emails verdadeiros. Cada mensagem (por exemplo, o código para recuperar a password ou as credenciais de uma conta nova) é escrita num ficheiro de texto na pasta `dados/caixa_saida`.
+A aplicação não envia emails verdadeiros. Cada mensagem (por exemplo, o código para recuperar a password, as credenciais de uma conta nova ou o aviso de que um pedido foi aprovado) é escrita num ficheiro de texto na pasta `dados/caixa_saida`.
 
 ### Sessões
 

@@ -334,7 +334,7 @@ def atribuir_marketeer(ligacao: sqlite3.Connection) -> None:
     except ErroValidacao as erro:
         print(f"\n{erro} O responsável não foi alterado.")
     else:
-        print(f"\nA campanha passou para {campanha.marketeer_nome}, que foi avisado por email.")
+        print(f"\nA campanha passou para {campanha.marketeer_nome}. Foi enviado um aviso por email.")
     comum.pausa()
 
 
