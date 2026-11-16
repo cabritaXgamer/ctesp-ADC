@@ -502,3 +502,32 @@ Cancelar pedido
 Pede o número do pedido, mostra os dados dele e pede confirmação. Só um
 pedido ``Pendente`` pode ser cancelado. O pedido cancelado não é apagado:
 continua na lista, com o estado ``Cancelado``.
+
+Campanhas
+~~~~~~~~~
+
+Mostra as campanhas do cliente, com as datas, o budget, o estado e o
+marketeer responsável. Um cliente só vê as suas campanhas.
+
+.. code-block:: text
+
+   N.º  Nome        Início      Fim         Budget      Estado       Marketeer
+   ---  ----------  ----------  ----------  ----------  -----------  ----------------
+   1    Natal 2026  2026-12-01  2026-12-24  1 500,00 €  Por começar  Miguel Marketeer
+
+   1 campanha.
+   O budget de cada campanha é definido pelo administrador.
+
+Uma campanha que ainda não tem budget atribuído aparece na lista com
+``Por definir`` na coluna do budget. O cliente não altera o budget.
+
+**Ver campanha e marketeer responsável** pede o número da campanha e mostra
+todos os dados dela, incluindo o objetivo, e os contactos do marketeer
+responsável:
+
+.. code-block:: text
+
+   Marketeer responsável
+     Nome:      Miguel Marketeer
+     Email:     marketeer@agencia.pt
+     Telefone:  910000002
