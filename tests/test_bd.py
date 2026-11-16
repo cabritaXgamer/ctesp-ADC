@@ -76,3 +76,11 @@ def test_chave_de_configuracao_nao_pode_repetir(ligacao):
 
     with pytest.raises(sqlite3.IntegrityError):
         ligacao.execute("INSERT INTO configuracoes (chave, valor) VALUES ('cor', 'verde')")
+
+
+def test_campanha_tem_de_ter_um_cliente_que_existe(ligacao):
+    with pytest.raises(sqlite3.IntegrityError):
+        ligacao.execute(
+            "INSERT INTO campanhas (nome, cliente_id, marketeer_id, criada_em) "
+            "VALUES ('Natal', 999, 999, '2026-11-16 10:00:00')"
+        )
