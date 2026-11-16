@@ -2,7 +2,7 @@
 
 import pytest
 
-from gestor_campanhas import bd, modelos, seguranca
+from gestor_campanhas import bd, config, modelos, seguranca
 from gestor_campanhas.repositorios import utilizadores
 
 #: Password de todas as contas criadas pela fixture ``contas``.
@@ -69,3 +69,21 @@ def contas(ligacao):
         perfil: utilizadores.criar(ligacao, nome, email, seguranca.gerar_hash(PASSWORD_TESTE), perfil)
         for perfil, (nome, email) in dados.items()
     }
+
+
+@pytest.fixture
+def emails(monkeypatch, tmp_path):
+    """Põe a pasta de dados numa pasta temporária e dá acesso aos emails enviados.
+
+    Devolve uma função que lê os emails da caixa de saída. Cada email é o
+    texto completo do ficheiro, com o destinatário e o assunto.
+    """
+    monkeypatch.setenv(config.VARIAVEL_PASTA_DADOS, str(tmp_path))
+
+    def ler():
+        pasta = config.pasta_caixa_saida()
+        if not pasta.exists():
+            return []
+        return [ficheiro.read_text(encoding="utf-8") for ficheiro in sorted(pasta.glob("*.txt"))]
+
+    return ler
