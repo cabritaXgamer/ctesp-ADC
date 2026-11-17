@@ -4,7 +4,7 @@ from datetime import date
 
 import pytest
 
-from gestor_campanhas import modelos
+from gestor_campanhas import dados_demo, modelos
 from gestor_campanhas.cli import criativos as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -75,6 +75,38 @@ def test_repositorio_guarda_e_le_um_criativo(ligacao, natal):
     assert criativo.descricao == "Árvore e presentes"
     assert criativo.estado == modelos.EM_PREPARACAO
     assert criativo.campanha_nome == "Natal"
+
+
+def test_repositorio_guarda_o_custo_o_prazo_o_publico_e_a_plataforma(ligacao, natal):
+    criativo = repositorio.criar(
+        ligacao, natal.id, "Banner", "", 40000, date(2026, 11, 25), "Famílias com filhos", "Facebook"
+    )
+
+    lido = repositorio.obter_por_id(ligacao, criativo.id)
+    assert lido.custo_centimos == 40000
+    assert lido.prazo == date(2026, 11, 25)
+    assert lido.publico_alvo == "Famílias com filhos"
+    assert lido.plataforma == "Facebook"
+
+
+def test_repositorio_aceita_criativo_sem_custo_nem_prazo(ligacao, natal):
+    criativo = repositorio.criar(ligacao, natal.id, "Banner", "")
+
+    assert criativo.custo_centimos is None
+    assert criativo.prazo is None
+    assert criativo.publico_alvo == ""
+    assert criativo.plataforma == ""
+
+
+def test_repositorio_atualiza_todos_os_dados(ligacao, natal):
+    criativo = repositorio.criar(ligacao, natal.id, "Banner", "", 40000, date(2026, 11, 25), "Famílias", "Facebook")
+
+    alterado = repositorio.atualizar(ligacao, criativo.id, "Banner", "", None, None, "", "Instagram")
+
+    assert alterado.custo_centimos is None
+    assert alterado.prazo is None
+    assert alterado.publico_alvo == ""
+    assert alterado.plataforma == "Instagram"
 
 
 def test_repositorio_devolve_none_quando_o_criativo_nao_existe(ligacao):
@@ -217,7 +249,7 @@ def test_menu_mostra_as_campanhas_e_os_criativos_da_escolhida(teclado, ligacao, 
     assert "Criativos — escolher a campanha" in saida
     assert "2 campanhas." in saida
     assert "Criativos da campanha Natal (Carla Cliente)" in saida
-    assert "Banner de Natal  Em preparação" in saida
+    assert "Banner de Natal  Por definir  -      -             -           Em preparação" in saida
     assert "1 criativo." in saida
     assert "Cartaz dos saldos" not in saida
 
@@ -240,7 +272,7 @@ def test_campanha_sem_criativos(teclado, ligacao, contas, natal, capsys):
 
 
 def test_menu_cria_um_criativo(teclado, ligacao, contas, natal, capsys):
-    teclado("1", "Banner de Natal", "Árvore e presentes", "", "0")
+    teclado("1", "Banner de Natal", "Árvore e presentes", "", "", "", "", "", "0")
 
     menu.da_campanha(ligacao, contas[modelos.MARKETEER], natal)
 
@@ -254,7 +286,7 @@ def test_menu_cria_um_criativo(teclado, ligacao, contas, natal, capsys):
 def test_menu_edita_um_criativo_mantendo_o_que_fica_vazio(teclado, ligacao, contas, natal, capsys):
     miguel = contas[modelos.MARKETEER]
     criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "Árvore")
-    teclado("2", str(criativo.id), "Banner grande", "", "", "0")
+    teclado("2", str(criativo.id), "Banner grande", "", "", "", "", "", "", "0")
 
     menu.da_campanha(ligacao, miguel, natal)
 
@@ -277,7 +309,7 @@ def test_menu_nao_aceita_criativo_de_outra_campanha(teclado, ligacao, contas, na
 def test_menu_elimina_depois_de_confirmar(teclado, ligacao, contas, natal, capsys):
     miguel = contas[modelos.MARKETEER]
     criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
-    teclado("3", str(criativo.id), "s", "", "0")
+    teclado("4", str(criativo.id), "s", "", "0")
 
     menu.da_campanha(ligacao, miguel, natal)
 
@@ -290,9 +322,232 @@ def test_menu_elimina_depois_de_confirmar(teclado, ligacao, contas, natal, capsy
 def test_menu_nao_elimina_sem_confirmacao(teclado, ligacao, contas, natal, capsys):
     miguel = contas[modelos.MARKETEER]
     criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
-    teclado("3", str(criativo.id), "n", "", "0")
+    teclado("4", str(criativo.id), "n", "", "0")
 
     menu.da_campanha(ligacao, miguel, natal)
 
     assert "Nada foi alterado." in capsys.readouterr().out
     assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
+
+
+# --- custo, prazo, público-alvo e plataforma ---------------------------------
+
+
+def test_cria_um_criativo_com_todos_os_dados(ligacao, contas, natal):
+    criativo = servico.criar(
+        ligacao, contas[modelos.MARKETEER], natal.id, "Banner", "", "399,90", "2026-11-25", " Famílias ", "Facebook"
+    )
+
+    assert criativo.custo_centimos == 39990
+    assert criativo.prazo == date(2026, 11, 25)
+    assert criativo.publico_alvo == "Famílias"
+    assert criativo.plataforma == "Facebook"
+
+
+@pytest.mark.parametrize(
+    ("custo", "esperado"),
+    [("", None), ("0", 0), ("400", 40000), ("1 500,50 €", 150050)],
+)
+def test_custo_em_euros(custo, esperado):
+    assert servico.custo_validado(custo) == esperado
+
+
+def test_custo_tem_de_ser_um_valor_em_euros(ligacao, contas, natal):
+    with pytest.raises(ErroValidacao, match="O valor não é válido"):
+        servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner", custo="quatrocentos")
+
+
+def test_plataforma_tem_de_ser_uma_das_previstas(ligacao, contas, natal):
+    with pytest.raises(ErroValidacao, match="A plataforma tem de ser uma destas: Facebook, Instagram"):
+        servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner", plataforma="Myspace")
+
+    assert servico.plataforma_validada("") == ""
+    assert servico.plataforma_validada("TikTok") == "TikTok"
+
+
+def test_prazo_tem_de_ser_uma_data(ligacao, contas, natal):
+    with pytest.raises(ErroValidacao, match="A data do prazo não é válida."):
+        servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner", prazo="25/11/2026")
+
+
+def test_prazo_nao_pode_passar_o_fim_da_campanha(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+
+    with pytest.raises(ErroValidacao, match=r"O prazo não pode ser depois do fim da campanha \(2026-12-24\)."):
+        servico.criar(ligacao, miguel, natal.id, "Banner", prazo="2026-12-25")
+
+    assert servico.criar(ligacao, miguel, natal.id, "Banner", prazo="2026-12-24").prazo == date(2026, 12, 24)
+
+
+def test_campanha_sem_data_de_fim_aceita_qualquer_prazo(ligacao, contas, saldos):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], saldos.id, "Cartaz", prazo="2027-06-30")
+
+    assert criativo.prazo == date(2027, 6, 30)
+
+
+def test_editar_altera_e_apaga_os_dados(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "", "400", "2026-11-25", "Famílias", "Facebook")
+
+    alterado = servico.editar(ligacao, miguel, criativo.id, "Banner", "", "450", "", "", "Instagram")
+
+    assert alterado.custo_centimos == 45000
+    assert alterado.prazo is None
+    assert alterado.publico_alvo == ""
+    assert alterado.plataforma == "Instagram"
+
+
+def test_editar_com_um_valor_errado_nao_altera_nada(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "", "400")
+
+    with pytest.raises(ErroValidacao):
+        servico.editar(ligacao, miguel, criativo.id, "Banner novo", "", "400", "2027-01-01")
+
+    assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
+
+
+def test_menu_cria_um_criativo_com_todos_os_dados(teclado, ligacao, contas, natal, capsys):
+    teclado("1", "Banner", "", "400", "2026-11-25", "Famílias com filhos", "1", "", "0")
+
+    menu.da_campanha(ligacao, contas[modelos.MARKETEER], natal)
+
+    saida = capsys.readouterr().out
+    assert "N.º  Nome    Custo     Prazo       Público-alvo         Plataforma  Estado" in saida
+    assert "Banner  400,00 €  2026-11-25  Famílias com filhos  Facebook    Em preparação" in saida
+
+
+def test_menu_mostra_o_erro_e_nao_cria(teclado, ligacao, contas, natal, capsys):
+    teclado("1", "Banner", "", "400", "2026-12-31", "", "", "", "0")
+
+    menu.da_campanha(ligacao, contas[modelos.MARKETEER], natal)
+
+    saida = capsys.readouterr().out
+    assert "O prazo não pode ser depois do fim da campanha (2026-12-24). O criativo não foi criado." in saida
+    assert servico.listar_da_campanha(ligacao, natal) == []
+
+
+def test_menu_repete_a_plataforma_ate_ser_um_numero_valido(teclado, ligacao, contas, natal, capsys):
+    teclado("1", "Banner", "", "", "", "", "9", "x", "2", "", "0")
+
+    menu.da_campanha(ligacao, contas[modelos.MARKETEER], natal)
+
+    assert "Escreva um número entre 1 e 6." in capsys.readouterr().out
+    assert servico.listar_da_campanha(ligacao, natal)[0].plataforma == "Instagram"
+
+
+def test_menu_edita_e_apaga_valores(teclado, ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "Árvore", "400", "2026-11-25", "Famílias", "Facebook")
+    teclado("2", str(criativo.id), "", "-", "450", "-", "", "-", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    alterado = repositorio.obter_por_id(ligacao, criativo.id)
+    assert alterado.nome == "Banner"
+    assert alterado.descricao == ""
+    assert alterado.custo_centimos == 45000
+    assert alterado.prazo is None
+    assert alterado.publico_alvo == "Famílias"
+    assert alterado.plataforma == ""
+
+
+def test_menu_editar_mantem_tudo_com_enter(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "Árvore", "400", "2026-11-25", "Famílias", "Facebook")
+    teclado("2", str(criativo.id), "", "", "", "", "", "", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "Criativo guardado." in capsys.readouterr().out
+    assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
+
+
+def test_menu_editar_sem_valores_mantem_o_criativo_vazio(teclado, ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("2", str(criativo.id), "", "", "", "", "", "", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
+
+
+def test_custo_por_palavras():
+    assert menu.custo(Criativo(1, 1, "Banner")) == "Por definir"
+    assert menu.custo(Criativo(1, 1, "Banner", custo_centimos=0)) == "0,00 €"
+
+
+def test_menu_mostra_os_detalhes_de_um_criativo(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(
+        ligacao, miguel, natal.id, "Banner", "Árvore e presentes", "400", "2026-11-25", "Famílias", "Facebook"
+    )
+    teclado("3", str(criativo.id), "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert f"Criativo n.º {criativo.id}" in saida
+    assert "  Campanha:    Natal" in saida
+    assert "  Descrição:   Árvore e presentes" in saida
+    assert "  Custo:       400,00 €" in saida
+    assert "  Prazo:       2026-11-25" in saida
+    assert "  Público:     Famílias" in saida
+    assert "  Plataforma:  Facebook" in saida
+    assert "  Estado:      Em preparação" in saida
+
+
+def test_detalhes_mostram_tracos_quando_faltam_dados(ligacao, contas, natal, capsys):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    menu.mostrar_detalhes(criativo)
+
+    saida = capsys.readouterr().out
+    assert "  Descrição:   -" in saida
+    assert "  Custo:       Por definir" in saida
+    assert "  Prazo:       -" in saida
+    assert "  Plataforma:  -" in saida
+
+
+def test_menu_tem_as_opcoes_pela_ordem_certa():
+    assert [descricao for descricao, _ in menu.ACOES] == [
+        "Criar criativo",
+        "Editar criativo",
+        "Ver criativo",
+        "Eliminar criativo",
+    ]
+
+
+# --- dados de demonstração ---------------------------------------------------
+
+
+def test_dados_demo_criam_criativos_nas_campanhas(ligacao):
+    dados_demo.criar_contas(ligacao)
+    dados_demo.criar_campanhas(ligacao)
+
+    criados = dados_demo.criar_criativos(ligacao)
+
+    assert criados == ["Banner de Natal", "Vídeo da montra", "Cartaz dos lanches", "Anúncio da bicicleta elétrica"]
+    natal = next(c for c in repositorio_campanhas.listar_todas(ligacao) if c.nome == "Natal 2026")
+    banner, video = repositorio.listar_por_campanha(ligacao, natal.id)
+    assert banner.custo_centimos == 40000
+    assert banner.plataforma == "Facebook"
+    assert video.prazo == date(2026, 11, 28)
+
+
+def test_dados_demo_nao_repetem_criativos(ligacao):
+    dados_demo.criar_contas(ligacao)
+    dados_demo.criar_campanhas(ligacao)
+    dados_demo.criar_criativos(ligacao)
+
+    assert dados_demo.criar_criativos(ligacao) == []
+
+
+def test_criativos_de_demonstracao_respeitam_as_regras():
+    campanhas_demo = {campanha["nome"]: campanha for campanha in dados_demo.CAMPANHAS}
+    for criativo in dados_demo.CRIATIVOS:
+        campanha = campanhas_demo[criativo["campanha"]]
+        assert criativo["plataforma"] in ("", *modelos.PLATAFORMAS)
+        if criativo["prazo"] and campanha["fim"]:
+            assert criativo["prazo"] <= campanha["fim"]

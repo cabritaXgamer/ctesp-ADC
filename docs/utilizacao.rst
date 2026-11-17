@@ -43,8 +43,9 @@ São também criadas três campanhas: ``Natal 2026`` e ``Regresso às aulas``, d
 marketeer ``marketeer@agencia.pt``, e ``Bicicletas de primavera``, da
 marketeer ``marta@agencia.pt``. Ficam também dois pedidos de campanha
 pendentes, um do cliente ``jose@padaria.pt`` e outro da cliente
-``beatriz@bicicletas.pt``. O comando pode ser repetido: só acrescenta o que
-faltar.
+``beatriz@bicicletas.pt``, e quatro criativos: dois na campanha
+``Natal 2026``, um em ``Regresso às aulas`` e um em ``Bicicletas de
+primavera``. O comando pode ser repetido: só acrescenta o que faltar.
 
 Entrar e sair
 -------------
@@ -443,11 +444,16 @@ opções para os gerir.
    ============================================================
    Criativos da campanha Natal 2026 (Carla Cliente)
    ============================================================
-   N.º  Nome             Estado
-   ---  ---------------  -------------
-   1    Banner de Natal  Em preparação
+   N.º  Nome             Custo     Prazo       Público-alvo               Plataforma  Estado
+   ---  ---------------  --------  ----------  -------------------------  ----------  -------------
+   1    Banner de Natal  400,00 €  2026-11-25  Famílias da região de...   Facebook    Em preparação
+   2    Vídeo da montra  900,00 €  2026-11-28  Jovens adultos, 18 a 3...  Instagram   Em preparação
 
-   1 criativo.
+   2 criativos.
+
+O custo aparece como ``Por definir`` e os outros dados como ``-`` enquanto
+não forem indicados. Um público-alvo comprido aparece cortado e terminado em
+``...``; o texto completo está em **Ver criativo**.
 
 Um criativo novo fica no estado ``Em preparação``. O número da primeira
 coluna identifica o criativo nas outras opções. Com **0. Voltar** volta-se à
@@ -456,15 +462,47 @@ escolha da campanha, e com Enter nessa pergunta volta-se ao menu do perfil.
 Criar criativo
 ^^^^^^^^^^^^^^
 
-Pede o nome do criativo, que é obrigatório, e uma descrição, que é opcional.
-O criativo fica na campanha escolhida.
+Pede os dados do criativo, que fica na campanha escolhida. Só o nome é
+obrigatório: os outros dados podem ser indicados mais tarde, em **Editar
+criativo**.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Dado
+     - Regras
+   * - Nome
+     - Obrigatório.
+   * - Descrição
+     - Opcional.
+   * - Custo estimado
+     - Opcional. Valor em euros, por exemplo ``400`` ou ``399,90``.
+   * - Prazo
+     - Opcional, no formato ``AAAA-MM-DD``. Não pode ser depois da data de
+       fim da campanha.
+   * - Público-alvo
+     - Opcional. Texto livre, por exemplo ``Pais de alunos do básico``.
+   * - Plataforma
+     - Opcional. Escolhe-se pelo número, numa lista com Facebook, Instagram,
+       Google Ads, LinkedIn, TikTok e YouTube.
+
+Se algum valor não respeitar as regras, o criativo não é criado.
 
 Editar criativo
 ^^^^^^^^^^^^^^^
 
-Pede o número do criativo e mostra o nome e a descrição, com o valor atual
-entre parênteses retos. Com Enter, o valor mantém-se. Só se podem escolher
+Pede o número do criativo e mostra cada dado, com o valor atual entre
+parênteses retos. Com Enter, o valor mantém-se; para apagar um valor,
+escreve-se ``-``. As regras são as mesmas de quando se cria o criativo, e se
+algum valor não as respeitar nenhum dado é alterado. Só se podem escolher
 criativos da campanha que está a ser vista.
+
+Ver criativo
+^^^^^^^^^^^^
+
+Pede o número do criativo e mostra todos os dados dele, um por linha,
+incluindo a descrição e o público-alvo completo.
 
 Eliminar criativo
 ^^^^^^^^^^^^^^^^^
