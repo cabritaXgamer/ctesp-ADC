@@ -13,7 +13,7 @@ from datetime import date
 from gestor_campanhas import dinheiro, modelos, relogio
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Campanha, Utilizador
-from gestor_campanhas.repositorios import campanhas, utilizadores
+from gestor_campanhas.repositorios import campanhas, criativos, utilizadores
 from gestor_campanhas.servicos import correio, gestao, validacao
 
 
@@ -145,13 +145,23 @@ def estado(campanha: Campanha, hoje: date | None = None) -> str:
 def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador, identificador: int) -> Campanha:
     """Elimina uma campanha do marketeer. Não pode ser desfeito.
 
+    Só se pode eliminar uma campanha sem criativos, para não se perder
+    trabalho por engano: os criativos têm de ser eliminados primeiro.
+
     :param ligacao: Ligação aberta à base de dados.
     :param marketeer: Marketeer que está a eliminar.
     :param identificador: Número da campanha.
     :return: A campanha que foi eliminada, para se poder mostrar o nome.
-    :raises ErroValidacao: Se a campanha não for do marketeer.
+    :raises ErroValidacao: Se a campanha não for do marketeer ou se ainda
+        tiver criativos.
     """
     campanha = obter_do_marketeer(ligacao, marketeer, identificador)
+    total = criativos.contar_por_campanha(ligacao, campanha.id)
+    if total:
+        palavra = "criativo" if total == 1 else "criativos"
+        raise ErroValidacao(
+            f"A campanha {campanha.nome} tem {total} {palavra}. Elimine primeiro os criativos, na opção \"Criativos\"."
+        )
     campanhas.eliminar(ligacao, campanha.id)
     return campanha
 

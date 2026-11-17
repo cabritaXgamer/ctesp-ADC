@@ -9,6 +9,7 @@ from gestor_campanhas.cli import campanhas as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import campanhas as repositorio
+from gestor_campanhas.repositorios import criativos
 from gestor_campanhas.repositorios import utilizadores
 from gestor_campanhas.servicos import campanhas as servico
 from tests.conftest import PASSWORD_TESTE
@@ -472,6 +473,37 @@ def test_menu_eliminar_pode_ser_cancelado_com_enter(teclado, ligacao, contas, na
 
     menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
 
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+def test_nao_elimina_uma_campanha_com_criativos(ligacao, contas, natal):
+    criativos.criar(ligacao, natal.id, "Banner", "")
+    criativos.criar(ligacao, natal.id, "Vídeo", "")
+
+    with pytest.raises(ErroValidacao, match="A campanha Natal tem 2 criativos. Elimine primeiro os criativos"):
+        servico.eliminar(ligacao, contas[modelos.MARKETEER], natal.id)
+
+    assert repositorio.obter_por_id(ligacao, natal.id) == natal
+
+
+def test_elimina_a_campanha_depois_de_eliminar_os_criativos(ligacao, contas, natal):
+    banner = criativos.criar(ligacao, natal.id, "Banner", "")
+    criativos.eliminar(ligacao, banner.id)
+
+    servico.eliminar(ligacao, contas[modelos.MARKETEER], natal.id)
+
+    assert repositorio.obter_por_id(ligacao, natal.id) is None
+
+
+def test_menu_explica_porque_nao_elimina_campanha_com_criativos(teclado, ligacao, contas, natal, capsys):
+    criativos.criar(ligacao, natal.id, "Banner", "")
+    teclado("4", str(natal.id), "s", "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    saida = capsys.readouterr().out
+    assert 'A campanha Natal tem 1 criativo. Elimine primeiro os criativos, na opção "Criativos".' in saida
+    assert "foi eliminada" not in saida
     assert repositorio.obter_por_id(ligacao, natal.id) == natal
 
 
