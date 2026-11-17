@@ -738,3 +738,18 @@ def test_filtro_repete_a_pergunta_quando_o_numero_nao_existe(teclado, ligacao, c
     assert "Escreva um número entre 1 e 2, ou Enter." in saida
     assert "Escreva um número entre 1 e 6, ou Enter." in saida
     assert "1 criativo." in saida.split("Criativos encontrados")[1].split("Os meus criativos")[0]
+
+
+# --- estados -----------------------------------------------------------------
+
+
+def test_repositorio_muda_o_estado_e_guarda_o_motivo(ligacao, natal):
+    criativo = repositorio.criar(ligacao, natal.id, "Banner", "")
+
+    rejeitado = repositorio.definir_estado(ligacao, criativo.id, modelos.REJEITADO, "Cores escuras")
+    assert rejeitado.estado == modelos.REJEITADO
+    assert rejeitado.motivo_rejeicao == "Cores escuras"
+
+    em_preparacao = repositorio.definir_estado(ligacao, criativo.id, modelos.EM_PREPARACAO)
+    assert em_preparacao.estado == modelos.EM_PREPARACAO
+    assert em_preparacao.motivo_rejeicao == ""
