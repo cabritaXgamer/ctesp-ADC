@@ -5,8 +5,8 @@ custo, o prazo, o público-alvo e a plataforma de cada um. A partir daí pode
 criar, editar, consultar e eliminar criativos, e atualizar o estado de cada
 um.
 
-O cliente vê os criativos de todas as suas campanhas, numa só lista, e pode
-filtrá-los e pesquisá-los.
+O cliente vê os criativos de todas as suas campanhas, numa só lista, pode
+filtrá-los e pesquisá-los, e aprova ou rejeita os que estão em revisão.
 """
 
 from __future__ import annotations
@@ -484,20 +484,59 @@ def filtrar(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
     comum.pausa()
 
 
+def decidir(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
+    """Pede o número de um criativo em revisão e deixa aprová-lo ou rejeitá-lo.
+
+    Para rejeitar, é obrigatório escrever o motivo. Também se pode deixar a
+    decisão para mais tarde: o criativo continua em revisão.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a decidir.
+    """
+    comum.titulo("Aprovar ou rejeitar criativo")
+    criativo = pedir_criativo_do_cliente(ligacao, cliente)
+    if criativo is None:
+        return
+    print()
+    mostrar_detalhes(criativo)
+    if criativo.estado != modelos.EM_REVISAO:
+        print(f"\nSó se pode aprovar ou rejeitar um criativo em revisão. Este criativo está {criativo.nome_estado}.")
+        comum.pausa()
+        return
+    escolha = comum.escolher_opcao(
+        "Decisão", [("1", "Aprovar"), ("2", "Rejeitar"), ("0", "Decidir mais tarde")]
+    )
+    if escolha == "0":
+        return
+    try:
+        if escolha == "1":
+            criativos.aprovar(ligacao, cliente, criativo.id)
+            print("\nCriativo aprovado. O marketeer já o pode publicar.")
+        else:
+            motivo = comum.ler_texto("Motivo da rejeição (o que quer que mude)")
+            criativos.rejeitar(ligacao, cliente, criativo.id, motivo)
+            print("\nCriativo rejeitado. O marketeer vai ver o motivo e preparar uma versão nova.")
+    except ErroValidacao as erro:
+        print(f"\n{erro}")
+    comum.pausa()
+
+
 #: Opções do menu de criativos do Cliente. Cada opção é um par
 #: ``(descrição, função)``; a função recebe a ligação à base de dados e o
 #: cliente.
 ACOES_DO_CLIENTE = [
     ("Filtrar e pesquisar", filtrar),
     ("Ver criativo", ver_do_cliente),
+    ("Aprovar ou rejeitar criativo", decidir),
 ]
 
 
 def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
     """Opção "Criativos" do menu do Cliente.
 
-    Mostra os criativos de todas as campanhas do cliente e as opções para os
-    filtrar e consultar. A lista completa volta a aparecer depois de cada opção.
+    Mostra os criativos de todas as campanhas do cliente, quantos estão à
+    espera de aprovação e as opções para os filtrar, consultar, aprovar e
+    rejeitar. A lista completa volta a aparecer depois de cada opção.
 
     :param ligacao: Ligação aberta à base de dados.
     :param utilizador: Cliente que está a usar o menu.
@@ -509,6 +548,11 @@ def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
         lista = criativos.listar_do_cliente(ligacao, utilizador)
         if lista:
             mostrar_do_cliente(lista)
+            em_revisao = len(criativos.filtrar(lista, estado=modelos.EM_REVISAO))
+            if em_revisao == 1:
+                print("Há 1 criativo à espera da sua aprovação.")
+            elif em_revisao:
+                print(f"Há {em_revisao} criativos à espera da sua aprovação.")
         else:
             print("Ainda não há criativos nas suas campanhas.")
         escolha = comum.escolher_opcao("Criativos", menu)

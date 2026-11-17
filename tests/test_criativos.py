@@ -959,3 +959,51 @@ def test_so_decide_criativos_em_revisao(ligacao, contas, natal):
 def test_cliente_nao_decide_criativos_de_outro(ligacao, em_revisao, jose):
     with pytest.raises(ErroValidacao, match="Não tem nenhum criativo"):
         servico.aprovar(ligacao, jose, em_revisao.id)
+
+
+def test_menu_do_cliente_avisa_quantos_esperam_aprovacao(teclado, ligacao, contas, em_revisao, capsys):
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "Há 1 criativo à espera da sua aprovação." in capsys.readouterr().out
+
+
+def test_menu_do_cliente_aprova(teclado, ligacao, contas, em_revisao, capsys):
+    teclado("3", str(em_revisao.id), "1", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Criativo aprovado. O marketeer já o pode publicar." in saida
+    assert repositorio.obter_por_id(ligacao, em_revisao.id).estado == modelos.APROVADO
+
+
+def test_menu_do_cliente_rejeita_com_motivo(teclado, ligacao, contas, em_revisao, capsys):
+    teclado("3", str(em_revisao.id), "2", "Cores mais claras", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "Criativo rejeitado." in capsys.readouterr().out
+    rejeitado = repositorio.obter_por_id(ligacao, em_revisao.id)
+    assert rejeitado.estado == modelos.REJEITADO
+    assert rejeitado.motivo_rejeicao == "Cores mais claras"
+
+
+def test_menu_do_cliente_deixa_para_mais_tarde(teclado, ligacao, contas, em_revisao):
+    teclado("3", str(em_revisao.id), "0", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert repositorio.obter_por_id(ligacao, em_revisao.id).estado == modelos.EM_REVISAO
+
+
+def test_menu_do_cliente_nao_decide_criativos_fora_de_revisao(teclado, ligacao, contas, natal, capsys):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+    teclado("3", str(criativo.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Só se pode aprovar ou rejeitar um criativo em revisão. Este criativo está Em preparação." in saida
+    assert "Decisão" not in saida
