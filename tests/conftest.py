@@ -15,6 +15,16 @@ def hash_rapido(monkeypatch):
     monkeypatch.setattr(seguranca, "ITERACOES", 1000)
 
 
+@pytest.fixture(autouse=True)
+def dados_temporarios(monkeypatch, tmp_path):
+    """Põe a pasta de dados numa pasta temporária, em todos os testes.
+
+    Assim, nenhum teste mexe nos ficheiros da pasta ``dados`` do projeto, por
+    exemplo ao eliminar um criativo, que apaga a pasta do ficheiro dele.
+    """
+    monkeypatch.setenv(config.VARIAVEL_PASTA_DADOS, str(tmp_path / "dados_teste"))
+
+
 @pytest.fixture
 def ligacao():
     """Base de dados em memória, já com as tabelas criadas.

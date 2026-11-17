@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="200" viewBox="0 0 600 200">
+  <!-- Ficheiro de exemplo para anexar a um criativo (ver o Guia de utilização). -->
+  <rect width="600" height="200" fill="#b3202a"/>
+  <polygon points="90,30 140,150 40,150" fill="#1f6b3a"/>
+  <rect x="80" y="150" width="20" height="25" fill="#6b3f1f"/>
+  <circle cx="90" cy="28" r="8" fill="#f2c94c"/>
+  <text x="190" y="95" font-family="Arial, sans-serif" font-size="40" fill="#ffffff">Natal 2026</text>
+  <text x="190" y="140" font-family="Arial, sans-serif" font-size="22" fill="#ffffff">Empresa Exemplo — presentes para todos</text>
+</svg>

@@ -1,10 +1,11 @@
 """Testes dos criativos."""
 
 from datetime import date
+from pathlib import Path
 
 import pytest
 
-from gestor_campanhas import dados_demo, modelos
+from gestor_campanhas import config, dados_demo, modelos
 from gestor_campanhas.cli import criativos as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -14,6 +15,7 @@ from gestor_campanhas.repositorios import criativos as repositorio
 from gestor_campanhas.repositorios import utilizadores
 from gestor_campanhas.servicos import campanhas as servico_campanhas
 from gestor_campanhas.servicos import criativos as servico
+from gestor_campanhas.servicos import ficheiros
 
 
 @pytest.fixture
@@ -517,6 +519,8 @@ def test_menu_tem_as_opcoes_pela_ordem_certa():
         "Ver criativo",
         "Eliminar criativo",
         "Atualizar estado",
+        "Anexar ficheiro",
+        "Pré-visualizar ficheiro",
     ]
 
 
@@ -1007,3 +1011,281 @@ def test_menu_do_cliente_nao_decide_criativos_fora_de_revisao(teclado, ligacao, 
     saida = capsys.readouterr().out
     assert "Só se pode aprovar ou rejeitar um criativo em revisão. Este criativo está Em preparação." in saida
     assert "Decisão" not in saida
+
+
+# --- ficheiros ---------------------------------------------------------------
+
+
+@pytest.fixture
+def pasta_dados(monkeypatch, tmp_path):
+    """Põe a pasta de dados numa pasta temporária."""
+    pasta = tmp_path / "dados"
+    monkeypatch.setenv(config.VARIAVEL_PASTA_DADOS, str(pasta))
+    return pasta
+
+
+@pytest.fixture
+def imagem(tmp_path):
+    """Um ficheiro de imagem, fora da pasta de dados."""
+    ficheiro = tmp_path / "banner.png"
+    ficheiro.write_bytes(b"imagem")
+    return ficheiro
+
+
+def test_repositorio_guarda_o_nome_do_ficheiro(ligacao, natal):
+    criativo = repositorio.criar(ligacao, natal.id, "Banner", "")
+    assert criativo.ficheiro == ""
+
+    assert repositorio.definir_ficheiro(ligacao, criativo.id, "banner.png").ficheiro == "banner.png"
+
+
+def test_marketeer_anexa_um_ficheiro(ligacao, contas, natal, pasta_dados, imagem):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+
+    com_ficheiro = servico.anexar(ligacao, miguel, criativo.id, str(imagem))
+
+    assert com_ficheiro.ficheiro == "banner.png"
+    assert servico.ficheiro_de(com_ficheiro) == pasta_dados / "ficheiros" / str(criativo.id) / "banner.png"
+    assert servico.ficheiro_de(com_ficheiro).read_bytes() == b"imagem"
+
+
+def test_anexar_um_ficheiro_que_nao_existe_nao_altera_nada(ligacao, contas, natal, pasta_dados, tmp_path):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match="Não existe nenhum ficheiro em"):
+        servico.anexar(ligacao, miguel, criativo.id, str(tmp_path / "nada.png"))
+
+    assert repositorio.obter_por_id(ligacao, criativo.id).ficheiro == ""
+
+
+def test_nao_muda_o_ficheiro_de_um_criativo_em_revisao(ligacao, contas, natal, pasta_dados, imagem):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.EM_REVISAO)
+
+    with pytest.raises(ErroValidacao, match="Só se pode mudar o ficheiro de um criativo em preparação ou rejeitado."):
+        servico.anexar(ligacao, miguel, criativo.id, str(imagem))
+
+
+def test_marketeer_nao_anexa_a_criativos_de_outro(ligacao, contas, natal, marta, pasta_dados, imagem):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match="Não tem nenhum criativo"):
+        servico.anexar(ligacao, marta, criativo.id, str(imagem))
+
+
+def test_criativo_sem_ficheiro(ligacao, contas, natal):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match="O criativo Banner ainda não tem ficheiro."):
+        servico.ficheiro_de(criativo)
+
+
+def test_ficheiro_que_desapareceu_da_pasta(ligacao, contas, natal, pasta_dados, imagem):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.anexar(ligacao, miguel, servico.criar(ligacao, miguel, natal.id, "Banner").id, str(imagem))
+    ficheiros.apagar(criativo.id)
+
+    with pytest.raises(ErroValidacao, match="O ficheiro banner.png já não está na pasta de ficheiros."):
+        servico.ficheiro_de(criativo)
+
+
+def test_eliminar_o_criativo_apaga_o_ficheiro(ligacao, contas, natal, pasta_dados, imagem):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.anexar(ligacao, miguel, servico.criar(ligacao, miguel, natal.id, "Banner").id, str(imagem))
+
+    servico.eliminar(ligacao, miguel, criativo.id)
+
+    assert not ficheiros.pasta_do_criativo(criativo.id).exists()
+    assert imagem.exists()
+
+
+@pytest.fixture
+def aberturas(monkeypatch):
+    """Substitui a abertura de ficheiros, para os testes não abrirem janelas.
+
+    Devolve a lista dos ficheiros que a aplicação tentou abrir.
+    """
+    abertos = []
+    monkeypatch.setattr(ficheiros, "abrir", abertos.append)
+    return abertos
+
+
+def test_menu_anexa_um_ficheiro(teclado, ligacao, contas, natal, pasta_dados, imagem, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("6", str(criativo.id), f'"{imagem}"', "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "Ficheiro banner.png anexado ao criativo Banner." in capsys.readouterr().out
+    assert repositorio.obter_por_id(ligacao, criativo.id).ficheiro == "banner.png"
+
+
+def test_menu_avisa_que_o_ficheiro_vai_ser_substituido(teclado, ligacao, contas, natal, pasta_dados, imagem, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.anexar(ligacao, miguel, servico.criar(ligacao, miguel, natal.id, "Banner").id, str(imagem))
+    teclado("6", str(criativo.id), "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "O criativo Banner já tem o ficheiro banner.png, que vai ser substituído." in capsys.readouterr().out
+
+
+def test_menu_mostra_o_erro_quando_o_ficheiro_nao_existe(teclado, ligacao, contas, natal, pasta_dados, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("6", str(criativo.id), "C:/nada/banner.png", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "O ficheiro não foi anexado." in capsys.readouterr().out
+
+
+def test_menu_pre_visualiza_e_abre_o_ficheiro(teclado, ligacao, contas, natal, pasta_dados, imagem, aberturas, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.anexar(ligacao, miguel, servico.criar(ligacao, miguel, natal.id, "Banner").id, str(imagem))
+    teclado("7", str(criativo.id), "s", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert "Ficheiro do criativo Banner" in saida
+    assert "  Nome:     banner.png" in saida
+    assert "  Tipo:     Imagem (image/png)" in saida
+    assert "  Tamanho:  6 bytes" in saida
+    assert "O ficheiro foi aberto noutra janela." in saida
+    assert aberturas == [servico.ficheiro_de(criativo)]
+
+
+def test_menu_pre_visualiza_sem_abrir(teclado, ligacao, contas, natal, pasta_dados, imagem, aberturas):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.anexar(ligacao, miguel, servico.criar(ligacao, miguel, natal.id, "Banner").id, str(imagem))
+    teclado("7", str(criativo.id), "n", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert aberturas == []
+
+
+def test_menu_pre_visualizar_sem_ficheiro(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("7", str(criativo.id), "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "O criativo Banner ainda não tem ficheiro." in capsys.readouterr().out
+
+
+def test_menu_mostra_o_erro_quando_nao_consegue_abrir(teclado, ligacao, contas, natal, pasta_dados, imagem, monkeypatch, capsys):
+    def falhar(_caminho):
+        raise OSError("sem programa para este tipo de ficheiro")
+
+    monkeypatch.setattr(ficheiros, "abrir", falhar)
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.anexar(ligacao, miguel, servico.criar(ligacao, miguel, natal.id, "Banner").id, str(imagem))
+    teclado("7", str(criativo.id), "s", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "Não foi possível abrir o ficheiro: sem programa para este tipo de ficheiro" in capsys.readouterr().out
+
+
+def test_detalhes_mostram_o_ficheiro(ligacao, contas, natal, capsys):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+    menu.mostrar_detalhes(criativo)
+    menu.mostrar_detalhes(repositorio.definir_ficheiro(ligacao, criativo.id, "banner.png"))
+
+    saida = capsys.readouterr().out
+    assert "  Ficheiro:    -" in saida
+    assert "  Ficheiro:    banner.png" in saida
+
+
+def test_ficheiro_de_exemplo_existe():
+    exemplo = config.PASTA_PROJETO / "exemplos" / "banner-natal.svg"
+
+    assert exemplo.is_file()
+    assert ficheiros.tipo(exemplo) == "Imagem (image/svg+xml)"
+
+
+@pytest.fixture
+def com_ficheiro(ligacao, contas, natal, pasta_dados, imagem):
+    """Um criativo da Carla, com o ficheiro ``banner.png`` anexado."""
+    miguel = contas[modelos.MARKETEER]
+    return servico.anexar(ligacao, miguel, servico.criar(ligacao, miguel, natal.id, "Banner").id, str(imagem))
+
+
+def test_opcoes_do_menu_do_cliente():
+    assert [descricao for descricao, _ in menu.ACOES_DO_CLIENTE] == [
+        "Filtrar e pesquisar",
+        "Ver criativo",
+        "Aprovar ou rejeitar criativo",
+        "Pré-visualizar ficheiro",
+        "Descarregar ficheiro",
+    ]
+
+
+def test_cliente_pre_visualiza_e_abre(teclado, ligacao, contas, com_ficheiro, aberturas, capsys):
+    teclado("4", str(com_ficheiro.id), "s", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "  Tipo:     Imagem (image/png)" in saida
+    assert aberturas == [servico.ficheiro_de(com_ficheiro)]
+
+
+def test_cliente_nao_pre_visualiza_ficheiros_de_outro(teclado, ligacao, com_ficheiro, jose, aberturas, capsys):
+    teclado("4", str(com_ficheiro.id), "", "0")
+
+    menu.do_cliente(ligacao, jose)
+
+    assert f"Não tem nenhum criativo com o número {com_ficheiro.id}." in capsys.readouterr().out
+    assert aberturas == []
+
+
+def test_cliente_descarrega_para_uma_pasta(teclado, ligacao, contas, com_ficheiro, tmp_path, capsys):
+    destino = tmp_path / "guardados"
+    destino.mkdir()
+    teclado("5", str(com_ficheiro.id), str(destino), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert f"Cópia guardada em {destino / 'banner.png'}" in capsys.readouterr().out
+    assert (destino / "banner.png").read_bytes() == b"imagem"
+
+
+def test_cliente_descarrega_para_as_transferencias(teclado, ligacao, contas, com_ficheiro, tmp_path, monkeypatch):
+    transferencias = tmp_path / "Downloads"
+    transferencias.mkdir()
+    monkeypatch.setattr(menu, "pasta_transferencias", lambda: transferencias)
+    teclado("5", str(com_ficheiro.id), "", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert (transferencias / "banner.png").exists()
+
+
+def test_descarregar_para_uma_pasta_que_nao_existe(teclado, ligacao, contas, com_ficheiro, tmp_path, capsys):
+    teclado("5", str(com_ficheiro.id), str(tmp_path / "nao_existe"), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "não existe." in capsys.readouterr().out
+
+
+def test_descarregar_um_criativo_sem_ficheiro(teclado, ligacao, contas, natal, capsys):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+    teclado("5", str(criativo.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "O criativo Banner ainda não tem ficheiro." in saida
+    assert "Pasta onde guardar" not in saida
+
+
+def test_pasta_transferencias_fica_na_pasta_pessoal():
+    assert menu.pasta_transferencias() == Path.home() / "Downloads"

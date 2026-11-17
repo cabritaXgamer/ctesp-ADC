@@ -14,18 +14,22 @@ Um criativo passa por vários estados. O marketeer muda-o de estado seguindo
 :data:`PROXIMOS_ESTADOS`; o cliente aprova ou rejeita os que estão em
 revisão. Um criativo só pode ser editado enquanto está em preparação ou
 depois de ser rejeitado, e um criativo publicado não pode ser eliminado.
+
+Cada criativo pode ter um ficheiro anexado (a imagem, o vídeo ou o texto).
+A cópia do ficheiro é tratada por :mod:`gestor_campanhas.servicos.ficheiros`.
 """
 
 from __future__ import annotations
 
 import sqlite3
 from datetime import date
+from pathlib import Path
 
 from gestor_campanhas import dinheiro, modelos
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Campanha, Criativo, Utilizador
 from gestor_campanhas.repositorios import campanhas, criativos
-from gestor_campanhas.servicos import gestao, validacao
+from gestor_campanhas.servicos import ficheiros, gestao, validacao
 
 #: Estados para onde o marketeer pode mudar um criativo, a partir de cada
 #: estado. Os estados :data:`~gestor_campanhas.modelos.APROVADO` e
@@ -204,6 +208,8 @@ def editar(
 def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador, identificador: int) -> Criativo:
     """Elimina um criativo do marketeer. Não pode ser desfeito.
 
+    O ficheiro anexado, se houver, também é apagado.
+
     :param ligacao: Ligação aberta à base de dados.
     :param marketeer: Marketeer que está a eliminar.
     :param identificador: Número do criativo.
@@ -215,6 +221,7 @@ def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador, identificador: 
     if criativo.estado == modelos.PUBLICADO:
         raise ErroValidacao("Um criativo publicado não pode ser eliminado.")
     criativos.eliminar(ligacao, criativo.id)
+    ficheiros.apagar(criativo.id)
     return criativo
 
 
@@ -357,3 +364,43 @@ def contar_por_estado(ligacao: sqlite3.Connection, campanha: Campanha) -> dict[s
     for criativo in criativos.listar_por_campanha(ligacao, campanha.id):
         totais[criativo.estado] += 1
     return {estado: total for estado, total in totais.items() if total}
+
+
+def anexar(ligacao: sqlite3.Connection, marketeer: Utilizador, identificador: int, origem: str) -> Criativo:
+    """Anexa um ficheiro a um criativo do marketeer, substituindo o que lá estava.
+
+    Tal como os outros dados, o ficheiro só pode ser mudado enquanto o
+    criativo está num dos estados de :data:`EDITAVEIS`.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a anexar.
+    :param identificador: Número do criativo.
+    :param origem: Caminho do ficheiro no computador, tal como foi escrito.
+    :return: O criativo, já com o ficheiro.
+    :raises ErroValidacao: Se o criativo não for do marketeer, se não puder
+        ser alterado ou se o ficheiro não existir.
+    """
+    criativo = obter_do_marketeer(ligacao, marketeer, identificador)
+    if criativo.estado not in EDITAVEIS:
+        raise ErroValidacao(
+            f"Só se pode mudar o ficheiro de um criativo em preparação ou rejeitado. "
+            f"Este criativo está {criativo.nome_estado}."
+        )
+    nome = ficheiros.guardar(origem, criativo.id)
+    return criativos.definir_ficheiro(ligacao, criativo.id, nome)
+
+
+def ficheiro_de(criativo: Criativo) -> Path:
+    """Devolve o caminho do ficheiro anexado a um criativo.
+
+    :param criativo: Criativo a consultar.
+    :return: Caminho da cópia do ficheiro.
+    :raises ErroValidacao: Se o criativo não tiver ficheiro, ou se a cópia
+        tiver desaparecido da pasta de ficheiros.
+    """
+    if not criativo.ficheiro:
+        raise ErroValidacao(f"O criativo {criativo.nome} ainda não tem ficheiro.")
+    caminho = ficheiros.caminho(criativo.id, criativo.ficheiro)
+    if not caminho.is_file():
+        raise ErroValidacao(f"O ficheiro {criativo.ficheiro} já não está na pasta de ficheiros.")
+    return caminho

@@ -59,3 +59,13 @@ def pasta_caixa_saida() -> Path:
     :return: Caminho da pasta ``caixa_saida`` dentro da pasta de dados.
     """
     return pasta_dados() / "caixa_saida"
+
+
+def pasta_ficheiros() -> Path:
+    """Devolve a pasta onde ficam os ficheiros anexados aos criativos.
+
+    Cada criativo tem uma pasta própria, com o número do criativo como nome.
+
+    :return: Caminho da pasta ``ficheiros`` dentro da pasta de dados.
+    """
+    return pasta_dados() / "ficheiros"

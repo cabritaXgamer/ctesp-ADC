@@ -2,17 +2,20 @@
 
 O marketeer escolhe uma das suas campanhas e vê os criativos dela, com o
 custo, o prazo, o público-alvo e a plataforma de cada um. A partir daí pode
-criar, editar, consultar e eliminar criativos, e atualizar o estado de cada
-um.
+criar, editar, consultar e eliminar criativos, atualizar o estado de cada
+um e anexar o ficheiro do criativo.
 
 O cliente vê os criativos de todas as suas campanhas, numa só lista, pode
-filtrá-los e pesquisá-los, e aprova ou rejeita os que estão em revisão.
+filtrá-los e pesquisá-los, aprova ou rejeita os que estão em revisão, e
+pré-visualiza e descarrega os ficheiros.
 """
 
 from __future__ import annotations
 
 import sqlite3
+import subprocess
 from datetime import date
+from pathlib import Path
 
 from gestor_campanhas import dinheiro, modelos
 from gestor_campanhas.cli import campanhas as menu_campanhas
@@ -20,7 +23,7 @@ from gestor_campanhas.cli import comum
 from gestor_campanhas.cli.pedidos import resumir
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Campanha, Criativo, Utilizador
-from gestor_campanhas.servicos import campanhas, criativos
+from gestor_campanhas.servicos import campanhas, criativos, ficheiros
 
 
 #: O que se escreve para apagar um valor quando se edita um criativo.
@@ -87,6 +90,7 @@ def mostrar_detalhes(criativo: Criativo) -> None:
     print(f"  Estado:      {criativo.nome_estado}")
     if criativo.estado == modelos.REJEITADO:
         print(f"  Motivo:      {criativo.motivo_rejeicao}")
+    print(f"  Ficheiro:    {criativo.ficheiro or '-'}")
 
 
 def pedir_criativo(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanha) -> Criativo | None:
@@ -295,6 +299,80 @@ def atualizar_estado(ligacao: sqlite3.Connection, marketeer: Utilizador, campanh
     comum.pausa()
 
 
+def anexar(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanha) -> None:
+    """Pede o número de um criativo e o caminho de um ficheiro, e anexa-o.
+
+    O ficheiro é copiado para a pasta de ficheiros da aplicação. Se o criativo
+    já tinha um ficheiro, fica o novo.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a anexar.
+    :param campanha: Campanha que está a ser vista.
+    """
+    comum.titulo("Anexar ficheiro")
+    criativo = pedir_criativo(ligacao, marketeer, campanha)
+    if criativo is None:
+        return
+    if criativo.ficheiro:
+        print(f"\nO criativo {criativo.nome} já tem o ficheiro {criativo.ficheiro}, que vai ser substituído.")
+    print("\nNo Windows, pode clicar no ficheiro com o botão direito, escolher \"Copiar como caminho\"")
+    print("e colar aqui com o botão direito do rato.")
+    origem = comum.ler_texto("Caminho do ficheiro (Enter para cancelar)", obrigatorio=False)
+    if not origem:
+        return
+    try:
+        criativo = criativos.anexar(ligacao, marketeer, criativo.id, origem)
+    except ErroValidacao as erro:
+        print(f"\n{erro} O ficheiro não foi anexado.")
+    else:
+        print(f"\nFicheiro {criativo.ficheiro} anexado ao criativo {criativo.nome}.")
+    comum.pausa()
+
+
+def pre_visualizar_ficheiro(criativo: Criativo) -> None:
+    """Mostra o nome, o tipo e o tamanho do ficheiro de um criativo e oferece-se para o abrir.
+
+    O ficheiro abre-se no programa predefinido do sistema (por exemplo, o
+    visualizador de imagens). Mostra uma mensagem se o criativo não tiver
+    ficheiro.
+
+    :param criativo: Criativo cujo ficheiro se quer ver.
+    """
+    try:
+        caminho = criativos.ficheiro_de(criativo)
+    except ErroValidacao as erro:
+        print(f"\n{erro}")
+        comum.pausa()
+        return
+    dados = ficheiros.descrever(caminho)
+    print(f"\nFicheiro do criativo {criativo.nome}")
+    print(f"  Nome:     {dados['nome']}")
+    print(f"  Tipo:     {dados['tipo']}")
+    print(f"  Tamanho:  {dados['tamanho']}")
+    print()
+    if comum.confirmar("Abrir o ficheiro no programa predefinido?"):
+        try:
+            ficheiros.abrir(caminho)
+        except (OSError, subprocess.CalledProcessError) as erro:
+            print(f"\nNão foi possível abrir o ficheiro: {erro}")
+        else:
+            print("\nO ficheiro foi aberto noutra janela.")
+    comum.pausa()
+
+
+def pre_visualizar(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanha) -> None:
+    """Pede o número de um criativo e mostra o ficheiro dele (ver :func:`pre_visualizar_ficheiro`).
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a consultar.
+    :param campanha: Campanha que está a ser vista.
+    """
+    comum.titulo("Pré-visualizar ficheiro")
+    criativo = pedir_criativo(ligacao, marketeer, campanha)
+    if criativo is not None:
+        pre_visualizar_ficheiro(criativo)
+
+
 #: Opções do menu de criativos de uma campanha. Cada opção é um par
 #: ``(descrição, função)``; a função recebe a ligação à base de dados, o
 #: marketeer e a campanha.
@@ -304,6 +382,8 @@ ACOES = [
     ("Ver criativo", ver),
     ("Eliminar criativo", eliminar),
     ("Atualizar estado", atualizar_estado),
+    ("Anexar ficheiro", anexar),
+    ("Pré-visualizar ficheiro", pre_visualizar),
 ]
 
 
@@ -521,6 +601,52 @@ def decidir(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
     comum.pausa()
 
 
+def pre_visualizar_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
+    """Pede o número de um criativo do cliente e mostra o ficheiro dele.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    """
+    comum.titulo("Pré-visualizar ficheiro")
+    criativo = pedir_criativo_do_cliente(ligacao, cliente)
+    if criativo is not None:
+        pre_visualizar_ficheiro(criativo)
+
+
+def pasta_transferencias() -> Path:
+    """Devolve a pasta onde os ficheiros são guardados quando não se indica outra.
+
+    :return: A pasta ``Downloads`` (Transferências) da pasta pessoal do utilizador.
+    """
+    return Path.home() / "Downloads"
+
+
+def descarregar(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
+    """Pede o número de um criativo do cliente e guarda uma cópia do ficheiro dele.
+
+    A cópia vai para a pasta indicada, ou para a pasta Transferências se a
+    resposta ficar vazia. Nenhum ficheiro que já lá esteja é apagado.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a descarregar.
+    """
+    comum.titulo("Descarregar ficheiro")
+    criativo = pedir_criativo_do_cliente(ligacao, cliente)
+    if criativo is None:
+        return
+    try:
+        caminho = criativos.ficheiro_de(criativo)
+        pasta = comum.ler_texto(
+            f"Pasta onde guardar a cópia (Enter para {pasta_transferencias()})", obrigatorio=False
+        )
+        copia = ficheiros.copiar_para(caminho, pasta or str(pasta_transferencias()))
+    except ErroValidacao as erro:
+        print(f"\n{erro}")
+    else:
+        print(f"\nCópia guardada em {copia}")
+    comum.pausa()
+
+
 #: Opções do menu de criativos do Cliente. Cada opção é um par
 #: ``(descrição, função)``; a função recebe a ligação à base de dados e o
 #: cliente.
@@ -528,6 +654,8 @@ ACOES_DO_CLIENTE = [
     ("Filtrar e pesquisar", filtrar),
     ("Ver criativo", ver_do_cliente),
     ("Aprovar ou rejeitar criativo", decidir),
+    ("Pré-visualizar ficheiro", pre_visualizar_do_cliente),
+    ("Descarregar ficheiro", descarregar),
 ]
 
 
@@ -536,7 +664,7 @@ def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
 
     Mostra os criativos de todas as campanhas do cliente, quantos estão à
     espera de aprovação e as opções para os filtrar, consultar, aprovar e
-    rejeitar. A lista completa volta a aparecer depois de cada opção.
+    rejeitar, e para ver e descarregar os ficheiros. A lista completa volta a aparecer depois de cada opção.
 
     :param ligacao: Ligação aberta à base de dados.
     :param utilizador: Cliente que está a usar o menu.
