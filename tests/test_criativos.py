@@ -753,3 +753,78 @@ def test_repositorio_muda_o_estado_e_guarda_o_motivo(ligacao, natal):
     em_preparacao = repositorio.definir_estado(ligacao, criativo.id, modelos.EM_PREPARACAO)
     assert em_preparacao.estado == modelos.EM_PREPARACAO
     assert em_preparacao.motivo_rejeicao == ""
+
+
+def com_estado(ligacao, criativo, estado):
+    """Põe um criativo num estado qualquer, sem passar pelas regras."""
+    return repositorio.definir_estado(ligacao, criativo.id, estado)
+
+
+@pytest.mark.parametrize(
+    ("inicial", "novo"),
+    [
+        (modelos.EM_PREPARACAO, modelos.EM_REVISAO),
+        (modelos.EM_REVISAO, modelos.EM_PREPARACAO),
+        (modelos.REJEITADO, modelos.EM_PREPARACAO),
+        (modelos.REJEITADO, modelos.EM_REVISAO),
+        (modelos.APROVADO, modelos.PUBLICADO),
+    ],
+)
+def test_marketeer_muda_o_estado(ligacao, contas, natal, inicial, novo):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), inicial)
+
+    assert servico.mudar_estado(ligacao, miguel, criativo.id, novo).estado == novo
+
+
+@pytest.mark.parametrize(
+    ("inicial", "novo", "mensagem"),
+    [
+        (modelos.EM_PREPARACAO, modelos.PUBLICADO, "Um criativo Em preparação não pode passar a Publicado."),
+        (modelos.EM_PREPARACAO, modelos.APROVADO, "Um criativo Em preparação não pode passar a Aprovado."),
+        (modelos.EM_REVISAO, modelos.APROVADO, "Um criativo Em revisão não pode passar a Aprovado."),
+        (modelos.APROVADO, modelos.EM_PREPARACAO, "Um criativo Aprovado não pode passar a Em preparação."),
+        (modelos.PUBLICADO, modelos.EM_PREPARACAO, "Um criativo Publicado não pode passar a Em preparação."),
+    ],
+)
+def test_marketeer_nao_faz_mudancas_que_nao_estao_previstas(ligacao, contas, natal, inicial, novo, mensagem):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), inicial)
+
+    with pytest.raises(ErroValidacao, match=mensagem):
+        servico.mudar_estado(ligacao, miguel, criativo.id, novo)
+
+    assert repositorio.obter_por_id(ligacao, criativo.id).estado == inicial
+
+
+def test_marketeer_nao_muda_o_estado_de_criativos_de_outro(ligacao, contas, natal, marta):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match="Não tem nenhum criativo"):
+        servico.mudar_estado(ligacao, marta, criativo.id, modelos.EM_REVISAO)
+
+
+@pytest.mark.parametrize("estado", [modelos.EM_REVISAO, modelos.APROVADO, modelos.PUBLICADO])
+def test_so_edita_criativos_em_preparacao_ou_rejeitados(ligacao, contas, natal, estado):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), estado)
+
+    with pytest.raises(ErroValidacao, match="Só se pode editar um criativo em preparação ou rejeitado."):
+        servico.editar(ligacao, miguel, criativo.id, "Outro nome")
+
+
+def test_edita_um_criativo_rejeitado(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.REJEITADO)
+
+    assert servico.editar(ligacao, miguel, criativo.id, "Banner novo").nome == "Banner novo"
+
+
+def test_nao_elimina_um_criativo_publicado(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.PUBLICADO)
+
+    with pytest.raises(ErroValidacao, match="Um criativo publicado não pode ser eliminado."):
+        servico.eliminar(ligacao, miguel, criativo.id)
+
+    assert repositorio.obter_por_id(ligacao, criativo.id) is not None
