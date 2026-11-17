@@ -249,7 +249,7 @@ def test_menu_mostra_as_campanhas_e_os_criativos_da_escolhida(teclado, ligacao, 
     assert "Criativos — escolher a campanha" in saida
     assert "2 campanhas." in saida
     assert "Criativos da campanha Natal (Carla Cliente)" in saida
-    assert "Banner de Natal  Em preparação" in saida
+    assert "Banner de Natal  Por definir  -      -             -           Em preparação" in saida
     assert "1 criativo." in saida
     assert "Cartaz dos saldos" not in saida
 
@@ -272,7 +272,7 @@ def test_campanha_sem_criativos(teclado, ligacao, contas, natal, capsys):
 
 
 def test_menu_cria_um_criativo(teclado, ligacao, contas, natal, capsys):
-    teclado("1", "Banner de Natal", "Árvore e presentes", "", "0")
+    teclado("1", "Banner de Natal", "Árvore e presentes", "", "", "", "", "", "0")
 
     menu.da_campanha(ligacao, contas[modelos.MARKETEER], natal)
 
@@ -286,7 +286,7 @@ def test_menu_cria_um_criativo(teclado, ligacao, contas, natal, capsys):
 def test_menu_edita_um_criativo_mantendo_o_que_fica_vazio(teclado, ligacao, contas, natal, capsys):
     miguel = contas[modelos.MARKETEER]
     criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "Árvore")
-    teclado("2", str(criativo.id), "Banner grande", "", "", "0")
+    teclado("2", str(criativo.id), "Banner grande", "", "", "", "", "", "", "0")
 
     menu.da_campanha(ligacao, miguel, natal)
 
@@ -405,3 +405,74 @@ def test_editar_com_um_valor_errado_nao_altera_nada(ligacao, contas, natal):
         servico.editar(ligacao, miguel, criativo.id, "Banner novo", "", "400", "2027-01-01")
 
     assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
+
+
+def test_menu_cria_um_criativo_com_todos_os_dados(teclado, ligacao, contas, natal, capsys):
+    teclado("1", "Banner", "", "400", "2026-11-25", "Famílias com filhos", "1", "", "0")
+
+    menu.da_campanha(ligacao, contas[modelos.MARKETEER], natal)
+
+    saida = capsys.readouterr().out
+    assert "N.º  Nome    Custo     Prazo       Público-alvo         Plataforma  Estado" in saida
+    assert "Banner  400,00 €  2026-11-25  Famílias com filhos  Facebook    Em preparação" in saida
+
+
+def test_menu_mostra_o_erro_e_nao_cria(teclado, ligacao, contas, natal, capsys):
+    teclado("1", "Banner", "", "400", "2026-12-31", "", "", "", "0")
+
+    menu.da_campanha(ligacao, contas[modelos.MARKETEER], natal)
+
+    saida = capsys.readouterr().out
+    assert "O prazo não pode ser depois do fim da campanha (2026-12-24). O criativo não foi criado." in saida
+    assert servico.listar_da_campanha(ligacao, natal) == []
+
+
+def test_menu_repete_a_plataforma_ate_ser_um_numero_valido(teclado, ligacao, contas, natal, capsys):
+    teclado("1", "Banner", "", "", "", "", "9", "x", "2", "", "0")
+
+    menu.da_campanha(ligacao, contas[modelos.MARKETEER], natal)
+
+    assert "Escreva um número entre 1 e 6." in capsys.readouterr().out
+    assert servico.listar_da_campanha(ligacao, natal)[0].plataforma == "Instagram"
+
+
+def test_menu_edita_e_apaga_valores(teclado, ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "Árvore", "400", "2026-11-25", "Famílias", "Facebook")
+    teclado("2", str(criativo.id), "", "-", "450", "-", "", "-", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    alterado = repositorio.obter_por_id(ligacao, criativo.id)
+    assert alterado.nome == "Banner"
+    assert alterado.descricao == ""
+    assert alterado.custo_centimos == 45000
+    assert alterado.prazo is None
+    assert alterado.publico_alvo == "Famílias"
+    assert alterado.plataforma == ""
+
+
+def test_menu_editar_mantem_tudo_com_enter(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "Árvore", "400", "2026-11-25", "Famílias", "Facebook")
+    teclado("2", str(criativo.id), "", "", "", "", "", "", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "Criativo guardado." in capsys.readouterr().out
+    assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
+
+
+def test_menu_editar_sem_valores_mantem_o_criativo_vazio(teclado, ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("2", str(criativo.id), "", "", "", "", "", "", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
+
+
+def test_custo_por_palavras():
+    assert menu.custo(Criativo(1, 1, "Banner")) == "Por definir"
+    assert menu.custo(Criativo(1, 1, "Banner", custo_centimos=0)) == "0,00 €"
