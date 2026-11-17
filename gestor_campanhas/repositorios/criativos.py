@@ -19,7 +19,7 @@ _SELECIONAR = """
 SELECT criativos.id, criativos.campanha_id, criativos.nome, criativos.descricao,
        criativos.custo_centimos, criativos.prazo, criativos.publico_alvo,
        criativos.plataforma, criativos.estado, criativos.motivo_rejeicao,
-       campanhas.nome AS campanha_nome
+       criativos.ficheiro, campanhas.nome AS campanha_nome
 FROM criativos
 JOIN campanhas ON campanhas.id = criativos.campanha_id
 """
@@ -38,6 +38,7 @@ def _de_linha(linha: sqlite3.Row) -> Criativo:
         plataforma=linha["plataforma"],
         estado=linha["estado"],
         motivo_rejeicao=linha["motivo_rejeicao"],
+        ficheiro=linha["ficheiro"],
         campanha_nome=linha["campanha_nome"],
     )
 
@@ -176,6 +177,19 @@ def definir_estado(
     ligacao.execute(
         "UPDATE criativos SET estado = ?, motivo_rejeicao = ? WHERE id = ?", (estado, motivo_rejeicao, identificador)
     )
+    ligacao.commit()
+    return obter_por_id(ligacao, identificador)
+
+
+def definir_ficheiro(ligacao: sqlite3.Connection, identificador: int, ficheiro: str) -> Criativo:
+    """Guarda o nome do ficheiro anexado a um criativo.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param identificador: Identificador do criativo.
+    :param ficheiro: Nome do ficheiro.
+    :return: O criativo, já com o ficheiro.
+    """
+    ligacao.execute("UPDATE criativos SET ficheiro = ? WHERE id = ?", (ficheiro, identificador))
     ligacao.commit()
     return obter_por_id(ligacao, identificador)
 

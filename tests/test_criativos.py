@@ -4,7 +4,7 @@ from datetime import date
 
 import pytest
 
-from gestor_campanhas import dados_demo, modelos
+from gestor_campanhas import config, dados_demo, modelos
 from gestor_campanhas.cli import criativos as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -14,6 +14,7 @@ from gestor_campanhas.repositorios import criativos as repositorio
 from gestor_campanhas.repositorios import utilizadores
 from gestor_campanhas.servicos import campanhas as servico_campanhas
 from gestor_campanhas.servicos import criativos as servico
+from gestor_campanhas.servicos import ficheiros
 
 
 @pytest.fixture
@@ -1007,3 +1008,91 @@ def test_menu_do_cliente_nao_decide_criativos_fora_de_revisao(teclado, ligacao, 
     saida = capsys.readouterr().out
     assert "Só se pode aprovar ou rejeitar um criativo em revisão. Este criativo está Em preparação." in saida
     assert "Decisão" not in saida
+
+
+# --- ficheiros ---------------------------------------------------------------
+
+
+@pytest.fixture
+def pasta_dados(monkeypatch, tmp_path):
+    """Põe a pasta de dados numa pasta temporária."""
+    pasta = tmp_path / "dados"
+    monkeypatch.setenv(config.VARIAVEL_PASTA_DADOS, str(pasta))
+    return pasta
+
+
+@pytest.fixture
+def imagem(tmp_path):
+    """Um ficheiro de imagem, fora da pasta de dados."""
+    ficheiro = tmp_path / "banner.png"
+    ficheiro.write_bytes(b"imagem")
+    return ficheiro
+
+
+def test_repositorio_guarda_o_nome_do_ficheiro(ligacao, natal):
+    criativo = repositorio.criar(ligacao, natal.id, "Banner", "")
+    assert criativo.ficheiro == ""
+
+    assert repositorio.definir_ficheiro(ligacao, criativo.id, "banner.png").ficheiro == "banner.png"
+
+
+def test_marketeer_anexa_um_ficheiro(ligacao, contas, natal, pasta_dados, imagem):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+
+    com_ficheiro = servico.anexar(ligacao, miguel, criativo.id, str(imagem))
+
+    assert com_ficheiro.ficheiro == "banner.png"
+    assert servico.ficheiro_de(com_ficheiro) == pasta_dados / "ficheiros" / str(criativo.id) / "banner.png"
+    assert servico.ficheiro_de(com_ficheiro).read_bytes() == b"imagem"
+
+
+def test_anexar_um_ficheiro_que_nao_existe_nao_altera_nada(ligacao, contas, natal, pasta_dados, tmp_path):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match="Não existe nenhum ficheiro em"):
+        servico.anexar(ligacao, miguel, criativo.id, str(tmp_path / "nada.png"))
+
+    assert repositorio.obter_por_id(ligacao, criativo.id).ficheiro == ""
+
+
+def test_nao_muda_o_ficheiro_de_um_criativo_em_revisao(ligacao, contas, natal, pasta_dados, imagem):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.EM_REVISAO)
+
+    with pytest.raises(ErroValidacao, match="Só se pode mudar o ficheiro de um criativo em preparação ou rejeitado."):
+        servico.anexar(ligacao, miguel, criativo.id, str(imagem))
+
+
+def test_marketeer_nao_anexa_a_criativos_de_outro(ligacao, contas, natal, marta, pasta_dados, imagem):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match="Não tem nenhum criativo"):
+        servico.anexar(ligacao, marta, criativo.id, str(imagem))
+
+
+def test_criativo_sem_ficheiro(ligacao, contas, natal):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match="O criativo Banner ainda não tem ficheiro."):
+        servico.ficheiro_de(criativo)
+
+
+def test_ficheiro_que_desapareceu_da_pasta(ligacao, contas, natal, pasta_dados, imagem):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.anexar(ligacao, miguel, servico.criar(ligacao, miguel, natal.id, "Banner").id, str(imagem))
+    ficheiros.apagar(criativo.id)
+
+    with pytest.raises(ErroValidacao, match="O ficheiro banner.png já não está na pasta de ficheiros."):
+        servico.ficheiro_de(criativo)
+
+
+def test_eliminar_o_criativo_apaga_o_ficheiro(ligacao, contas, natal, pasta_dados, imagem):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.anexar(ligacao, miguel, servico.criar(ligacao, miguel, natal.id, "Banner").id, str(imagem))
+
+    servico.eliminar(ligacao, miguel, criativo.id)
+
+    assert not ficheiros.pasta_do_criativo(criativo.id).exists()
+    assert imagem.exists()

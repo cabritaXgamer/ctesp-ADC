@@ -222,6 +222,7 @@ class Criativo:
         :data:`REJEITADO` ou :data:`PUBLICADO`.
     :param motivo_rejeicao: Motivo indicado pelo cliente quando rejeita o
         criativo. Só existe nos criativos rejeitados.
+    :param ficheiro: Nome do ficheiro anexado, ou vazio se ainda não há.
     :param campanha_nome: Nome da campanha, para mostrar nas listas.
     """
 
@@ -235,6 +236,7 @@ class Criativo:
     plataforma: str = ""
     estado: str = EM_PREPARACAO
     motivo_rejeicao: str = ""
+    ficheiro: str = ""
     campanha_nome: str = ""
 
     @property
