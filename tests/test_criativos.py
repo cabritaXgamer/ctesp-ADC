@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from gestor_campanhas import config, dados_demo, modelos
+from gestor_campanhas.cli import campanhas as menu_campanhas
 from gestor_campanhas.cli import criativos as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -1328,3 +1329,73 @@ def test_aviso_quando_passa_o_budget(natal):
     assert servico.aviso_budget(natal, 170000) == (
         "Atenção: o custo dos criativos (1 700,00 €) ultrapassa o budget da campanha (1 500,00 €) em 200,00 €."
     )
+
+
+AVISO_NATAL = "Atenção: o custo dos criativos (1 700,00 €) ultrapassa o budget da campanha (1 500,00 €) em 200,00 €."
+
+
+def test_lista_mostra_o_custo_e_o_budget(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    servico.criar(ligacao, miguel, natal.id, "Banner", custo="400")
+    servico.criar(ligacao, miguel, natal.id, "Vídeo", custo="900")
+    teclado("0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert "Custo dos criativos: 1 300,00 €. Budget da campanha: 1 500,00 €." in saida
+    assert "Atenção" not in saida
+
+
+def test_lista_avisa_quando_passa_o_budget(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    servico.criar(ligacao, miguel, natal.id, "Banner", custo="800")
+    servico.criar(ligacao, miguel, natal.id, "Vídeo", custo="900")
+    teclado("0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert AVISO_NATAL in capsys.readouterr().out
+
+
+def test_criar_avisa_quando_o_criativo_faz_passar_o_budget(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    servico.criar(ligacao, miguel, natal.id, "Banner", custo="1200")
+    teclado("1", "Vídeo", "", "500", "", "", "", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out.split("Criativo criado com o número")[1]
+    assert AVISO_NATAL in saida.split("Prima Enter")[0]
+
+
+def test_editar_avisa_quando_o_custo_novo_passa_o_budget(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", custo="400")
+    teclado("2", str(criativo.id), "", "", "1700", "", "", "", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out.split("Criativo guardado.")[1]
+    assert AVISO_NATAL in saida.split("Prima Enter")[0]
+
+
+def test_campanha_sem_budget_nao_tem_aviso(teclado, ligacao, contas, saldos, capsys):
+    miguel = contas[modelos.MARKETEER]
+    servico.criar(ligacao, miguel, saldos.id, "Cartaz", custo="9999")
+    teclado("0")
+
+    menu.da_campanha(ligacao, miguel, saldos)
+
+    saida = capsys.readouterr().out
+    assert "Custo dos criativos: 9 999,00 €. Budget da campanha: Por definir." in saida
+    assert "Atenção" not in saida
+
+
+def test_ver_campanha_tambem_avisa(teclado, ligacao, contas, natal, capsys):
+    servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner", custo="1700")
+    teclado("3", str(natal.id), "", "0")
+
+    menu_campanhas.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    assert AVISO_NATAL in capsys.readouterr().out

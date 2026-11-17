@@ -236,9 +236,13 @@ def ver(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
     campanha = pedir_campanha(ligacao, marketeer)
     if campanha is None:
         return
+    gasto = criativos.despesa(ligacao, campanha)
     print()
-    mostrar_detalhes(campanha, criativos.despesa(ligacao, campanha))
+    mostrar_detalhes(campanha, gasto)
     print(f"  Criativos: {resumo_criativos(ligacao, campanha)}")
+    aviso = criativos.aviso_budget(campanha, gasto)
+    if aviso:
+        print(f"\n{aviso}")
     comum.pausa()
 
 
