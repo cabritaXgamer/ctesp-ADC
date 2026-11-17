@@ -39,6 +39,7 @@ OPCOES: dict[str, list] = {
     modelos.CLIENTE: [
         ("Pedidos de campanha", pedidos.do_cliente),
         ("Campanhas", campanhas.do_cliente),
+        ("Criativos", criativos.do_cliente),
         *OPCOES_DA_CONTA,
     ],
 }

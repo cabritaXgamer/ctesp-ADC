@@ -30,7 +30,7 @@ Estrutura de pastas
        admin.py           opções do menu do Administrador
        gestao.py          gestão de clientes e marketeers, pelo Administrador
        campanhas.py       campanhas, nos menus dos três perfis
-       criativos.py       criativos, no menu do Marketeer
+       criativos.py       criativos, nos menus do Marketeer e do Cliente
        pedidos.py         pedidos de campanha, nos menus do Cliente e do Administrador
        conta.py           opções da conta, comuns a todos os perfis
        recuperacao.py     recuperação da password

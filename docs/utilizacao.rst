@@ -615,3 +615,50 @@ responsável:
      Nome:      Miguel Marketeer
      Email:     marketeer@agencia.pt
      Telefone:  910000002
+
+Criativos
+~~~~~~~~~
+
+Mostra os criativos de todas as campanhas do cliente, numa só lista, com a
+campanha, o custo, o prazo, o público-alvo, a plataforma e o estado de cada
+um. Um cliente só vê os criativos das suas campanhas.
+
+.. code-block:: text
+
+   N.º  Nome             Campanha    Custo     Prazo       Público-alvo               Plataforma  Estado
+   ---  ---------------  ----------  --------  ----------  -------------------------  ----------  -------------
+   1    Banner de Natal  Natal 2026  400,00 €  2026-11-25  Famílias da região de...   Facebook    Em preparação
+   2    Vídeo da montra  Natal 2026  900,00 €  2026-11-28  Jovens adultos, 18 a 3...  Instagram   Em preparação
+
+   2 criativos.
+
+Os criativos aparecem agrupados por campanha. O cliente não altera nada
+nesta lista: os criativos são criados e alterados pelo marketeer.
+
+**Filtrar e pesquisar** faz quatro perguntas, por esta ordem. Com Enter, a
+pergunta não filtra nada:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Pergunta
+     - O que filtra
+   * - Texto a procurar
+     - Criativos com esse texto no nome, na descrição ou no público-alvo, em
+       qualquer posição. Não distingue maiúsculas nem acentos: ``familias``
+       encontra ``Famílias``.
+   * - Campanha
+     - Escolhe-se pelo número, numa lista com as campanhas do cliente.
+   * - Plataforma
+     - Escolhe-se pelo número, numa lista com as seis plataformas.
+   * - Estado
+     - Escolhe-se pelo número, numa lista com os estados de um criativo.
+
+Os criativos que respeitam todos os filtros aparecem com o título
+``Criativos encontrados``. Se nenhum respeitar, aparece
+``Nenhum criativo corresponde aos filtros.`` Depois de Enter, volta a lista
+completa.
+
+**Ver criativo** pede o número do criativo e mostra todos os dados dele,
+incluindo a descrição e o público-alvo completo.

@@ -551,3 +551,190 @@ def test_criativos_de_demonstracao_respeitam_as_regras():
         assert criativo["plataforma"] in ("", *modelos.PLATAFORMAS)
         if criativo["prazo"] and campanha["fim"]:
             assert criativo["prazo"] <= campanha["fim"]
+
+
+# --- criativos do cliente ----------------------------------------------------
+
+
+@pytest.fixture
+def jose(ligacao, contas):
+    """Um segundo cliente, além da ``Carla Cliente`` da fixture ``contas``."""
+    return utilizadores.criar(ligacao, "José Padeiro", "jose@padaria.pt", "x", modelos.CLIENTE)
+
+
+@pytest.fixture
+def aulas(ligacao, contas, jose):
+    """Uma campanha do José, do Miguel."""
+    return repositorio_campanhas.criar(ligacao, "Aulas", "", jose.id, contas[modelos.MARKETEER].id)
+
+
+def test_repositorio_lista_os_criativos_de_todas_as_campanhas_do_cliente(ligacao, contas, natal, saldos, aulas):
+    repositorio.criar(ligacao, saldos.id, "Cartaz", "")
+    repositorio.criar(ligacao, natal.id, "Banner", "")
+    repositorio.criar(ligacao, aulas.id, "Lanches", "")
+    repositorio.criar(ligacao, natal.id, "Vídeo", "")
+
+    lista = repositorio.listar_por_cliente(ligacao, contas[modelos.CLIENTE].id)
+
+    assert nomes(lista) == ["Banner", "Vídeo", "Cartaz"]
+    assert [criativo.campanha_nome for criativo in lista] == ["Natal", "Natal", "Saldos"]
+
+
+def test_cliente_ve_so_os_criativos_das_suas_campanhas(ligacao, contas, natal, aulas, jose):
+    miguel = contas[modelos.MARKETEER]
+    banner = servico.criar(ligacao, miguel, natal.id, "Banner")
+    lanches = servico.criar(ligacao, miguel, aulas.id, "Lanches")
+
+    assert servico.listar_do_cliente(ligacao, contas[modelos.CLIENTE]) == [banner]
+    assert servico.listar_do_cliente(ligacao, jose) == [lanches]
+
+
+@pytest.fixture
+def varios(ligacao, contas, natal, saldos):
+    """Quatro criativos da Carla, em duas campanhas, com dados diferentes."""
+    miguel = contas[modelos.MARKETEER]
+    servico.criar(ligacao, miguel, natal.id, "Banner de Natal", "Árvore", "400", "", "Famílias", "Facebook")
+    servico.criar(ligacao, miguel, natal.id, "Vídeo da montra", "", "900", "", "Jovens adultos", "Instagram")
+    servico.criar(ligacao, miguel, saldos.id, "Cartaz dos saldos", "Preços baixos", "", "", "Famílias", "Instagram")
+    servico.criar(ligacao, miguel, saldos.id, "Texto para o site", "", "", "", "", "")
+    return servico.listar_do_cliente(ligacao, contas[modelos.CLIENTE])
+
+
+def test_sem_filtros_ficam_todos(varios):
+    assert servico.filtrar(varios) == varios
+
+
+@pytest.mark.parametrize(
+    ("pesquisa", "esperado"),
+    [
+        ("natal", ["Banner de Natal"]),
+        ("VIDEO", ["Vídeo da montra"]),
+        ("famílias", ["Banner de Natal", "Cartaz dos saldos"]),
+        ("precos", ["Cartaz dos saldos"]),
+        ("  arvore ", ["Banner de Natal"]),
+        ("carnaval", []),
+    ],
+)
+def test_pesquisa_no_nome_na_descricao_e_no_publico(varios, pesquisa, esperado):
+    assert nomes(servico.filtrar(varios, pesquisa=pesquisa)) == esperado
+
+
+def test_filtra_pela_campanha(varios, saldos):
+    assert nomes(servico.filtrar(varios, campanha_id=saldos.id)) == ["Cartaz dos saldos", "Texto para o site"]
+
+
+def test_filtra_pela_plataforma(varios):
+    assert nomes(servico.filtrar(varios, plataforma="Instagram")) == ["Vídeo da montra", "Cartaz dos saldos"]
+
+
+def test_filtra_pelo_estado(varios):
+    assert servico.filtrar(varios, estado=modelos.EM_PREPARACAO) == varios
+    assert servico.filtrar(varios, estado=modelos.APROVADO) == []
+
+
+def test_junta_varios_filtros(varios, natal):
+    escolhidos = servico.filtrar(varios, pesquisa="famílias", campanha_id=natal.id, plataforma="Facebook")
+
+    assert nomes(escolhidos) == ["Banner de Natal"]
+
+
+# --- menu do cliente ---------------------------------------------------------
+
+
+def test_opcao_criativos_esta_no_menu_do_cliente():
+    descricoes = [descricao for descricao, _ in perfis.OPCOES[modelos.CLIENTE]]
+
+    assert descricoes[:3] == ["Pedidos de campanha", "Campanhas", "Criativos"]
+    assert dict(perfis.OPCOES[modelos.CLIENTE])["Criativos"] is menu.do_cliente
+
+
+def test_cliente_sem_criativos(teclado, ligacao, contas, capsys):
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "Ainda não há criativos nas suas campanhas." in capsys.readouterr().out
+
+
+def test_cliente_ve_a_lista_com_a_campanha(teclado, ligacao, contas, varios, aulas, capsys):
+    servico.criar(ligacao, contas[modelos.MARKETEER], aulas.id, "Lanches do José")
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Os meus criativos" in saida
+    assert "N.º  Nome               Campanha  Custo        Prazo  Público-alvo    Plataforma  Estado" in saida
+    assert "Banner de Natal    Natal     400,00 €     -      Famílias        Facebook    Em preparação" in saida
+    assert "Texto para o site  Saldos    Por definir  -      -               -           Em preparação" in saida
+    assert "4 criativos." in saida
+    assert "Lanches do José" not in saida
+
+
+def test_cliente_ve_os_detalhes_de_um_criativo(teclado, ligacao, contas, varios, capsys):
+    banner = varios[0]
+    teclado("2", str(banner.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert f"Criativo n.º {banner.id}" in saida
+    assert "  Descrição:   Árvore" in saida
+
+
+def test_cliente_nao_ve_criativos_de_outro_cliente(teclado, ligacao, contas, aulas, jose, capsys):
+    lanches = servico.criar(ligacao, contas[modelos.MARKETEER], aulas.id, "Lanches")
+    teclado("2", str(lanches.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert f"Não tem nenhum criativo com o número {lanches.id}." in saida
+    assert servico.obter_do_cliente(ligacao, jose, lanches.id) == lanches
+
+
+def test_cliente_filtra_pela_plataforma(teclado, ligacao, contas, varios, capsys):
+    teclado("1", "", "", "2", "", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    filtrada = saida.split("Criativos encontrados")[1].split("Os meus criativos")[0]
+    assert "Vídeo da montra" in filtrada
+    assert "Cartaz dos saldos" in filtrada
+    assert "Banner de Natal" not in filtrada
+    assert "2 criativos." in filtrada
+
+
+def test_cliente_pesquisa_e_escolhe_a_campanha(teclado, ligacao, contas, varios, capsys):
+    teclado("1", "famílias", "2", "", "", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "  1. Natal" in saida
+    assert "  2. Saldos" in saida
+    filtrada = saida.split("Criativos encontrados")[1].split("Os meus criativos")[0]
+    assert "Cartaz dos saldos" in filtrada
+    assert "1 criativo." in filtrada
+
+
+def test_cliente_filtra_pelo_estado_sem_resultados(teclado, ligacao, contas, varios, capsys):
+    teclado("1", "", "", "", "3", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "  3. Aprovado" in saida
+    assert "Nenhum criativo corresponde aos filtros." in saida
+
+
+def test_filtro_repete_a_pergunta_quando_o_numero_nao_existe(teclado, ligacao, contas, varios, capsys):
+    teclado("1", "", "7", "", "9", "1", "", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Escreva um número entre 1 e 2, ou Enter." in saida
+    assert "Escreva um número entre 1 e 6, ou Enter." in saida
+    assert "1 criativo." in saida.split("Criativos encontrados")[1].split("Os meus criativos")[0]

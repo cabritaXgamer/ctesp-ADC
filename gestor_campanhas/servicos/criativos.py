@@ -6,6 +6,9 @@ campanha pode criar, alterar ou eliminar os criativos dela.
 Além do nome e da descrição, o marketeer indica o custo estimado, o prazo,
 o público-alvo e a plataforma. Todos estes dados são opcionais quando o
 criativo é criado, porque podem ainda não ser conhecidos.
+
+O cliente vê os criativos de todas as suas campanhas e pode filtrá-los e
+pesquisá-los.
 """
 
 from __future__ import annotations
@@ -17,7 +20,7 @@ from gestor_campanhas import dinheiro, modelos
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Campanha, Criativo, Utilizador
 from gestor_campanhas.repositorios import campanhas, criativos
-from gestor_campanhas.servicos import validacao
+from gestor_campanhas.servicos import gestao, validacao
 
 
 def listar_da_campanha(ligacao: sqlite3.Connection, campanha: Campanha) -> list[Criativo]:
@@ -185,3 +188,67 @@ def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador, identificador: 
     criativo = obter_do_marketeer(ligacao, marketeer, identificador)
     criativos.eliminar(ligacao, criativo.id)
     return criativo
+
+
+def listar_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> list[Criativo]:
+    """Lista os criativos de todas as campanhas de um cliente.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    :return: Criativos das campanhas do cliente, agrupados por campanha.
+    """
+    return criativos.listar_por_cliente(ligacao, cliente.id)
+
+
+def obter_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador, identificador: int) -> Criativo:
+    """Procura um criativo pelo número, confirmando que é de uma campanha do cliente.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    :param identificador: Número do criativo, mostrado na primeira coluna da lista.
+    :return: O criativo.
+    :raises ErroValidacao: Se não houver nenhum criativo com esse número nas
+        campanhas do cliente.
+    """
+    criativo = criativos.obter_por_id(ligacao, identificador)
+    if criativo is not None:
+        campanha = campanhas.obter_por_id(ligacao, criativo.campanha_id)
+        if campanha.cliente_id == cliente.id:
+            return criativo
+    raise ErroValidacao(f"Não tem nenhum criativo com o número {identificador}.")
+
+
+def filtrar(
+    lista: list[Criativo],
+    pesquisa: str = "",
+    campanha_id: int | None = None,
+    plataforma: str = "",
+    estado: str = "",
+) -> list[Criativo]:
+    """Escolhe, de uma lista de criativos, os que respeitam todos os filtros.
+
+    Um filtro vazio (ou ``None``) não exclui nenhum criativo.
+
+    :param lista: Criativos a filtrar.
+    :param pesquisa: Texto a procurar no nome, na descrição e no público-alvo,
+        em qualquer posição. Não distingue maiúsculas nem acentos.
+    :param campanha_id: Número da campanha.
+    :param plataforma: Nome da plataforma.
+    :param estado: Estado do criativo, por exemplo
+        :data:`~gestor_campanhas.modelos.EM_PREPARACAO`.
+    :return: Os criativos que respeitam os filtros, pela mesma ordem.
+    """
+    procura = gestao.simplificar(pesquisa.strip())
+    escolhidos = []
+    for criativo in lista:
+        texto = gestao.simplificar(f"{criativo.nome} {criativo.descricao} {criativo.publico_alvo}")
+        if procura and procura not in texto:
+            continue
+        if campanha_id is not None and criativo.campanha_id != campanha_id:
+            continue
+        if plataforma and criativo.plataforma != plataforma:
+            continue
+        if estado and criativo.estado != estado:
+            continue
+        escolhidos.append(criativo)
+    return escolhidos
