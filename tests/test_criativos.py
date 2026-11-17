@@ -5,9 +5,12 @@ from datetime import date
 import pytest
 
 from gestor_campanhas import modelos
+from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Criativo
 from gestor_campanhas.repositorios import campanhas as repositorio_campanhas
 from gestor_campanhas.repositorios import criativos as repositorio
+from gestor_campanhas.repositorios import utilizadores
+from gestor_campanhas.servicos import criativos as servico
 
 
 @pytest.fixture
@@ -29,6 +32,12 @@ def natal(ligacao, contas):
 def saldos(ligacao, contas):
     """Outra campanha da Carla, do Miguel, sem budget."""
     return repositorio_campanhas.criar(ligacao, "Saldos", "", contas[modelos.CLIENTE].id, contas[modelos.MARKETEER].id)
+
+
+@pytest.fixture
+def marta(ligacao, contas):
+    """Um segundo marketeer, sem campanhas."""
+    return utilizadores.criar(ligacao, "Marta Marques", "marta@agencia.pt", "x", modelos.MARKETEER)
 
 
 def nomes(lista):
@@ -97,3 +106,79 @@ def test_repositorio_elimina_e_conta_criativos(ligacao, natal, saldos):
     assert repositorio.obter_por_id(ligacao, banner.id) is None
     assert repositorio.contar_por_campanha(ligacao, natal.id) == 1
     assert repositorio.contar_por_campanha(ligacao, saldos.id) == 0
+
+
+# --- regras ------------------------------------------------------------------
+
+
+def test_marketeer_cria_um_criativo_na_sua_campanha(ligacao, contas, natal):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "  Banner  ", "  Árvore  ")
+
+    assert criativo.nome == "Banner"
+    assert criativo.descricao == "Árvore"
+    assert criativo.estado == modelos.EM_PREPARACAO
+    assert servico.listar_da_campanha(ligacao, natal) == [criativo]
+
+
+def test_criativo_tem_de_ter_nome(ligacao, contas, natal):
+    with pytest.raises(ErroValidacao, match="O nome não pode ficar vazio."):
+        servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "   ")
+
+    assert servico.listar_da_campanha(ligacao, natal) == []
+
+
+def test_marketeer_nao_cria_criativos_em_campanhas_de_outro(ligacao, natal, marta):
+    with pytest.raises(ErroValidacao, match=f"Não tem nenhuma campanha com o número {natal.id}."):
+        servico.criar(ligacao, marta, natal.id, "Banner")
+
+
+def test_nao_cria_criativos_numa_campanha_que_nao_existe(ligacao, contas):
+    with pytest.raises(ErroValidacao, match="Não tem nenhuma campanha com o número 999."):
+        servico.criar(ligacao, contas[modelos.MARKETEER], 999, "Banner")
+
+
+def test_marketeer_edita_o_seu_criativo(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+
+    alterado = servico.editar(ligacao, miguel, criativo.id, "Banner grande", "Com o logótipo")
+
+    assert alterado.nome == "Banner grande"
+    assert alterado.descricao == "Com o logótipo"
+
+
+def test_editar_com_nome_vazio_nao_altera_nada(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "Árvore")
+
+    with pytest.raises(ErroValidacao):
+        servico.editar(ligacao, miguel, criativo.id, "", "Outra")
+
+    assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
+
+
+def test_marketeer_nao_mexe_em_criativos_de_outro(ligacao, contas, natal, marta):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match=f"Não tem nenhum criativo com o número {criativo.id}."):
+        servico.editar(ligacao, marta, criativo.id, "Meu")
+    with pytest.raises(ErroValidacao, match="Não tem nenhum criativo"):
+        servico.eliminar(ligacao, marta, criativo.id)
+
+    assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
+
+
+def test_nao_encontra_um_criativo_que_nao_existe(ligacao, contas):
+    with pytest.raises(ErroValidacao, match="Não tem nenhum criativo com o número 999."):
+        servico.obter_do_marketeer(ligacao, contas[modelos.MARKETEER], 999)
+
+
+def test_marketeer_elimina_o_seu_criativo(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    banner = servico.criar(ligacao, miguel, natal.id, "Banner")
+    video = servico.criar(ligacao, miguel, natal.id, "Vídeo")
+
+    eliminado = servico.eliminar(ligacao, miguel, banner.id)
+
+    assert eliminado == banner
+    assert servico.listar_da_campanha(ligacao, natal) == [video]
