@@ -2,7 +2,8 @@
 
 O marketeer vê as campanhas que lhe estão atribuídas, com o cliente, as
 datas, o budget e o estado, e pode criar, editar, consultar e eliminar
-cada uma.
+cada uma. Ao consultar uma campanha, vê também quantos criativos ela tem em
+cada estado.
 
 O Administrador vê as campanhas de todos os marketeers, define o budget de
 cada uma e escolhe o marketeer responsável.
@@ -16,11 +17,11 @@ from __future__ import annotations
 import sqlite3
 from datetime import date
 
-from gestor_campanhas import dinheiro
+from gestor_campanhas import dinheiro, modelos
 from gestor_campanhas.cli import comum
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Campanha, Utilizador
-from gestor_campanhas.servicos import campanhas
+from gestor_campanhas.servicos import campanhas, criativos
 
 #: O que se escreve para apagar uma data quando se edita uma campanha.
 APAGAR = "-"
@@ -82,6 +83,21 @@ def mostrar_detalhes(campanha: Campanha) -> None:
     print(f"  Fim:       {data(campanha.data_fim)}")
     print(f"  Budget:    {budget(campanha)}")
     print(f"  Estado:    {campanhas.estado(campanha)}")
+
+
+def resumo_criativos(ligacao: sqlite3.Connection, campanha: Campanha) -> str:
+    """Escreve quantos criativos uma campanha tem, no total e em cada estado.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param campanha: Campanha a descrever.
+    :return: Por exemplo ``"3 (Em preparação: 2, Em revisão: 1)"``, ou ``"0"``
+        se a campanha não tiver criativos.
+    """
+    por_estado = criativos.contar_por_estado(ligacao, campanha)
+    if not por_estado:
+        return "0"
+    partes = [f"{modelos.NOMES_ESTADOS_CRIATIVO[estado]}: {total}" for estado, total in por_estado.items()]
+    return f"{sum(por_estado.values())} ({', '.join(partes)})"
 
 
 def pedir_campanha(ligacao: sqlite3.Connection, marketeer: Utilizador) -> Campanha | None:
@@ -176,6 +192,8 @@ def editar(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
 def ver(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
     """Pede o número de uma campanha e mostra todos os dados dela.
 
+    Além dos dados da campanha, mostra quantos criativos ela tem em cada estado.
+
     :param ligacao: Ligação aberta à base de dados.
     :param marketeer: Marketeer que está a consultar.
     """
@@ -185,6 +203,7 @@ def ver(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
         return
     print()
     mostrar_detalhes(campanha)
+    print(f"  Criativos: {resumo_criativos(ligacao, campanha)}")
     comum.pausa()
 
 

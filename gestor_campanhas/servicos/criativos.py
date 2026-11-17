@@ -342,3 +342,18 @@ def rejeitar(ligacao: sqlite3.Connection, cliente: Utilizador, identificador: in
     if not motivo:
         raise ErroValidacao("Indique o motivo da rejeição, para o marketeer saber o que mudar.")
     return criativos.definir_estado(ligacao, criativo.id, modelos.REJEITADO, motivo)
+
+
+def contar_por_estado(ligacao: sqlite3.Connection, campanha: Campanha) -> dict[str, int]:
+    """Conta os criativos de uma campanha em cada estado.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param campanha: Campanha a consultar.
+    :return: Dicionário do estado para o número de criativos nesse estado,
+        pela ordem de :data:`~gestor_campanhas.modelos.NOMES_ESTADOS_CRIATIVO`.
+        Os estados sem criativos não aparecem.
+    """
+    totais = {estado: 0 for estado in modelos.NOMES_ESTADOS_CRIATIVO}
+    for criativo in criativos.listar_por_campanha(ligacao, campanha.id):
+        totais[criativo.estado] += 1
+    return {estado: total for estado, total in totais.items() if total}
