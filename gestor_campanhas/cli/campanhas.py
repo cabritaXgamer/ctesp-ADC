@@ -191,6 +191,9 @@ def ver(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
 def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
     """Pede o número de uma campanha e elimina-a, depois de pedir confirmação.
 
+    Uma campanha com criativos não é eliminada: aparece a mensagem a dizer
+    quantos criativos tem.
+
     :param ligacao: Ligação aberta à base de dados.
     :param marketeer: Marketeer que está a eliminar.
     """
@@ -202,8 +205,12 @@ def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador) -> None:
     mostrar_detalhes(campanha)
     print("\nUma campanha eliminada não pode ser recuperada.")
     if comum.confirmar("Eliminar esta campanha?"):
-        campanhas.eliminar(ligacao, marketeer, campanha.id)
-        print(f"\nA campanha {campanha.nome} foi eliminada.")
+        try:
+            campanhas.eliminar(ligacao, marketeer, campanha.id)
+        except ErroValidacao as erro:
+            print(f"\n{erro}")
+        else:
+            print(f"\nA campanha {campanha.nome} foi eliminada.")
     else:
         print("\nNada foi alterado.")
     comum.pausa()

@@ -81,6 +81,22 @@ CREATE TABLE IF NOT EXISTS pedidos_campanha (
     campanha_id INTEGER REFERENCES campanhas (id) ON DELETE SET NULL,
     criado_em TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS criativos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    campanha_id INTEGER NOT NULL REFERENCES campanhas (id),
+    nome TEXT NOT NULL,
+    descricao TEXT NOT NULL DEFAULT '',
+    custo_centimos INTEGER,
+    prazo TEXT,
+    publico_alvo TEXT NOT NULL DEFAULT '',
+    plataforma TEXT NOT NULL DEFAULT '',
+    estado TEXT NOT NULL DEFAULT 'em_preparacao'
+        CHECK (estado IN ('em_preparacao', 'em_revisao', 'aprovado', 'rejeitado', 'publicado')),
+    motivo_rejeicao TEXT NOT NULL DEFAULT '',
+    ficheiro TEXT NOT NULL DEFAULT '',
+    criado_em TEXT NOT NULL
+);
 """
 
 

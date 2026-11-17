@@ -95,3 +95,38 @@ def test_pedido_de_campanha_so_aceita_os_estados_previstos(ligacao, contas):
             "VALUES (?, 'Vender', 1000, '2026-12-01', 'perdido', '2026-11-16 10:00:00')",
             (cliente.id,),
         )
+
+
+def test_criativo_tem_de_ter_uma_campanha_que_existe(ligacao):
+    with pytest.raises(sqlite3.IntegrityError):
+        ligacao.execute(
+            "INSERT INTO criativos (campanha_id, nome, criado_em) VALUES (999, 'Banner', '2026-11-17 10:00:00')"
+        )
+
+
+def test_campanha_com_criativos_nao_pode_ser_apagada(ligacao, contas):
+    cursor = ligacao.execute(
+        "INSERT INTO campanhas (nome, cliente_id, marketeer_id, criada_em) VALUES ('Natal', ?, ?, '2026-11-17')",
+        (contas["cliente"].id, contas["marketeer"].id),
+    )
+    ligacao.execute(
+        "INSERT INTO criativos (campanha_id, nome, criado_em) VALUES (?, 'Banner', '2026-11-17 10:00:00')",
+        (cursor.lastrowid,),
+    )
+
+    with pytest.raises(sqlite3.IntegrityError):
+        ligacao.execute("DELETE FROM campanhas WHERE id = ?", (cursor.lastrowid,))
+
+
+def test_criativo_comeca_em_preparacao(ligacao, contas):
+    cursor = ligacao.execute(
+        "INSERT INTO campanhas (nome, cliente_id, marketeer_id, criada_em) VALUES ('Natal', ?, ?, '2026-11-17')",
+        (contas["cliente"].id, contas["marketeer"].id),
+    )
+    ligacao.execute(
+        "INSERT INTO criativos (campanha_id, nome, criado_em) VALUES (?, 'Banner', '2026-11-17 10:00:00')",
+        (cursor.lastrowid,),
+    )
+
+    linha = ligacao.execute("SELECT estado, custo_centimos, ficheiro FROM criativos").fetchone()
+    assert tuple(linha) == ("em_preparacao", None, "")

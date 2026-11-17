@@ -426,6 +426,52 @@ Pede o número da campanha, mostra os dados dela e pede confirmação. Uma
 campanha eliminada não pode ser recuperada. Um marketeer só pode eliminar as
 suas campanhas.
 
+Uma campanha com criativos não pode ser eliminada: aparece uma mensagem com
+o número de criativos que ela tem. Primeiro eliminam-se os criativos, na
+opção **Criativos**, e depois a campanha.
+
+Criativos
+~~~~~~~~~
+
+Um criativo é uma peça de uma campanha: uma imagem, um vídeo ou um texto que
+vai ser publicado. A opção mostra as campanhas do marketeer e pede o número
+de uma delas. Depois mostra os criativos dessa campanha e, por baixo, as
+opções para os gerir.
+
+.. code-block:: text
+
+   ============================================================
+   Criativos da campanha Natal 2026 (Carla Cliente)
+   ============================================================
+   N.º  Nome             Estado
+   ---  ---------------  -------------
+   1    Banner de Natal  Em preparação
+
+   1 criativo.
+
+Um criativo novo fica no estado ``Em preparação``. O número da primeira
+coluna identifica o criativo nas outras opções. Com **0. Voltar** volta-se à
+escolha da campanha, e com Enter nessa pergunta volta-se ao menu do perfil.
+
+Criar criativo
+^^^^^^^^^^^^^^
+
+Pede o nome do criativo, que é obrigatório, e uma descrição, que é opcional.
+O criativo fica na campanha escolhida.
+
+Editar criativo
+^^^^^^^^^^^^^^^
+
+Pede o número do criativo e mostra o nome e a descrição, com o valor atual
+entre parênteses retos. Com Enter, o valor mantém-se. Só se podem escolher
+criativos da campanha que está a ser vista.
+
+Eliminar criativo
+^^^^^^^^^^^^^^^^^
+
+Pede o número do criativo, mostra os dados dele e pede confirmação. Um
+criativo eliminado não pode ser recuperado.
+
 Cliente
 -------
 

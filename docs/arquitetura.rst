@@ -15,7 +15,7 @@ Estrutura de pastas
      __main__.py          ponto de entrada (python -m gestor_campanhas)
      config.py            caminhos da pasta de dados e da base de dados
      bd.py                ligação SQLite e criação das tabelas
-     modelos.py           classes de dados (Utilizador, Campanha, PedidoCampanha), perfis e estados
+     modelos.py           classes de dados (Utilizador, Campanha, PedidoCampanha, Criativo), perfis e estados
      erros.py             erros que os menus mostram ao utilizador
      relogio.py           data e hora atuais
      seguranca.py         hash das passwords
@@ -30,6 +30,7 @@ Estrutura de pastas
        admin.py           opções do menu do Administrador
        gestao.py          gestão de clientes e marketeers, pelo Administrador
        campanhas.py       campanhas, nos menus dos três perfis
+       criativos.py       criativos, no menu do Marketeer
        pedidos.py         pedidos de campanha, nos menus do Cliente e do Administrador
        conta.py           opções da conta, comuns a todos os perfis
        recuperacao.py     recuperação da password
@@ -228,3 +229,16 @@ executadas em todos os arranques sem apagar dados.
        cêntimos, prazo, plataformas, estado (``pendente``, ``em_analise``,
        ``aprovado``, ``rejeitado`` ou ``cancelado``), motivo da rejeição e
        campanha a que deu origem.
+   * - ``criativos``
+     - Uma linha por criativo: campanha a que pertence, nome, descrição,
+       custo em cêntimos, prazo, público-alvo, plataforma, estado
+       (``em_preparacao``, ``em_revisao``, ``aprovado``, ``rejeitado`` ou
+       ``publicado``), motivo da rejeição e nome do ficheiro anexado. A
+       tabela é criada logo com todas as colunas; as que ainda não estão em
+       uso ficam vazias.
+
+Uma campanha com criativos não pode ser apagada: a coluna ``campanha_id`` da
+tabela ``criativos`` aponta para ela, e o SQLite recusa apagar uma linha a
+que outra tabela ainda faz referência. A regra está também em
+:func:`gestor_campanhas.servicos.campanhas.eliminar`, que mostra uma
+mensagem a explicar o que fazer.
