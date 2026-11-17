@@ -41,10 +41,18 @@ def para_centimos(texto: str) -> int:
 def formatar(centimos: int) -> str:
     """Escreve um valor em cêntimos como é mostrado ao utilizador.
 
+    Um valor negativo (por exemplo, o que falta quando se gasta mais do que
+    o budget) leva o sinal ``-`` à frente.
+
     :param centimos: Valor em cêntimos.
     :return: O valor em euros, com os milhares separados por um espaço e duas
-        casas decimais. ``150050`` dá ``"1 500,50 €"``.
+        casas decimais. ``150050`` dá ``"1 500,50 €"`` e ``-150`` dá
+        ``"-1,50 €"``.
     """
-    euros, resto = divmod(centimos, 100)
+    # O divmod de um número negativo não dá o que se espera (divmod(-150, 100)
+    # é (-2, 50)), por isso faz-se a conta com o valor positivo e põe-se o
+    # sinal no fim.
+    sinal = "-" if centimos < 0 else ""
+    euros, resto = divmod(abs(centimos), 100)
     milhares = f"{euros:,}".replace(",", " ")
-    return f"{milhares},{resto:02d} €"
+    return f"{sinal}{milhares},{resto:02d} €"
