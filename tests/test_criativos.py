@@ -5,11 +5,14 @@ from datetime import date
 import pytest
 
 from gestor_campanhas import modelos
+from gestor_campanhas.cli import criativos as menu
+from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.modelos import Criativo
 from gestor_campanhas.repositorios import campanhas as repositorio_campanhas
 from gestor_campanhas.repositorios import criativos as repositorio
 from gestor_campanhas.repositorios import utilizadores
+from gestor_campanhas.servicos import campanhas as servico_campanhas
 from gestor_campanhas.servicos import criativos as servico
 
 
@@ -182,3 +185,114 @@ def test_marketeer_elimina_o_seu_criativo(ligacao, contas, natal):
 
     assert eliminado == banner
     assert servico.listar_da_campanha(ligacao, natal) == [video]
+
+
+# --- menu do marketeer -------------------------------------------------------
+
+
+def test_opcao_criativos_esta_no_menu_do_marketeer():
+    opcoes = dict(perfis.OPCOES[modelos.MARKETEER])
+
+    assert opcoes["Criativos"] is menu.do_marketeer
+    assert [descricao for descricao, _ in perfis.OPCOES[modelos.MARKETEER]][:2] == ["Campanhas", "Criativos"]
+
+
+def test_menu_sem_campanhas_avisa_e_volta(teclado, ligacao, marta, capsys):
+    teclado("")
+
+    menu.do_marketeer(ligacao, marta)
+
+    assert 'Ainda não tem campanhas. Crie uma na opção "Campanhas".' in capsys.readouterr().out
+
+
+def test_menu_mostra_as_campanhas_e_os_criativos_da_escolhida(teclado, ligacao, contas, natal, saldos, capsys):
+    miguel = contas[modelos.MARKETEER]
+    servico.criar(ligacao, miguel, natal.id, "Banner de Natal")
+    servico.criar(ligacao, miguel, saldos.id, "Cartaz dos saldos")
+    teclado(str(natal.id), "0", "")
+
+    menu.do_marketeer(ligacao, miguel)
+
+    saida = capsys.readouterr().out
+    assert "Criativos — escolher a campanha" in saida
+    assert "2 campanhas." in saida
+    assert "Criativos da campanha Natal (Carla Cliente)" in saida
+    assert "Banner de Natal  Em preparação" in saida
+    assert "1 criativo." in saida
+    assert "Cartaz dos saldos" not in saida
+
+
+def test_menu_recusa_campanha_de_outro_marketeer(teclado, ligacao, contas, natal, marta, capsys):
+    servico_campanhas.criar(ligacao, marta, "Da Marta", "", contas[modelos.CLIENTE].id)
+    teclado(str(natal.id), "", "")
+
+    menu.do_marketeer(ligacao, marta)
+
+    assert f"Não tem nenhuma campanha com o número {natal.id}." in capsys.readouterr().out
+
+
+def test_campanha_sem_criativos(teclado, ligacao, contas, natal, capsys):
+    teclado(str(natal.id), "0", "")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    assert "Esta campanha ainda não tem criativos." in capsys.readouterr().out
+
+
+def test_menu_cria_um_criativo(teclado, ligacao, contas, natal, capsys):
+    teclado("1", "Banner de Natal", "Árvore e presentes", "", "0")
+
+    menu.da_campanha(ligacao, contas[modelos.MARKETEER], natal)
+
+    saida = capsys.readouterr().out
+    (criativo,) = servico.listar_da_campanha(ligacao, natal)
+    assert f"Criativo criado com o número {criativo.id}." in saida
+    assert criativo.nome == "Banner de Natal"
+    assert criativo.descricao == "Árvore e presentes"
+
+
+def test_menu_edita_um_criativo_mantendo_o_que_fica_vazio(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "Árvore")
+    teclado("2", str(criativo.id), "Banner grande", "", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "Criativo guardado." in capsys.readouterr().out
+    alterado = repositorio.obter_por_id(ligacao, criativo.id)
+    assert alterado.nome == "Banner grande"
+    assert alterado.descricao == "Árvore"
+
+
+def test_menu_nao_aceita_criativo_de_outra_campanha(teclado, ligacao, contas, natal, saldos, capsys):
+    miguel = contas[modelos.MARKETEER]
+    cartaz = servico.criar(ligacao, miguel, saldos.id, "Cartaz")
+    teclado("2", str(cartaz.id), "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert f"Esta campanha não tem nenhum criativo com o número {cartaz.id}." in capsys.readouterr().out
+
+
+def test_menu_elimina_depois_de_confirmar(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("3", str(criativo.id), "s", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert "Um criativo eliminado não pode ser recuperado." in saida
+    assert "O criativo Banner foi eliminado." in saida
+    assert repositorio.obter_por_id(ligacao, criativo.id) is None
+
+
+def test_menu_nao_elimina_sem_confirmacao(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("3", str(criativo.id), "n", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "Nada foi alterado." in capsys.readouterr().out
+    assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
