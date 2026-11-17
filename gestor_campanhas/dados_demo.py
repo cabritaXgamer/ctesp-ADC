@@ -1,8 +1,9 @@
 """Dados de demonstração.
 
-Cria um administrador, dois marketeers, três clientes, três campanhas e dois
-pedidos de campanha, para se poder experimentar a aplicação logo a seguir a instalá-la. Corre-se a
-partir da pasta do projeto com::
+Cria um administrador, dois marketeers, três clientes, três campanhas, dois
+pedidos de campanha e quatro criativos, para se poder experimentar a
+aplicação logo a seguir a instalá-la. Corre-se a partir da pasta do projeto
+com::
 
     python -m gestor_campanhas.dados_demo
 
@@ -19,7 +20,7 @@ from datetime import date
 
 from gestor_campanhas import bd, modelos, seguranca
 from gestor_campanhas.cli import comum
-from gestor_campanhas.repositorios import campanhas, pedidos, utilizadores
+from gestor_campanhas.repositorios import campanhas, criativos, pedidos, utilizadores
 
 #: Contas de demonstração: pelo menos uma de cada perfil.
 CONTAS = [
@@ -125,6 +126,48 @@ PEDIDOS = [
 ]
 
 
+#: Criativos de demonstração. A campanha é indicada pelo nome, e tem de ser
+#: uma das de :data:`CAMPANHAS`. O custo está em cêntimos.
+CRIATIVOS = [
+    {
+        "campanha": "Natal 2026",
+        "nome": "Banner de Natal",
+        "descricao": "Árvore de Natal com os produtos da loja",
+        "custo": 40000,
+        "prazo": date(2026, 11, 25),
+        "publico": "Famílias da região de Lisboa",
+        "plataforma": "Facebook",
+    },
+    {
+        "campanha": "Natal 2026",
+        "nome": "Vídeo da montra",
+        "descricao": "Vídeo curto da montra decorada",
+        "custo": 90000,
+        "prazo": date(2026, 11, 28),
+        "publico": "Jovens adultos, 18 a 35 anos",
+        "plataforma": "Instagram",
+    },
+    {
+        "campanha": "Regresso às aulas",
+        "nome": "Cartaz dos lanches",
+        "descricao": "Lanches para levar para a escola",
+        "custo": 30000,
+        "prazo": date(2026, 8, 25),
+        "publico": "Pais de alunos do básico",
+        "plataforma": "Facebook",
+    },
+    {
+        "campanha": "Bicicletas de primavera",
+        "nome": "Anúncio da bicicleta elétrica",
+        "descricao": "",
+        "custo": None,
+        "prazo": None,
+        "publico": "",
+        "plataforma": "",
+    },
+]
+
+
 def criar_contas(ligacao: sqlite3.Connection) -> list[str]:
     """Cria as contas de demonstração que ainda não existem.
 
@@ -201,8 +244,38 @@ def criar_pedidos(ligacao: sqlite3.Connection) -> list[str]:
     return criados
 
 
+def criar_criativos(ligacao: sqlite3.Connection) -> list[str]:
+    """Cria os criativos de demonstração que ainda não existem.
+
+    As campanhas de demonstração têm de existir (ver :func:`criar_campanhas`).
+    Um criativo já existe quando a campanha dele tem um criativo com o mesmo nome.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Nomes dos criativos criados nesta chamada.
+    """
+    criados = []
+    por_nome = {campanha.nome: campanha for campanha in campanhas.listar_todas(ligacao)}
+    for criativo in CRIATIVOS:
+        campanha = por_nome[criativo["campanha"]]
+        existentes = [existente.nome for existente in criativos.listar_por_campanha(ligacao, campanha.id)]
+        if criativo["nome"] in existentes:
+            continue
+        criativos.criar(
+            ligacao,
+            campanha.id,
+            criativo["nome"],
+            criativo["descricao"],
+            criativo["custo"],
+            criativo["prazo"],
+            criativo["publico"],
+            criativo["plataforma"],
+        )
+        criados.append(criativo["nome"])
+    return criados
+
+
 def main() -> int:
-    """Cria as contas, as campanhas e os pedidos e mostra as credenciais de cada conta.
+    """Cria as contas, as campanhas, os pedidos e os criativos e mostra as credenciais de cada conta.
 
     :return: Código de saída do processo (``0`` quando termina sem erros).
     """
@@ -212,11 +285,13 @@ def main() -> int:
         criadas = criar_contas(ligacao)
         campanhas_criadas = criar_campanhas(ligacao)
         pedidos_criados = criar_pedidos(ligacao)
+        criativos_criados = criar_criativos(ligacao)
     finally:
         ligacao.close()
     print(f"Contas criadas: {len(criadas)} (as restantes já existiam).")
     print(f"Campanhas criadas: {len(campanhas_criadas)} (as restantes já existiam).")
     print(f"Pedidos de campanha criados: {len(pedidos_criados)} (os restantes já existiam).")
+    print(f"Criativos criados: {len(criativos_criados)} (os restantes já existiam).")
     print()
     print("Contas de demonstração:")
     for conta in CONTAS:

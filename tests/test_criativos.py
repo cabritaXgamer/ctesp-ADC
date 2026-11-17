@@ -4,7 +4,7 @@ from datetime import date
 
 import pytest
 
-from gestor_campanhas import modelos
+from gestor_campanhas import dados_demo, modelos
 from gestor_campanhas.cli import criativos as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
@@ -517,3 +517,37 @@ def test_menu_tem_as_opcoes_pela_ordem_certa():
         "Ver criativo",
         "Eliminar criativo",
     ]
+
+
+# --- dados de demonstração ---------------------------------------------------
+
+
+def test_dados_demo_criam_criativos_nas_campanhas(ligacao):
+    dados_demo.criar_contas(ligacao)
+    dados_demo.criar_campanhas(ligacao)
+
+    criados = dados_demo.criar_criativos(ligacao)
+
+    assert criados == ["Banner de Natal", "Vídeo da montra", "Cartaz dos lanches", "Anúncio da bicicleta elétrica"]
+    natal = next(c for c in repositorio_campanhas.listar_todas(ligacao) if c.nome == "Natal 2026")
+    banner, video = repositorio.listar_por_campanha(ligacao, natal.id)
+    assert banner.custo_centimos == 40000
+    assert banner.plataforma == "Facebook"
+    assert video.prazo == date(2026, 11, 28)
+
+
+def test_dados_demo_nao_repetem_criativos(ligacao):
+    dados_demo.criar_contas(ligacao)
+    dados_demo.criar_campanhas(ligacao)
+    dados_demo.criar_criativos(ligacao)
+
+    assert dados_demo.criar_criativos(ligacao) == []
+
+
+def test_criativos_de_demonstracao_respeitam_as_regras():
+    campanhas_demo = {campanha["nome"]: campanha for campanha in dados_demo.CAMPANHAS}
+    for criativo in dados_demo.CRIATIVOS:
+        campanha = campanhas_demo[criativo["campanha"]]
+        assert criativo["plataforma"] in ("", *modelos.PLATAFORMAS)
+        if criativo["prazo"] and campanha["fim"]:
+            assert criativo["prazo"] <= campanha["fim"]
