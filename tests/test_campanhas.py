@@ -394,6 +394,26 @@ def test_menu_mostra_os_detalhes_de_uma_campanha(teclado, ligacao, contas, natal
     assert "  Estado:    Por começar" in saida
 
 
+def test_menu_mostra_os_criativos_por_estado(teclado, ligacao, contas, natal, dia_16_de_novembro, capsys):
+    banner = criativos.criar(ligacao, natal.id, "Banner", "")
+    criativos.criar(ligacao, natal.id, "Vídeo", "")
+    criativos.criar(ligacao, natal.id, "Cartaz", "")
+    criativos.definir_estado(ligacao, banner.id, modelos.EM_REVISAO)
+    teclado("3", str(natal.id), "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    assert "  Criativos: 3 (Em preparação: 2, Em revisão: 1)" in capsys.readouterr().out
+
+
+def test_menu_mostra_zero_criativos(teclado, ligacao, contas, natal, dia_16_de_novembro, capsys):
+    teclado("3", str(natal.id), "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    assert "  Criativos: 0" in capsys.readouterr().out
+
+
 def test_detalhes_mostram_um_traco_quando_nao_ha_objetivo(ligacao, contas, capsys):
     campanha = servico.criar(ligacao, contas[modelos.MARKETEER], "Natal", "", contas[modelos.CLIENTE].id)
 

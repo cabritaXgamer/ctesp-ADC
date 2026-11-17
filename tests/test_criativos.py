@@ -516,6 +516,7 @@ def test_menu_tem_as_opcoes_pela_ordem_certa():
         "Editar criativo",
         "Ver criativo",
         "Eliminar criativo",
+        "Atualizar estado",
     ]
 
 
@@ -738,3 +739,271 @@ def test_filtro_repete_a_pergunta_quando_o_numero_nao_existe(teclado, ligacao, c
     assert "Escreva um número entre 1 e 2, ou Enter." in saida
     assert "Escreva um número entre 1 e 6, ou Enter." in saida
     assert "1 criativo." in saida.split("Criativos encontrados")[1].split("Os meus criativos")[0]
+
+
+# --- estados -----------------------------------------------------------------
+
+
+def test_repositorio_muda_o_estado_e_guarda_o_motivo(ligacao, natal):
+    criativo = repositorio.criar(ligacao, natal.id, "Banner", "")
+
+    rejeitado = repositorio.definir_estado(ligacao, criativo.id, modelos.REJEITADO, "Cores escuras")
+    assert rejeitado.estado == modelos.REJEITADO
+    assert rejeitado.motivo_rejeicao == "Cores escuras"
+
+    em_preparacao = repositorio.definir_estado(ligacao, criativo.id, modelos.EM_PREPARACAO)
+    assert em_preparacao.estado == modelos.EM_PREPARACAO
+    assert em_preparacao.motivo_rejeicao == ""
+
+
+def com_estado(ligacao, criativo, estado):
+    """Põe um criativo num estado qualquer, sem passar pelas regras."""
+    return repositorio.definir_estado(ligacao, criativo.id, estado)
+
+
+@pytest.mark.parametrize(
+    ("inicial", "novo"),
+    [
+        (modelos.EM_PREPARACAO, modelos.EM_REVISAO),
+        (modelos.EM_REVISAO, modelos.EM_PREPARACAO),
+        (modelos.REJEITADO, modelos.EM_PREPARACAO),
+        (modelos.REJEITADO, modelos.EM_REVISAO),
+        (modelos.APROVADO, modelos.PUBLICADO),
+    ],
+)
+def test_marketeer_muda_o_estado(ligacao, contas, natal, inicial, novo):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), inicial)
+
+    assert servico.mudar_estado(ligacao, miguel, criativo.id, novo).estado == novo
+
+
+@pytest.mark.parametrize(
+    ("inicial", "novo", "mensagem"),
+    [
+        (modelos.EM_PREPARACAO, modelos.PUBLICADO, "Um criativo Em preparação não pode passar a Publicado."),
+        (modelos.EM_PREPARACAO, modelos.APROVADO, "Um criativo Em preparação não pode passar a Aprovado."),
+        (modelos.EM_REVISAO, modelos.APROVADO, "Um criativo Em revisão não pode passar a Aprovado."),
+        (modelos.APROVADO, modelos.EM_PREPARACAO, "Um criativo Aprovado não pode passar a Em preparação."),
+        (modelos.PUBLICADO, modelos.EM_PREPARACAO, "Um criativo Publicado não pode passar a Em preparação."),
+    ],
+)
+def test_marketeer_nao_faz_mudancas_que_nao_estao_previstas(ligacao, contas, natal, inicial, novo, mensagem):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), inicial)
+
+    with pytest.raises(ErroValidacao, match=mensagem):
+        servico.mudar_estado(ligacao, miguel, criativo.id, novo)
+
+    assert repositorio.obter_por_id(ligacao, criativo.id).estado == inicial
+
+
+def test_marketeer_nao_muda_o_estado_de_criativos_de_outro(ligacao, contas, natal, marta):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match="Não tem nenhum criativo"):
+        servico.mudar_estado(ligacao, marta, criativo.id, modelos.EM_REVISAO)
+
+
+@pytest.mark.parametrize("estado", [modelos.EM_REVISAO, modelos.APROVADO, modelos.PUBLICADO])
+def test_so_edita_criativos_em_preparacao_ou_rejeitados(ligacao, contas, natal, estado):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), estado)
+
+    with pytest.raises(ErroValidacao, match="Só se pode editar um criativo em preparação ou rejeitado."):
+        servico.editar(ligacao, miguel, criativo.id, "Outro nome")
+
+
+def test_edita_um_criativo_rejeitado(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.REJEITADO)
+
+    assert servico.editar(ligacao, miguel, criativo.id, "Banner novo").nome == "Banner novo"
+
+
+def test_nao_elimina_um_criativo_publicado(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.PUBLICADO)
+
+    with pytest.raises(ErroValidacao, match="Um criativo publicado não pode ser eliminado."):
+        servico.eliminar(ligacao, miguel, criativo.id)
+
+    assert repositorio.obter_por_id(ligacao, criativo.id) is not None
+
+
+def test_menu_envia_o_criativo_para_revisao(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("5", str(criativo.id), "1", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert "O criativo Banner está Em preparação." in saida
+    assert "  1. Enviar ao cliente para revisão" in saida
+    assert "O criativo passou a Em revisão." in saida
+    assert 'O cliente já o pode aprovar ou rejeitar, na opção "Criativos" do menu dele.' in saida
+    assert repositorio.obter_por_id(ligacao, criativo.id).estado == modelos.EM_REVISAO
+
+
+def test_menu_mostra_o_motivo_e_as_duas_opcoes_de_um_rejeitado(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    repositorio.definir_estado(ligacao, criativo.id, modelos.REJEITADO, "Cores escuras")
+    teclado("5", str(criativo.id), "1", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert "Motivo da rejeição: Cores escuras" in saida
+    assert "  1. Voltar a pôr em preparação" in saida
+    assert "  2. Enviar ao cliente para revisão" in saida
+    assert repositorio.obter_por_id(ligacao, criativo.id).estado == modelos.EM_PREPARACAO
+
+
+def test_menu_deixa_o_estado_como_esta(teclado, ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("5", str(criativo.id), "0", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert repositorio.obter_por_id(ligacao, criativo.id).estado == modelos.EM_PREPARACAO
+
+
+def test_menu_criativo_publicado_ja_nao_muda(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.PUBLICADO)
+    teclado("5", str(criativo.id), "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "O estado de um criativo publicado já não muda." in capsys.readouterr().out
+
+
+def test_menu_nao_deixa_editar_um_criativo_em_revisao(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.EM_REVISAO)
+    teclado("2", str(criativo.id), "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert "Só se pode editar um criativo em preparação ou rejeitado. Este criativo está Em revisão." in saida
+    assert "A editar o criativo" not in saida
+
+
+def test_menu_nao_elimina_um_criativo_publicado(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.PUBLICADO)
+    teclado("4", str(criativo.id), "s", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "Um criativo publicado não pode ser eliminado." in capsys.readouterr().out
+    assert repositorio.obter_por_id(ligacao, criativo.id) is not None
+
+
+def test_detalhes_de_um_rejeitado_mostram_o_motivo(ligacao, contas, natal, capsys):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+    criativo = repositorio.definir_estado(ligacao, criativo.id, modelos.REJEITADO, "Cores escuras")
+
+    menu.mostrar_detalhes(criativo)
+
+    assert "  Motivo:      Cores escuras" in capsys.readouterr().out
+
+
+# --- aprovação pelo cliente --------------------------------------------------
+
+
+@pytest.fixture
+def em_revisao(ligacao, contas, natal):
+    """Um criativo da Carla, já enviado para revisão."""
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    return servico.mudar_estado(ligacao, miguel, criativo.id, modelos.EM_REVISAO)
+
+
+def test_cliente_aprova_um_criativo_em_revisao(ligacao, contas, em_revisao):
+    aprovado = servico.aprovar(ligacao, contas[modelos.CLIENTE], em_revisao.id)
+
+    assert aprovado.estado == modelos.APROVADO
+    assert servico.mudar_estado(ligacao, contas[modelos.MARKETEER], em_revisao.id, modelos.PUBLICADO).estado == (
+        modelos.PUBLICADO
+    )
+
+
+def test_cliente_rejeita_com_motivo(ligacao, contas, em_revisao):
+    rejeitado = servico.rejeitar(ligacao, contas[modelos.CLIENTE], em_revisao.id, "  Cores escuras  ")
+
+    assert rejeitado.estado == modelos.REJEITADO
+    assert rejeitado.motivo_rejeicao == "Cores escuras"
+
+
+def test_rejeitar_exige_motivo(ligacao, contas, em_revisao):
+    with pytest.raises(ErroValidacao, match="Indique o motivo da rejeição"):
+        servico.rejeitar(ligacao, contas[modelos.CLIENTE], em_revisao.id, "   ")
+
+    assert repositorio.obter_por_id(ligacao, em_revisao.id).estado == modelos.EM_REVISAO
+
+
+def test_so_decide_criativos_em_revisao(ligacao, contas, natal):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match="Só se pode aprovar ou rejeitar um criativo em revisão."):
+        servico.aprovar(ligacao, contas[modelos.CLIENTE], criativo.id)
+    with pytest.raises(ErroValidacao, match="Este criativo está Em preparação."):
+        servico.rejeitar(ligacao, contas[modelos.CLIENTE], criativo.id, "Não gosto")
+
+
+def test_cliente_nao_decide_criativos_de_outro(ligacao, em_revisao, jose):
+    with pytest.raises(ErroValidacao, match="Não tem nenhum criativo"):
+        servico.aprovar(ligacao, jose, em_revisao.id)
+
+
+def test_menu_do_cliente_avisa_quantos_esperam_aprovacao(teclado, ligacao, contas, em_revisao, capsys):
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "Há 1 criativo à espera da sua aprovação." in capsys.readouterr().out
+
+
+def test_menu_do_cliente_aprova(teclado, ligacao, contas, em_revisao, capsys):
+    teclado("3", str(em_revisao.id), "1", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Criativo aprovado. O marketeer já o pode publicar." in saida
+    assert repositorio.obter_por_id(ligacao, em_revisao.id).estado == modelos.APROVADO
+
+
+def test_menu_do_cliente_rejeita_com_motivo(teclado, ligacao, contas, em_revisao, capsys):
+    teclado("3", str(em_revisao.id), "2", "Cores mais claras", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "Criativo rejeitado." in capsys.readouterr().out
+    rejeitado = repositorio.obter_por_id(ligacao, em_revisao.id)
+    assert rejeitado.estado == modelos.REJEITADO
+    assert rejeitado.motivo_rejeicao == "Cores mais claras"
+
+
+def test_menu_do_cliente_deixa_para_mais_tarde(teclado, ligacao, contas, em_revisao):
+    teclado("3", str(em_revisao.id), "0", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert repositorio.obter_por_id(ligacao, em_revisao.id).estado == modelos.EM_REVISAO
+
+
+def test_menu_do_cliente_nao_decide_criativos_fora_de_revisao(teclado, ligacao, contas, natal, capsys):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+    teclado("3", str(criativo.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Só se pode aprovar ou rejeitar um criativo em revisão. Este criativo está Em preparação." in saida
+    assert "Decisão" not in saida

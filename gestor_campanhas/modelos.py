@@ -220,6 +220,8 @@ class Criativo:
         :data:`PLATAFORMAS`, ou vazio se ainda não foi escolhida.
     :param estado: :data:`EM_PREPARACAO`, :data:`EM_REVISAO`, :data:`APROVADO`,
         :data:`REJEITADO` ou :data:`PUBLICADO`.
+    :param motivo_rejeicao: Motivo indicado pelo cliente quando rejeita o
+        criativo. Só existe nos criativos rejeitados.
     :param campanha_nome: Nome da campanha, para mostrar nas listas.
     """
 
@@ -232,6 +234,7 @@ class Criativo:
     publico_alvo: str = ""
     plataforma: str = ""
     estado: str = EM_PREPARACAO
+    motivo_rejeicao: str = ""
     campanha_nome: str = ""
 
     @property
