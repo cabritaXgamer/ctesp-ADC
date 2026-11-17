@@ -106,6 +106,20 @@ def listar_por_campanha(ligacao: sqlite3.Connection, campanha_id: int) -> list[C
     return [_de_linha(linha) for linha in linhas]
 
 
+def listar_por_cliente(ligacao: sqlite3.Connection, cliente_id: int) -> list[Criativo]:
+    """Devolve os criativos de todas as campanhas de um cliente.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente_id: Identificador do cliente.
+    :return: Criativos das campanhas desse cliente, agrupados por campanha e,
+        dentro de cada campanha, pela ordem em que foram criados.
+    """
+    linhas = ligacao.execute(
+        f"{_SELECIONAR} WHERE campanhas.cliente_id = ? ORDER BY campanhas.id, criativos.id", (cliente_id,)
+    ).fetchall()
+    return [_de_linha(linha) for linha in linhas]
+
+
 def atualizar(
     ligacao: sqlite3.Connection,
     identificador: int,

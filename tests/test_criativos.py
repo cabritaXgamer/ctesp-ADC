@@ -551,3 +551,30 @@ def test_criativos_de_demonstracao_respeitam_as_regras():
         assert criativo["plataforma"] in ("", *modelos.PLATAFORMAS)
         if criativo["prazo"] and campanha["fim"]:
             assert criativo["prazo"] <= campanha["fim"]
+
+
+# --- criativos do cliente ----------------------------------------------------
+
+
+@pytest.fixture
+def jose(ligacao, contas):
+    """Um segundo cliente, além da ``Carla Cliente`` da fixture ``contas``."""
+    return utilizadores.criar(ligacao, "José Padeiro", "jose@padaria.pt", "x", modelos.CLIENTE)
+
+
+@pytest.fixture
+def aulas(ligacao, contas, jose):
+    """Uma campanha do José, do Miguel."""
+    return repositorio_campanhas.criar(ligacao, "Aulas", "", jose.id, contas[modelos.MARKETEER].id)
+
+
+def test_repositorio_lista_os_criativos_de_todas_as_campanhas_do_cliente(ligacao, contas, natal, saldos, aulas):
+    repositorio.criar(ligacao, saldos.id, "Cartaz", "")
+    repositorio.criar(ligacao, natal.id, "Banner", "")
+    repositorio.criar(ligacao, aulas.id, "Lanches", "")
+    repositorio.criar(ligacao, natal.id, "Vídeo", "")
+
+    lista = repositorio.listar_por_cliente(ligacao, contas[modelos.CLIENTE].id)
+
+    assert nomes(lista) == ["Banner", "Vídeo", "Cartaz"]
+    assert [criativo.campanha_nome for criativo in lista] == ["Natal", "Natal", "Saldos"]
