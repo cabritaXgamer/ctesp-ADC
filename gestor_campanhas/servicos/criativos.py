@@ -17,6 +17,10 @@ depois de ser rejeitado, e um criativo publicado não pode ser eliminado.
 
 Cada criativo pode ter um ficheiro anexado (a imagem, o vídeo ou o texto).
 A cópia do ficheiro é tratada por :mod:`gestor_campanhas.servicos.ficheiros`.
+
+A despesa de uma campanha é a soma do custo estimado dos seus criativos,
+seja qual for o estado deles. Quando a despesa passa o budget, o marketeer é
+avisado (ver :func:`aviso_budget`).
 """
 
 from __future__ import annotations
@@ -404,3 +408,53 @@ def ficheiro_de(criativo: Criativo) -> Path:
     if not caminho.is_file():
         raise ErroValidacao(f"O ficheiro {criativo.ficheiro} já não está na pasta de ficheiros.")
     return caminho
+
+
+def despesas(ligacao: sqlite3.Connection) -> dict[int, int]:
+    """Calcula a despesa de todas as campanhas, de uma só vez.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Dicionário do número da campanha para a despesa, em cêntimos.
+        As campanhas sem criativos não aparecem: a despesa delas é zero.
+    """
+    return criativos.somar_custos_por_campanha(ligacao)
+
+
+def despesa(ligacao: sqlite3.Connection, campanha: Campanha) -> int:
+    """Calcula a despesa de uma campanha: a soma do custo dos criativos dela.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param campanha: Campanha a consultar.
+    :return: A despesa em cêntimos. Os criativos sem custo contam como zero.
+    """
+    return despesas(ligacao).get(campanha.id, 0)
+
+
+def restante(campanha: Campanha, gasto: int) -> int | None:
+    """Calcula quanto falta gastar do budget de uma campanha.
+
+    :param campanha: Campanha a consultar.
+    :param gasto: Despesa da campanha, em cêntimos.
+    :return: O budget menos a despesa, em cêntimos (negativo quando a despesa
+        passa o budget), ou ``None`` se a campanha ainda não tiver budget.
+    """
+    if campanha.budget_centimos is None:
+        return None
+    return campanha.budget_centimos - gasto
+
+
+def aviso_budget(campanha: Campanha, gasto: int) -> str:
+    """Prepara o aviso de que o custo dos criativos passa o budget da campanha.
+
+    :param campanha: Campanha a consultar.
+    :param gasto: Despesa da campanha, em cêntimos.
+    :return: O texto do aviso, ou ``""`` se não houver nada a avisar (a
+        campanha não tem budget, ou a despesa não o ultrapassa).
+    """
+    sobra = restante(campanha, gasto)
+    if sobra is None or sobra >= 0:
+        return ""
+    return (
+        f"Atenção: o custo dos criativos ({dinheiro.formatar(gasto)}) ultrapassa o budget da campanha "
+        f"({dinheiro.formatar(campanha.budget_centimos)}) em {dinheiro.formatar(-sobra)}."
+    )

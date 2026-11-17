@@ -147,8 +147,8 @@ campanhas por terminar. A verificação está em
 Dinheiro
 --------
 
-Os valores em euros (o budget de uma campanha e o orçamento de um pedido)
-são guardados em cêntimos, como números inteiros. O módulo
+Os valores em euros (o budget de uma campanha, o orçamento de um pedido e
+o custo de um criativo) são guardados em cêntimos, como números inteiros. O módulo
 :mod:`gestor_campanhas.dinheiro` converte o que o utilizador escreve em
 cêntimos e os cêntimos no texto que é mostrado.
 
@@ -281,3 +281,18 @@ Os testes nunca mexem na pasta ``dados`` do projeto: a *fixture*
 ``dados_temporarios``, em ``tests/conftest.py``, põe a pasta de dados numa
 pasta temporária em todos os testes, e a *fixture* ``aberturas`` substitui a
 abertura de ficheiros, para não aparecerem janelas.
+
+Despesa e budget restante
+-------------------------
+
+A despesa de uma campanha não é guardada: é calculada sempre que é precisa,
+somando o custo dos criativos. Assim, nunca fica desatualizada quando um
+criativo muda de custo ou é eliminado. Para as listas, que mostram várias
+campanhas, :func:`gestor_campanhas.servicos.criativos.despesas` faz uma só
+consulta com ``GROUP BY`` e devolve a despesa de todas as campanhas de uma
+vez, em vez de uma consulta por campanha.
+
+O aviso de budget ultrapassado é preparado por
+:func:`gestor_campanhas.servicos.criativos.aviso_budget` e mostrado pelos
+menus. Não impede guardar o criativo: o custo é uma estimativa, e cabe ao
+marketeer e ao Administrador decidir o que fazer.

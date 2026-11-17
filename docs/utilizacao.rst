@@ -350,17 +350,22 @@ alterações. Um marketeer só vê e só altera as suas campanhas.
 
 .. code-block:: text
 
-   N.º  Nome               Cliente        Início      Fim         Budget      Estado
-   ---  -----------------  -------------  ----------  ----------  ----------  -----------
-   1    Natal 2026         Carla Cliente  2026-12-01  2026-12-24  1 500,00 €  Por começar
-   2    Regresso às aulas  José Padeiro   2026-09-01  2026-09-30  800,00 €    Terminada
+   N.º  Nome               Cliente        Início      Fim         Budget      Estado       Despesa     Restante
+   ---  -----------------  -------------  ----------  ----------  ----------  -----------  ----------  --------
+   1    Natal 2026         Carla Cliente  2026-12-01  2026-12-24  1 500,00 €  Por começar  1 300,00 €  200,00 €
+   2    Regresso às aulas  José Padeiro   2026-09-01  2026-09-30  800,00 €    Terminada    300,00 €    500,00 €
 
    2 campanhas.
 
 O número da primeira coluna identifica a campanha nas outras opções.
 
 O budget aparece como ``Por definir`` enquanto o Administrador não o
-atribuir. O estado é calculado a partir das datas:
+atribuir. A **despesa** é a soma do custo estimado dos criativos da campanha,
+seja qual for o estado deles; um criativo sem custo conta como zero. O
+**restante** é o budget menos a despesa: fica negativo quando a despesa passa
+o budget, e aparece como ``Por definir`` enquanto não houver budget.
+
+O estado é calculado a partir das datas:
 
 .. list-table::
    :header-rows: 1
@@ -418,11 +423,19 @@ Ver campanha
 ^^^^^^^^^^^^
 
 Pede o número da campanha e mostra todos os dados dela, incluindo o objetivo,
-que não cabe na lista, e quantos criativos a campanha tem em cada estado:
+que não cabe na lista, a despesa, o restante e quantos criativos a campanha
+tem em cada estado:
 
 .. code-block:: text
 
-     Criativos: 3 (Em preparação: 2, Em revisão: 1)
+     Budget:    1 500,00 €
+     Despesa:   1 300,00 €
+     Restante:  200,00 €
+     Estado:    Por começar
+     Criativos: 2 (Em preparação: 2)
+
+Se a despesa passar o budget, aparece no fim o aviso descrito em
+**Criativos**.
 
 Eliminar campanha
 ^^^^^^^^^^^^^^^^^
@@ -458,6 +471,20 @@ opções para os gerir.
 O custo aparece como ``Por definir`` e os outros dados como ``-`` enquanto
 não forem indicados. Um público-alvo comprido aparece cortado e terminado em
 ``...``; o texto completo está em **Ver criativo**.
+
+Por baixo da tabela aparece a soma do custo dos criativos e o budget da
+campanha, por exemplo
+``Custo dos criativos: 1 300,00 €. Budget da campanha: 1 500,00 €.`` Quando
+a soma passa o budget, aparece também um aviso:
+
+.. code-block:: text
+
+   Atenção: o custo dos criativos (1 700,00 €) ultrapassa o budget da campanha (1 500,00 €) em 200,00 €.
+
+O mesmo aviso aparece logo a seguir a criar ou a editar um criativo que faça
+passar o budget, e em **Ver campanha**. O criativo é guardado na mesma: o
+aviso serve para o marketeer ajustar os custos ou pedir mais budget ao
+Administrador.
 
 Um criativo novo fica no estado ``Em preparação``. O número da primeira
 coluna identifica o criativo nas outras opções. Com **0. Voltar** volta-se à
@@ -669,19 +696,25 @@ marketeer responsável. Um cliente só vê as suas campanhas.
 
 .. code-block:: text
 
-   N.º  Nome        Início      Fim         Budget      Estado       Marketeer
-   ---  ----------  ----------  ----------  ----------  -----------  ----------------
-   1    Natal 2026  2026-12-01  2026-12-24  1 500,00 €  Por começar  Miguel Marketeer
+   N.º  Nome        Início      Fim         Budget      Estado       Marketeer         Despesa     Restante
+   ---  ----------  ----------  ----------  ----------  -----------  ----------------  ----------  --------
+   1    Natal 2026  2026-12-01  2026-12-24  1 500,00 €  Por começar  Miguel Marketeer  1 300,00 €  200,00 €
 
    1 campanha.
    O budget de cada campanha é definido pelo administrador.
+   A despesa é a soma do custo estimado dos criativos de cada campanha.
 
 Uma campanha que ainda não tem budget atribuído aparece na lista com
 ``Por definir`` na coluna do budget. O cliente não altera o budget.
 
+A despesa e o restante são calculados como no menu do Marketeer: a despesa
+é a soma do custo dos criativos da campanha, e o restante é o budget menos a
+despesa.
+
 **Ver campanha e marketeer responsável** pede o número da campanha e mostra
-todos os dados dela, incluindo o objetivo, e os contactos do marketeer
-responsável:
+todos os dados dela, incluindo o objetivo, a despesa e a parte do budget já
+gasta (por exemplo ``Gasto:     86% do budget``), e os contactos do
+marketeer responsável:
 
 .. code-block:: text
 

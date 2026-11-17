@@ -37,3 +37,11 @@ def test_formatar_separa_os_milhares_e_mostra_dois_decimais(centimos, texto):
 
 def test_formatar_e_para_centimos_sao_inversos():
     assert dinheiro.para_centimos(dinheiro.formatar(150050)) == 150050
+
+
+@pytest.mark.parametrize(
+    ("centimos", "texto"),
+    [(-5, "-0,05 €"), (-150, "-1,50 €"), (-20000, "-200,00 €"), (-150050, "-1 500,50 €")],
+)
+def test_formatar_valores_negativos(centimos, texto):
+    assert dinheiro.formatar(centimos) == texto

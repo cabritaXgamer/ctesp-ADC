@@ -3,7 +3,8 @@
 O marketeer escolhe uma das suas campanhas e vê os criativos dela, com o
 custo, o prazo, o público-alvo e a plataforma de cada um. A partir daí pode
 criar, editar, consultar e eliminar criativos, atualizar o estado de cada
-um e anexar o ficheiro do criativo.
+um e anexar o ficheiro do criativo. Por baixo da lista aparece a soma do
+custo dos criativos e, se ela passar o budget da campanha, um aviso.
 
 O cliente vê os criativos de todas as suas campanhas, numa só lista, pode
 filtrá-los e pesquisá-los, aprova ou rejeita os que estão em revisão, e
@@ -72,6 +73,17 @@ def mostrar_criativos(lista: list[Criativo]) -> None:
         ],
     )
     print(f"\n{len(lista)} {'criativo' if len(lista) == 1 else 'criativos'}.")
+
+
+def avisar_se_passar_o_budget(ligacao: sqlite3.Connection, campanha: Campanha) -> None:
+    """Mostra um aviso se o custo dos criativos da campanha passar o budget.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param campanha: Campanha a verificar.
+    """
+    aviso = criativos.aviso_budget(campanha, criativos.despesa(ligacao, campanha))
+    if aviso:
+        print(f"\n{aviso}")
 
 
 def mostrar_detalhes(criativo: Criativo) -> None:
@@ -168,6 +180,7 @@ def criar(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanha
         print(f"\n{erro} O criativo não foi criado.")
     else:
         print(f"\nCriativo criado com o número {criativo.id}.")
+        avisar_se_passar_o_budget(ligacao, campanha)
     comum.pausa()
 
 
@@ -218,6 +231,7 @@ def editar(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanh
         print(f"\n{erro} O criativo não foi alterado.")
     else:
         print("\nCriativo guardado.")
+        avisar_se_passar_o_budget(ligacao, campanha)
     comum.pausa()
 
 
@@ -403,6 +417,9 @@ def da_campanha(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Ca
         lista = criativos.listar_da_campanha(ligacao, campanha)
         if lista:
             mostrar_criativos(lista)
+            gasto = criativos.despesa(ligacao, campanha)
+            print(f"Custo dos criativos: {dinheiro.formatar(gasto)}. Budget da campanha: {menu_campanhas.budget(campanha)}.")
+            avisar_se_passar_o_budget(ligacao, campanha)
         else:
             print("Esta campanha ainda não tem criativos.")
         escolha = comum.escolher_opcao("Criativos", menu)
