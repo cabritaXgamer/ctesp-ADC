@@ -4,7 +4,8 @@ O marketeer escolhe uma das suas campanhas e vê os criativos dela, com o
 custo, o prazo, o público-alvo e a plataforma de cada um. A partir daí pode
 criar, editar, consultar e eliminar criativos.
 
-O cliente vê os criativos de todas as suas campanhas, numa só lista.
+O cliente vê os criativos de todas as suas campanhas, numa só lista, e pode
+filtrá-los e pesquisá-los.
 """
 
 from __future__ import annotations
@@ -367,10 +368,72 @@ def ver_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
     comum.pausa()
 
 
+def escolher_da_lista(titulo_lista: str, nomes: list[str], pergunta: str) -> int | None:
+    """Mostra uma lista numerada e pede o número de um dos elementos.
+
+    Repete a pergunta enquanto a resposta não for um dos números mostrados.
+
+    :param titulo_lista: Texto mostrado por cima da lista, por exemplo ``"Plataformas:"``.
+    :param nomes: Elementos da lista, pela ordem em que aparecem.
+    :param pergunta: Texto da pergunta.
+    :return: A posição do elemento escolhido (a contar do zero), ou ``None``
+        se a resposta ficou vazia.
+    """
+    print(titulo_lista)
+    for numero, nome in enumerate(nomes, start=1):
+        print(f"  {numero}. {nome}")
+    while True:
+        resposta = input(f"{pergunta}: ").strip()
+        if not resposta:
+            return None
+        if resposta.isdigit() and 1 <= int(resposta) <= len(nomes):
+            return int(resposta) - 1
+        print(f"Escreva um número entre 1 e {len(nomes)}, ou Enter.")
+
+
+def filtrar(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
+    """Pede os filtros e mostra os criativos do cliente que os respeitam.
+
+    São pedidos, por esta ordem, o texto a pesquisar, a campanha, a
+    plataforma e o estado. Com Enter, a pergunta não filtra nada.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    """
+    comum.titulo("Filtrar e pesquisar")
+    print("Carregue em Enter nas perguntas que não quer usar.\n")
+    pesquisa = comum.ler_texto("Texto a procurar no nome, na descrição e no público-alvo", obrigatorio=False)
+    lista_campanhas = campanhas.listar_do_cliente(ligacao, cliente)
+    posicao = escolher_da_lista(
+        "\nCampanhas:", [campanha.nome for campanha in lista_campanhas], "Número da campanha (Enter para todas)"
+    )
+    campanha_id = None if posicao is None else lista_campanhas[posicao].id
+    posicao = escolher_da_lista(
+        "\nPlataformas:", list(modelos.PLATAFORMAS), "Número da plataforma (Enter para todas)"
+    )
+    plataforma = "" if posicao is None else modelos.PLATAFORMAS[posicao]
+    estados = list(modelos.NOMES_ESTADOS_CRIATIVO)
+    posicao = escolher_da_lista(
+        "\nEstados:", list(modelos.NOMES_ESTADOS_CRIATIVO.values()), "Número do estado (Enter para todos)"
+    )
+    estado = "" if posicao is None else estados[posicao]
+
+    escolhidos = criativos.filtrar(
+        criativos.listar_do_cliente(ligacao, cliente), pesquisa, campanha_id, plataforma, estado
+    )
+    comum.titulo("Criativos encontrados")
+    if escolhidos:
+        mostrar_do_cliente(escolhidos)
+    else:
+        print("Nenhum criativo corresponde aos filtros.")
+    comum.pausa()
+
+
 #: Opções do menu de criativos do Cliente. Cada opção é um par
 #: ``(descrição, função)``; a função recebe a ligação à base de dados e o
 #: cliente.
 ACOES_DO_CLIENTE = [
+    ("Filtrar e pesquisar", filtrar),
     ("Ver criativo", ver_do_cliente),
 ]
 
@@ -379,7 +442,7 @@ def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
     """Opção "Criativos" do menu do Cliente.
 
     Mostra os criativos de todas as campanhas do cliente e as opções para os
-    consultar. A lista volta a aparecer depois de cada opção.
+    filtrar e consultar. A lista completa volta a aparecer depois de cada opção.
 
     :param ligacao: Ligação aberta à base de dados.
     :param utilizador: Cliente que está a usar o menu.

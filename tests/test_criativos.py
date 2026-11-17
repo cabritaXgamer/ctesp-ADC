@@ -673,7 +673,7 @@ def test_cliente_ve_a_lista_com_a_campanha(teclado, ligacao, contas, varios, aul
 
 def test_cliente_ve_os_detalhes_de_um_criativo(teclado, ligacao, contas, varios, capsys):
     banner = varios[0]
-    teclado("1", str(banner.id), "", "0")
+    teclado("2", str(banner.id), "", "0")
 
     menu.do_cliente(ligacao, contas[modelos.CLIENTE])
 
@@ -684,10 +684,57 @@ def test_cliente_ve_os_detalhes_de_um_criativo(teclado, ligacao, contas, varios,
 
 def test_cliente_nao_ve_criativos_de_outro_cliente(teclado, ligacao, contas, aulas, jose, capsys):
     lanches = servico.criar(ligacao, contas[modelos.MARKETEER], aulas.id, "Lanches")
-    teclado("1", str(lanches.id), "", "0")
+    teclado("2", str(lanches.id), "", "0")
 
     menu.do_cliente(ligacao, contas[modelos.CLIENTE])
 
     saida = capsys.readouterr().out
     assert f"Não tem nenhum criativo com o número {lanches.id}." in saida
     assert servico.obter_do_cliente(ligacao, jose, lanches.id) == lanches
+
+
+def test_cliente_filtra_pela_plataforma(teclado, ligacao, contas, varios, capsys):
+    teclado("1", "", "", "2", "", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    filtrada = saida.split("Criativos encontrados")[1].split("Os meus criativos")[0]
+    assert "Vídeo da montra" in filtrada
+    assert "Cartaz dos saldos" in filtrada
+    assert "Banner de Natal" not in filtrada
+    assert "2 criativos." in filtrada
+
+
+def test_cliente_pesquisa_e_escolhe_a_campanha(teclado, ligacao, contas, varios, capsys):
+    teclado("1", "famílias", "2", "", "", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "  1. Natal" in saida
+    assert "  2. Saldos" in saida
+    filtrada = saida.split("Criativos encontrados")[1].split("Os meus criativos")[0]
+    assert "Cartaz dos saldos" in filtrada
+    assert "1 criativo." in filtrada
+
+
+def test_cliente_filtra_pelo_estado_sem_resultados(teclado, ligacao, contas, varios, capsys):
+    teclado("1", "", "", "", "3", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "  3. Aprovado" in saida
+    assert "Nenhum criativo corresponde aos filtros." in saida
+
+
+def test_filtro_repete_a_pergunta_quando_o_numero_nao_existe(teclado, ligacao, contas, varios, capsys):
+    teclado("1", "", "7", "", "9", "1", "", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Escreva um número entre 1 e 2, ou Enter." in saida
+    assert "Escreva um número entre 1 e 6, ou Enter." in saida
+    assert "1 criativo." in saida.split("Criativos encontrados")[1].split("Os meus criativos")[0]
