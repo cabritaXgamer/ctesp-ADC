@@ -1,6 +1,7 @@
 """Testes dos criativos."""
 
 from datetime import date
+from pathlib import Path
 
 import pytest
 
@@ -1207,3 +1208,84 @@ def test_ficheiro_de_exemplo_existe():
 
     assert exemplo.is_file()
     assert ficheiros.tipo(exemplo) == "Imagem (image/svg+xml)"
+
+
+@pytest.fixture
+def com_ficheiro(ligacao, contas, natal, pasta_dados, imagem):
+    """Um criativo da Carla, com o ficheiro ``banner.png`` anexado."""
+    miguel = contas[modelos.MARKETEER]
+    return servico.anexar(ligacao, miguel, servico.criar(ligacao, miguel, natal.id, "Banner").id, str(imagem))
+
+
+def test_opcoes_do_menu_do_cliente():
+    assert [descricao for descricao, _ in menu.ACOES_DO_CLIENTE] == [
+        "Filtrar e pesquisar",
+        "Ver criativo",
+        "Aprovar ou rejeitar criativo",
+        "Pré-visualizar ficheiro",
+        "Descarregar ficheiro",
+    ]
+
+
+def test_cliente_pre_visualiza_e_abre(teclado, ligacao, contas, com_ficheiro, aberturas, capsys):
+    teclado("4", str(com_ficheiro.id), "s", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "  Tipo:     Imagem (image/png)" in saida
+    assert aberturas == [servico.ficheiro_de(com_ficheiro)]
+
+
+def test_cliente_nao_pre_visualiza_ficheiros_de_outro(teclado, ligacao, com_ficheiro, jose, aberturas, capsys):
+    teclado("4", str(com_ficheiro.id), "", "0")
+
+    menu.do_cliente(ligacao, jose)
+
+    assert f"Não tem nenhum criativo com o número {com_ficheiro.id}." in capsys.readouterr().out
+    assert aberturas == []
+
+
+def test_cliente_descarrega_para_uma_pasta(teclado, ligacao, contas, com_ficheiro, tmp_path, capsys):
+    destino = tmp_path / "guardados"
+    destino.mkdir()
+    teclado("5", str(com_ficheiro.id), str(destino), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert f"Cópia guardada em {destino / 'banner.png'}" in capsys.readouterr().out
+    assert (destino / "banner.png").read_bytes() == b"imagem"
+
+
+def test_cliente_descarrega_para_as_transferencias(teclado, ligacao, contas, com_ficheiro, tmp_path, monkeypatch):
+    transferencias = tmp_path / "Downloads"
+    transferencias.mkdir()
+    monkeypatch.setattr(menu, "pasta_transferencias", lambda: transferencias)
+    teclado("5", str(com_ficheiro.id), "", "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert (transferencias / "banner.png").exists()
+
+
+def test_descarregar_para_uma_pasta_que_nao_existe(teclado, ligacao, contas, com_ficheiro, tmp_path, capsys):
+    teclado("5", str(com_ficheiro.id), str(tmp_path / "nao_existe"), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "não existe." in capsys.readouterr().out
+
+
+def test_descarregar_um_criativo_sem_ficheiro(teclado, ligacao, contas, natal, capsys):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+    teclado("5", str(criativo.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "O criativo Banner ainda não tem ficheiro." in saida
+    assert "Pasta onde guardar" not in saida
+
+
+def test_pasta_transferencias_fica_na_pasta_pessoal():
+    assert menu.pasta_transferencias() == Path.home() / "Downloads"

@@ -6,7 +6,8 @@ criar, editar, consultar e eliminar criativos, atualizar o estado de cada
 um e anexar o ficheiro do criativo.
 
 O cliente vê os criativos de todas as suas campanhas, numa só lista, pode
-filtrá-los e pesquisá-los, e aprova ou rejeita os que estão em revisão.
+filtrá-los e pesquisá-los, aprova ou rejeita os que estão em revisão, e
+pré-visualiza e descarrega os ficheiros.
 """
 
 from __future__ import annotations
@@ -14,6 +15,7 @@ from __future__ import annotations
 import sqlite3
 import subprocess
 from datetime import date
+from pathlib import Path
 
 from gestor_campanhas import dinheiro, modelos
 from gestor_campanhas.cli import campanhas as menu_campanhas
@@ -599,6 +601,52 @@ def decidir(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
     comum.pausa()
 
 
+def pre_visualizar_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
+    """Pede o número de um criativo do cliente e mostra o ficheiro dele.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    """
+    comum.titulo("Pré-visualizar ficheiro")
+    criativo = pedir_criativo_do_cliente(ligacao, cliente)
+    if criativo is not None:
+        pre_visualizar_ficheiro(criativo)
+
+
+def pasta_transferencias() -> Path:
+    """Devolve a pasta onde os ficheiros são guardados quando não se indica outra.
+
+    :return: A pasta ``Downloads`` (Transferências) da pasta pessoal do utilizador.
+    """
+    return Path.home() / "Downloads"
+
+
+def descarregar(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
+    """Pede o número de um criativo do cliente e guarda uma cópia do ficheiro dele.
+
+    A cópia vai para a pasta indicada, ou para a pasta Transferências se a
+    resposta ficar vazia. Nenhum ficheiro que já lá esteja é apagado.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a descarregar.
+    """
+    comum.titulo("Descarregar ficheiro")
+    criativo = pedir_criativo_do_cliente(ligacao, cliente)
+    if criativo is None:
+        return
+    try:
+        caminho = criativos.ficheiro_de(criativo)
+        pasta = comum.ler_texto(
+            f"Pasta onde guardar a cópia (Enter para {pasta_transferencias()})", obrigatorio=False
+        )
+        copia = ficheiros.copiar_para(caminho, pasta or str(pasta_transferencias()))
+    except ErroValidacao as erro:
+        print(f"\n{erro}")
+    else:
+        print(f"\nCópia guardada em {copia}")
+    comum.pausa()
+
+
 #: Opções do menu de criativos do Cliente. Cada opção é um par
 #: ``(descrição, função)``; a função recebe a ligação à base de dados e o
 #: cliente.
@@ -606,6 +654,8 @@ ACOES_DO_CLIENTE = [
     ("Filtrar e pesquisar", filtrar),
     ("Ver criativo", ver_do_cliente),
     ("Aprovar ou rejeitar criativo", decidir),
+    ("Pré-visualizar ficheiro", pre_visualizar_do_cliente),
+    ("Descarregar ficheiro", descarregar),
 ]
 
 
@@ -614,7 +664,7 @@ def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
 
     Mostra os criativos de todas as campanhas do cliente, quantos estão à
     espera de aprovação e as opções para os filtrar, consultar, aprovar e
-    rejeitar. A lista completa volta a aparecer depois de cada opção.
+    rejeitar, e para ver e descarregar os ficheiros. A lista completa volta a aparecer depois de cada opção.
 
     :param ligacao: Ligação aberta à base de dados.
     :param utilizador: Cliente que está a usar o menu.
