@@ -2,6 +2,34 @@
 
 Todas as alterações relevantes da aplicação, por versão. Cada versão corresponde a uma fase do projeto.
 
+## v0.4.0 — Criativos (2026-11-18)
+
+### Acrescentado
+
+- Criativos: o Marketeer cria, edita, consulta e elimina os criativos de cada uma das suas campanhas, na opção "Criativos" do seu menu.
+- Custo estimado, prazo, público-alvo e plataforma de cada criativo. O prazo não pode passar a data de fim da campanha.
+- Estados de um criativo: em preparação, em revisão, aprovado, rejeitado e publicado. O Marketeer envia o criativo ao cliente para revisão e marca-o como publicado depois de aprovado.
+- Aprovação pelo Cliente: aprova ou rejeita os criativos em revisão; a rejeição tem de ter um motivo, que o marketeer vê.
+- Ficheiros: o Marketeer anexa um ficheiro a cada criativo, que é copiado para a pasta `dados/ficheiros`. O Marketeer e o Cliente pré-visualizam o ficheiro (nome, tipo e tamanho) e abrem-no no programa predefinido; o Cliente descarrega uma cópia para uma pasta à escolha.
+- Opção "Criativos" no menu do Cliente, com os criativos de todas as suas campanhas e a pesquisa e os filtros por campanha, plataforma e estado.
+- Despesa de cada campanha (a soma do custo dos criativos) e budget restante, nas listas e nos detalhes das campanhas do Marketeer e do Cliente.
+- Aviso ao Marketeer quando o custo dos criativos ultrapassa o budget da campanha.
+- Número de criativos de cada campanha em cada estado, em "Ver campanha".
+- Criativos de demonstração e o ficheiro de exemplo `exemplos/banner-natal.svg`.
+
+### Alterado
+
+- Uma campanha com criativos já não pode ser eliminada: primeiro eliminam-se os criativos.
+- Um criativo só pode ser editado em preparação ou depois de rejeitado, e um criativo publicado não pode ser eliminado.
+- Os valores negativos em euros são escritos com o sinal à frente, por exemplo `-200,00 €`.
+- Os testes usam sempre uma pasta de dados temporária, para nunca mexerem na pasta `dados` do projeto.
+
+### User stories concluídas
+
+M06, M07, M08, M09, M10, M11, M12, M13, M14, M15, C10, C11, C12, C13 e C14.
+
+Ficam também concluídas as partes de M04 (budget restante e criativos por estado) e de M05 (só eliminar campanhas sem criativos) que tinham sido adiadas na versão 0.3.0.
+
 ## v0.3.0 — Campanhas e pedidos de campanha (2026-11-17)
 
 ### Acrescentado
