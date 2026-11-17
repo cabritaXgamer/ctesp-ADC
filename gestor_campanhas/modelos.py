@@ -212,6 +212,12 @@ class Criativo:
     :param campanha_id: Identificador da campanha a que o criativo pertence.
     :param nome: Nome do criativo, por exemplo ``"Banner de Natal"``.
     :param descricao: O que o criativo mostra ou diz. Pode estar vazio.
+    :param custo_centimos: Custo estimado, em cêntimos, ou ``None`` se ainda
+        não foi indicado.
+    :param prazo: Dia em que o criativo deve estar pronto, ou ``None``.
+    :param publico_alvo: A quem o criativo se destina. Pode estar vazio.
+    :param plataforma: Plataforma onde vai ser publicado, uma das de
+        :data:`PLATAFORMAS`, ou vazio se ainda não foi escolhida.
     :param estado: :data:`EM_PREPARACAO`, :data:`EM_REVISAO`, :data:`APROVADO`,
         :data:`REJEITADO` ou :data:`PUBLICADO`.
     :param campanha_nome: Nome da campanha, para mostrar nas listas.
@@ -221,6 +227,10 @@ class Criativo:
     campanha_id: int
     nome: str
     descricao: str = ""
+    custo_centimos: int | None = None
+    prazo: date | None = None
+    publico_alvo: str = ""
+    plataforma: str = ""
     estado: str = EM_PREPARACAO
     campanha_nome: str = ""
 

@@ -77,6 +77,38 @@ def test_repositorio_guarda_e_le_um_criativo(ligacao, natal):
     assert criativo.campanha_nome == "Natal"
 
 
+def test_repositorio_guarda_o_custo_o_prazo_o_publico_e_a_plataforma(ligacao, natal):
+    criativo = repositorio.criar(
+        ligacao, natal.id, "Banner", "", 40000, date(2026, 11, 25), "Famílias com filhos", "Facebook"
+    )
+
+    lido = repositorio.obter_por_id(ligacao, criativo.id)
+    assert lido.custo_centimos == 40000
+    assert lido.prazo == date(2026, 11, 25)
+    assert lido.publico_alvo == "Famílias com filhos"
+    assert lido.plataforma == "Facebook"
+
+
+def test_repositorio_aceita_criativo_sem_custo_nem_prazo(ligacao, natal):
+    criativo = repositorio.criar(ligacao, natal.id, "Banner", "")
+
+    assert criativo.custo_centimos is None
+    assert criativo.prazo is None
+    assert criativo.publico_alvo == ""
+    assert criativo.plataforma == ""
+
+
+def test_repositorio_atualiza_todos_os_dados(ligacao, natal):
+    criativo = repositorio.criar(ligacao, natal.id, "Banner", "", 40000, date(2026, 11, 25), "Famílias", "Facebook")
+
+    alterado = repositorio.atualizar(ligacao, criativo.id, "Banner", "", None, None, "", "Instagram")
+
+    assert alterado.custo_centimos is None
+    assert alterado.prazo is None
+    assert alterado.publico_alvo == ""
+    assert alterado.plataforma == "Instagram"
+
+
 def test_repositorio_devolve_none_quando_o_criativo_nao_existe(ligacao):
     assert repositorio.obter_por_id(ligacao, 999) is None
 
