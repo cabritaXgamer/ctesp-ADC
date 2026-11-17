@@ -406,6 +406,34 @@ def test_menu_mostra_os_criativos_por_estado(teclado, ligacao, contas, natal, di
     assert "  Criativos: 3 (Em preparação: 2, Em revisão: 1)" in capsys.readouterr().out
 
 
+def test_lista_mostra_a_despesa_e_o_restante(teclado, ligacao, contas, natal, dia_16_de_novembro, capsys):
+    miguel = contas[modelos.MARKETEER]
+    repositorio.definir_budget(ligacao, natal.id, 150000)
+    criativos.criar(ligacao, natal.id, "Banner", "", 40000)
+    criativos.criar(ligacao, natal.id, "Vídeo", "", 90000)
+    servico.criar(ligacao, miguel, "Saldos", "", contas[modelos.CLIENTE].id)
+    teclado("0")
+
+    menu.do_marketeer(ligacao, miguel)
+
+    saida = capsys.readouterr().out
+    assert "Budget       Estado       Despesa     Restante" in saida
+    assert "1 500,00 €   Por começar  1 300,00 €  200,00 €" in saida
+    assert "Por definir  Em curso     0,00 €      Por definir" in saida
+
+
+def test_detalhes_mostram_a_despesa_e_o_restante(teclado, ligacao, contas, natal, dia_16_de_novembro, capsys):
+    repositorio.definir_budget(ligacao, natal.id, 150000)
+    criativos.criar(ligacao, natal.id, "Banner", "", 170000)
+    teclado("3", str(natal.id), "", "0")
+
+    menu.do_marketeer(ligacao, contas[modelos.MARKETEER])
+
+    saida = capsys.readouterr().out
+    assert "  Despesa:   1 700,00 €" in saida
+    assert "  Restante:  -200,00 €" in saida
+
+
 def test_menu_mostra_zero_criativos(teclado, ligacao, contas, natal, dia_16_de_novembro, capsys):
     teclado("3", str(natal.id), "", "0")
 
