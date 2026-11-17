@@ -328,3 +328,80 @@ def test_menu_nao_elimina_sem_confirmacao(teclado, ligacao, contas, natal, capsy
 
     assert "Nada foi alterado." in capsys.readouterr().out
     assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
+
+
+# --- custo, prazo, público-alvo e plataforma ---------------------------------
+
+
+def test_cria_um_criativo_com_todos_os_dados(ligacao, contas, natal):
+    criativo = servico.criar(
+        ligacao, contas[modelos.MARKETEER], natal.id, "Banner", "", "399,90", "2026-11-25", " Famílias ", "Facebook"
+    )
+
+    assert criativo.custo_centimos == 39990
+    assert criativo.prazo == date(2026, 11, 25)
+    assert criativo.publico_alvo == "Famílias"
+    assert criativo.plataforma == "Facebook"
+
+
+@pytest.mark.parametrize(
+    ("custo", "esperado"),
+    [("", None), ("0", 0), ("400", 40000), ("1 500,50 €", 150050)],
+)
+def test_custo_em_euros(custo, esperado):
+    assert servico.custo_validado(custo) == esperado
+
+
+def test_custo_tem_de_ser_um_valor_em_euros(ligacao, contas, natal):
+    with pytest.raises(ErroValidacao, match="O valor não é válido"):
+        servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner", custo="quatrocentos")
+
+
+def test_plataforma_tem_de_ser_uma_das_previstas(ligacao, contas, natal):
+    with pytest.raises(ErroValidacao, match="A plataforma tem de ser uma destas: Facebook, Instagram"):
+        servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner", plataforma="Myspace")
+
+    assert servico.plataforma_validada("") == ""
+    assert servico.plataforma_validada("TikTok") == "TikTok"
+
+
+def test_prazo_tem_de_ser_uma_data(ligacao, contas, natal):
+    with pytest.raises(ErroValidacao, match="A data do prazo não é válida."):
+        servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner", prazo="25/11/2026")
+
+
+def test_prazo_nao_pode_passar_o_fim_da_campanha(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+
+    with pytest.raises(ErroValidacao, match=r"O prazo não pode ser depois do fim da campanha \(2026-12-24\)."):
+        servico.criar(ligacao, miguel, natal.id, "Banner", prazo="2026-12-25")
+
+    assert servico.criar(ligacao, miguel, natal.id, "Banner", prazo="2026-12-24").prazo == date(2026, 12, 24)
+
+
+def test_campanha_sem_data_de_fim_aceita_qualquer_prazo(ligacao, contas, saldos):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], saldos.id, "Cartaz", prazo="2027-06-30")
+
+    assert criativo.prazo == date(2027, 6, 30)
+
+
+def test_editar_altera_e_apaga_os_dados(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "", "400", "2026-11-25", "Famílias", "Facebook")
+
+    alterado = servico.editar(ligacao, miguel, criativo.id, "Banner", "", "450", "", "", "Instagram")
+
+    assert alterado.custo_centimos == 45000
+    assert alterado.prazo is None
+    assert alterado.publico_alvo == ""
+    assert alterado.plataforma == "Instagram"
+
+
+def test_editar_com_um_valor_errado_nao_altera_nada(ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner", "", "400")
+
+    with pytest.raises(ErroValidacao):
+        servico.editar(ligacao, miguel, criativo.id, "Banner novo", "", "400", "2027-01-01")
+
+    assert repositorio.obter_por_id(ligacao, criativo.id) == criativo
