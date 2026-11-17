@@ -242,3 +242,19 @@ tabela ``criativos`` aponta para ela, e o SQLite recusa apagar uma linha a
 que outra tabela ainda faz referência. A regra está também em
 :func:`gestor_campanhas.servicos.campanhas.eliminar`, que mostra uma
 mensagem a explicar o que fazer.
+
+Estados de um criativo
+----------------------
+
+As mudanças de estado que o marketeer pode fazer estão no dicionário
+:data:`gestor_campanhas.servicos.criativos.PROXIMOS_ESTADOS`: a chave é o
+estado atual e o valor são os estados para onde pode passar. O menu "Atualizar
+estado" mostra só essas opções, e
+:func:`gestor_campanhas.servicos.criativos.mudar_estado` recusa qualquer
+outra. A aprovação e a rejeição são do cliente, em
+:func:`gestor_campanhas.servicos.criativos.aprovar` e
+:func:`gestor_campanhas.servicos.criativos.rejeitar`, e só valem para
+criativos em revisão.
+
+Ter as regras num dicionário, em vez de espalhadas por vários ``if``, faz com
+que acrescentar ou retirar uma mudança seja alterar uma linha.

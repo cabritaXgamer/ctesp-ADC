@@ -418,7 +418,11 @@ Ver campanha
 ^^^^^^^^^^^^
 
 Pede o número da campanha e mostra todos os dados dela, incluindo o objetivo,
-que não cabe na lista.
+que não cabe na lista, e quantos criativos a campanha tem em cada estado:
+
+.. code-block:: text
+
+     Criativos: 3 (Em preparação: 2, Em revisão: 1)
 
 Eliminar campanha
 ^^^^^^^^^^^^^^^^^
@@ -492,6 +496,10 @@ Se algum valor não respeitar as regras, o criativo não é criado.
 Editar criativo
 ^^^^^^^^^^^^^^^
 
+Só se pode editar um criativo ``Em preparação`` ou ``Rejeitado``. Um
+criativo em revisão está a ser visto pelo cliente, e um aprovado ou publicado
+já foi aceite tal como está.
+
 Pede o número do criativo e mostra cada dado, com o valor atual entre
 parênteses retos. Com Enter, o valor mantém-se; para apagar um valor,
 escreve-se ``-``. As regras são as mesmas de quando se cria o criativo, e se
@@ -508,7 +516,40 @@ Eliminar criativo
 ^^^^^^^^^^^^^^^^^
 
 Pede o número do criativo, mostra os dados dele e pede confirmação. Um
-criativo eliminado não pode ser recuperado.
+criativo eliminado não pode ser recuperado. Um criativo ``Publicado`` não
+pode ser eliminado.
+
+Atualizar estado
+^^^^^^^^^^^^^^^^
+
+Pede o número do criativo, mostra o estado atual e as mudanças permitidas a
+partir dele. O caminho normal de um criativo é este:
+
+.. code-block:: text
+
+   Em preparação --> Em revisão --> Aprovado --> Publicado
+                          |
+                          +-------> Rejeitado --> Em preparação ou Em revisão
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Estado atual
+     - O que o marketeer pode fazer
+   * - ``Em preparação``
+     - Enviar ao cliente para revisão.
+   * - ``Em revisão``
+     - Voltar a pôr em preparação. A aprovação e a rejeição são do cliente.
+   * - ``Rejeitado``
+     - Voltar a pôr em preparação, ou enviar outra vez para revisão. O motivo
+       da rejeição aparece no ecrã.
+   * - ``Aprovado``
+     - Marcar como publicado.
+   * - ``Publicado``
+     - Nada: é o estado final.
+
+Com **0. Deixar como está**, o estado não muda.
 
 Cliente
 -------
@@ -662,3 +703,23 @@ completa.
 
 **Ver criativo** pede o número do criativo e mostra todos os dados dele,
 incluindo a descrição e o público-alvo completo.
+
+Por baixo da lista aparece quantos criativos estão à espera de aprovação,
+por exemplo ``Há 1 criativo à espera da sua aprovação.``
+
+**Aprovar ou rejeitar criativo** pede o número de um criativo
+``Em revisão``, mostra os dados dele e pergunta a decisão:
+
+.. code-block:: text
+
+   ============================================================
+   Decisão
+   ============================================================
+     1. Aprovar
+     2. Rejeitar
+     0. Decidir mais tarde
+
+Um criativo aprovado pode ser publicado pelo marketeer. Para rejeitar, é
+obrigatório escrever o motivo, que o marketeer vê quando atualiza o estado.
+Com **0. Decidir mais tarde**, o criativo continua em revisão. Os criativos
+noutros estados não podem ser aprovados nem rejeitados.
