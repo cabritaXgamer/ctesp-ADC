@@ -9,6 +9,7 @@ from gestor_campanhas.cli import campanhas as menu
 from gestor_campanhas.cli import perfis
 from gestor_campanhas.erros import ErroValidacao
 from gestor_campanhas.repositorios import campanhas as repositorio
+from gestor_campanhas.repositorios import criativos
 from gestor_campanhas.repositorios import utilizadores
 from gestor_campanhas.servicos import campanhas as servico
 
@@ -173,3 +174,43 @@ def test_menu_ver_campanha_pode_ser_cancelado_com_enter(teclado, ligacao, contas
     menu.do_cliente(ligacao, contas[modelos.CLIENTE])
 
     assert "Marketeer responsável" not in capsys.readouterr().out.split("Ver campanha\n")[-1]
+
+
+# --- despesa face ao budget --------------------------------------------------
+
+
+def test_lista_do_cliente_mostra_a_despesa_e_o_restante(teclado, ligacao, contas, natal, saldos, capsys):
+    criativos.criar(ligacao, natal.id, "Banner", "", 40000)
+    criativos.criar(ligacao, natal.id, "Vídeo", "", 90000)
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Marketeer         Despesa     Restante" in saida
+    assert "Miguel Marketeer  1 300,00 €  200,00 €" in saida
+    assert "Miguel Marketeer  0,00 €      Por definir" in saida
+    assert "A despesa é a soma do custo estimado dos criativos de cada campanha." in saida
+
+
+def test_detalhes_do_cliente_mostram_a_parte_gasta(teclado, ligacao, contas, natal, capsys):
+    criativos.criar(ligacao, natal.id, "Banner", "", 40000)
+    criativos.criar(ligacao, natal.id, "Vídeo", "", 90000)
+    teclado("1", str(natal.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "  Despesa:   1 300,00 €" in saida
+    assert "  Restante:  200,00 €" in saida
+    assert "  Gasto:     86% do budget" in saida
+
+
+def test_detalhes_sem_budget_nao_mostram_a_percentagem(teclado, ligacao, contas, saldos, capsys):
+    teclado("1", str(saldos.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "  Restante:  Por definir" in saida
+    assert "% do budget" not in saida

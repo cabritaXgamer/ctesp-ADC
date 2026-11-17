@@ -9,8 +9,8 @@ marketeer vê ainda quantos criativos ela tem em cada estado.
 O Administrador vê as campanhas de todos os marketeers, define o budget de
 cada uma e escolhe o marketeer responsável.
 
-O Cliente vê as suas campanhas, com o budget de cada uma, e os contactos do
-marketeer responsável.
+O Cliente vê as suas campanhas, com o budget de cada uma e a despesa face a
+esse budget, e os contactos do marketeer responsável.
 """
 
 from __future__ import annotations
@@ -432,34 +432,40 @@ def do_administrador(ligacao: sqlite3.Connection, utilizador: Utilizador) -> Non
         funcao(ligacao)
 
 
-def mostrar_do_cliente(lista: list[Campanha]) -> None:
+def mostrar_do_cliente(lista: list[Campanha], despesas: dict[int, int] | None = None) -> None:
     """Mostra uma tabela com as campanhas de um cliente, com o total no fim.
 
     :param lista: Campanhas a mostrar.
+    :param despesas: Despesa de cada campanha. Quando é indicada, a tabela
+        ganha as colunas ``Despesa`` e ``Restante``.
     """
-    comum.mostrar_tabela(
-        ["N.º", "Nome", "Início", "Fim", "Budget", "Estado", "Marketeer"],
-        [
-            [
-                str(campanha.id),
-                campanha.nome,
-                data(campanha.data_inicio),
-                data(campanha.data_fim),
-                budget(campanha),
-                campanhas.estado(campanha),
-                campanha.marketeer_nome,
-            ]
-            for campanha in lista
-        ],
-    )
+    cabecalhos = ["N.º", "Nome", "Início", "Fim", "Budget", "Estado", "Marketeer"]
+    if despesas is not None:
+        cabecalhos += ["Despesa", "Restante"]
+    linhas = []
+    for campanha in lista:
+        linha = [
+            str(campanha.id),
+            campanha.nome,
+            data(campanha.data_inicio),
+            data(campanha.data_fim),
+            budget(campanha),
+            campanhas.estado(campanha),
+            campanha.marketeer_nome,
+        ]
+        if despesas is not None:
+            linha += colunas_da_despesa(campanha, despesas)
+        linhas.append(linha)
+    comum.mostrar_tabela(cabecalhos, linhas)
     print(f"\n{len(lista)} {'campanha' if len(lista) == 1 else 'campanhas'}.")
 
 
 def ver_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
     """Pede o número de uma campanha do cliente e mostra os dados dela.
 
-    Além dos dados da campanha, mostra o nome e os contactos do marketeer
-    responsável, para o cliente saber a quem se dirigir.
+    Além dos dados da campanha, com a despesa e a parte do budget já
+    gasta, mostra o nome e os contactos do marketeer responsável, para o
+    cliente saber a quem se dirigir.
 
     :param ligacao: Ligação aberta à base de dados.
     :param cliente: Cliente que está a consultar.
@@ -475,8 +481,11 @@ def ver_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
         comum.pausa()
         return
     marketeer = campanhas.responsavel(ligacao, campanha)
+    gasto = criativos.despesa(ligacao, campanha)
     print()
-    mostrar_detalhes(campanha)
+    mostrar_detalhes(campanha, gasto)
+    if campanha.budget_centimos:
+        print(f"  Gasto:     {gasto * 100 // campanha.budget_centimos}% do budget")
     print("\nMarketeer responsável")
     print(f"  Nome:      {marketeer.nome}")
     print(f"  Email:     {marketeer.email}")
@@ -498,8 +507,9 @@ def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
         comum.titulo("As minhas campanhas")
         lista = campanhas.listar_do_cliente(ligacao, utilizador)
         if lista:
-            mostrar_do_cliente(lista)
+            mostrar_do_cliente(lista, criativos.despesas(ligacao))
             print("O budget de cada campanha é definido pelo administrador.")
+            print("A despesa é a soma do custo estimado dos criativos de cada campanha.")
         else:
             print('Ainda não tem campanhas. Pode pedir uma na opção "Pedidos de campanha".')
         escolha = comum.escolher_opcao("Campanhas", [("1", "Ver campanha e marketeer responsável"), ("0", "Voltar")])
