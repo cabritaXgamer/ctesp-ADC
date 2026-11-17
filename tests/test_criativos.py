@@ -516,6 +516,7 @@ def test_menu_tem_as_opcoes_pela_ordem_certa():
         "Editar criativo",
         "Ver criativo",
         "Eliminar criativo",
+        "Atualizar estado",
     ]
 
 
@@ -828,3 +829,85 @@ def test_nao_elimina_um_criativo_publicado(ligacao, contas, natal):
         servico.eliminar(ligacao, miguel, criativo.id)
 
     assert repositorio.obter_por_id(ligacao, criativo.id) is not None
+
+
+def test_menu_envia_o_criativo_para_revisao(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("5", str(criativo.id), "1", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert "O criativo Banner está Em preparação." in saida
+    assert "  1. Enviar ao cliente para revisão" in saida
+    assert "O criativo passou a Em revisão." in saida
+    assert 'O cliente já o pode aprovar ou rejeitar, na opção "Criativos" do menu dele.' in saida
+    assert repositorio.obter_por_id(ligacao, criativo.id).estado == modelos.EM_REVISAO
+
+
+def test_menu_mostra_o_motivo_e_as_duas_opcoes_de_um_rejeitado(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    repositorio.definir_estado(ligacao, criativo.id, modelos.REJEITADO, "Cores escuras")
+    teclado("5", str(criativo.id), "1", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert "Motivo da rejeição: Cores escuras" in saida
+    assert "  1. Voltar a pôr em preparação" in saida
+    assert "  2. Enviar ao cliente para revisão" in saida
+    assert repositorio.obter_por_id(ligacao, criativo.id).estado == modelos.EM_PREPARACAO
+
+
+def test_menu_deixa_o_estado_como_esta(teclado, ligacao, contas, natal):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    teclado("5", str(criativo.id), "0", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert repositorio.obter_por_id(ligacao, criativo.id).estado == modelos.EM_PREPARACAO
+
+
+def test_menu_criativo_publicado_ja_nao_muda(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.PUBLICADO)
+    teclado("5", str(criativo.id), "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "O estado de um criativo publicado já não muda." in capsys.readouterr().out
+
+
+def test_menu_nao_deixa_editar_um_criativo_em_revisao(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.EM_REVISAO)
+    teclado("2", str(criativo.id), "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert "Só se pode editar um criativo em preparação ou rejeitado. Este criativo está Em revisão." in saida
+    assert "A editar o criativo" not in saida
+
+
+def test_menu_nao_elimina_um_criativo_publicado(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = com_estado(ligacao, servico.criar(ligacao, miguel, natal.id, "Banner"), modelos.PUBLICADO)
+    teclado("4", str(criativo.id), "s", "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    assert "Um criativo publicado não pode ser eliminado." in capsys.readouterr().out
+    assert repositorio.obter_por_id(ligacao, criativo.id) is not None
+
+
+def test_detalhes_de_um_rejeitado_mostram_o_motivo(ligacao, contas, natal, capsys):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+    criativo = repositorio.definir_estado(ligacao, criativo.id, modelos.REJEITADO, "Cores escuras")
+
+    menu.mostrar_detalhes(criativo)
+
+    assert "  Motivo:      Cores escuras" in capsys.readouterr().out

@@ -2,7 +2,8 @@
 
 O marketeer escolhe uma das suas campanhas e vê os criativos dela, com o
 custo, o prazo, o público-alvo e a plataforma de cada um. A partir daí pode
-criar, editar, consultar e eliminar criativos.
+criar, editar, consultar e eliminar criativos, e atualizar o estado de cada
+um.
 
 O cliente vê os criativos de todas as suas campanhas, numa só lista, e pode
 filtrá-los e pesquisá-los.
@@ -24,6 +25,13 @@ from gestor_campanhas.servicos import campanhas, criativos
 
 #: O que se escreve para apagar um valor quando se edita um criativo.
 APAGAR = "-"
+
+#: O que aparece no menu "Atualizar estado" para cada estado de destino.
+DESCRICOES_ESTADOS = {
+    modelos.EM_REVISAO: "Enviar ao cliente para revisão",
+    modelos.EM_PREPARACAO: "Voltar a pôr em preparação",
+    modelos.PUBLICADO: "Marcar como publicado",
+}
 
 #: Número máximo de caracteres do público-alvo que cabem na lista.
 LARGURA_PUBLICO = 25
@@ -77,6 +85,8 @@ def mostrar_detalhes(criativo: Criativo) -> None:
     print(f"  Público:     {criativo.publico_alvo or '-'}")
     print(f"  Plataforma:  {criativo.plataforma or '-'}")
     print(f"  Estado:      {criativo.nome_estado}")
+    if criativo.estado == modelos.REJEITADO:
+        print(f"  Motivo:      {criativo.motivo_rejeicao}")
 
 
 def pedir_criativo(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanha) -> Criativo | None:
@@ -185,6 +195,10 @@ def editar(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanh
     criativo = pedir_criativo(ligacao, marketeer, campanha)
     if criativo is None:
         return
+    if criativo.estado not in criativos.EDITAVEIS:
+        print(f"\nSó se pode editar um criativo em preparação ou rejeitado. Este criativo está {criativo.nome_estado}.")
+        comum.pausa()
+        return
     print(f"\nA editar o criativo {criativo.nome}.")
     print("Carregue em Enter para manter o valor que está entre parênteses retos.")
     print(f"Para apagar um valor, escreva {APAGAR}\n")
@@ -234,10 +248,50 @@ def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campa
     mostrar_detalhes(criativo)
     print("\nUm criativo eliminado não pode ser recuperado.")
     if comum.confirmar("Eliminar este criativo?"):
-        criativos.eliminar(ligacao, marketeer, criativo.id)
-        print(f"\nO criativo {criativo.nome} foi eliminado.")
+        try:
+            criativos.eliminar(ligacao, marketeer, criativo.id)
+        except ErroValidacao as erro:
+            print(f"\n{erro}")
+        else:
+            print(f"\nO criativo {criativo.nome} foi eliminado.")
     else:
         print("\nNada foi alterado.")
+    comum.pausa()
+
+
+def atualizar_estado(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanha) -> None:
+    """Pede o número de um criativo e muda o estado dele.
+
+    Mostra só as mudanças permitidas a partir do estado atual (ver
+    :data:`gestor_campanhas.servicos.criativos.PROXIMOS_ESTADOS`).
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a usar o menu.
+    :param campanha: Campanha que está a ser vista.
+    """
+    comum.titulo("Atualizar estado")
+    criativo = pedir_criativo(ligacao, marketeer, campanha)
+    if criativo is None:
+        return
+    print(f"\nO criativo {criativo.nome} está {criativo.nome_estado}.")
+    if criativo.estado == modelos.REJEITADO:
+        print(f"Motivo da rejeição: {criativo.motivo_rejeicao}")
+    proximos = criativos.PROXIMOS_ESTADOS[criativo.estado]
+    if criativo.estado == modelos.EM_REVISAO:
+        print("Está à espera de que o cliente o aprove ou rejeite.")
+    if not proximos:
+        print("O estado de um criativo publicado já não muda.")
+        comum.pausa()
+        return
+    opcoes = [(str(numero), DESCRICOES_ESTADOS[estado]) for numero, estado in enumerate(proximos, start=1)]
+    opcoes.append(("0", "Deixar como está"))
+    escolha = comum.escolher_opcao("Novo estado", opcoes)
+    if escolha == "0":
+        return
+    criativo = criativos.mudar_estado(ligacao, marketeer, criativo.id, proximos[int(escolha) - 1])
+    print(f"\nO criativo passou a {criativo.nome_estado}.")
+    if criativo.estado == modelos.EM_REVISAO:
+        print("O cliente já o pode aprovar ou rejeitar, na opção \"Criativos\" do menu dele.")
     comum.pausa()
 
 
@@ -249,6 +303,7 @@ ACOES = [
     ("Editar criativo", editar),
     ("Ver criativo", ver),
     ("Eliminar criativo", eliminar),
+    ("Atualizar estado", atualizar_estado),
 ]
 
 
