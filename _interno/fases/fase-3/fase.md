@@ -2,6 +2,7 @@
 numero: 3
 titulo: Campanhas e pedidos
 testes: 382
+fechada: sim
 ---
 
 @@ entrega

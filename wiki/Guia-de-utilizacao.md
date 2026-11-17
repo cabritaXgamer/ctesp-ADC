@@ -1,6 +1,6 @@
 # Guia de utilização
 
-Como usar a aplicação, na versão 0.2.0.
+Como usar a aplicação, na versão 0.4.0.
 
 ## Arrancar
 
@@ -10,7 +10,7 @@ python -m gestor_campanhas
 
 ```
 ============================================================
-Gestor de Campanhas v0.2.0
+Gestor de Campanhas v0.4.0
 ============================================================
   1. Entrar
   2. Recuperar a password
@@ -22,7 +22,7 @@ Em todos os menus escreve-se o número da opção e prime-se Enter.
 
 ## Contas de demonstração
 
-Uma instalação nova não tem contas. Para criar as contas, as campanhas e os pedidos de demonstração:
+Uma instalação nova não tem contas. Para criar as contas, as campanhas, os pedidos e os criativos de demonstração:
 
 ```bash
 python -m gestor_campanhas.dados_demo
@@ -39,7 +39,7 @@ python -m gestor_campanhas.dados_demo
 
 Estas passwords são públicas e servem só para demonstração.
 
-O mesmo comando cria três campanhas (`Natal 2026`, `Regresso às aulas` e `Bicicletas de primavera`) e dois pedidos de campanha pendentes. Pode ser repetido: só acrescenta o que faltar.
+O mesmo comando cria três campanhas (`Natal 2026`, `Regresso às aulas` e `Bicicletas de primavera`) , dois pedidos de campanha pendentes e quatro criativos (três nas campanhas do Miguel e um na da Marta). Pode ser repetido: só acrescenta o que faltar.
 
 ## Entrar e sair
 
@@ -54,7 +54,8 @@ Ao fim de 15 minutos sem atividade, a sessão termina sozinha e é preciso entra
 | Clientes | Sim | | |
 | Marketeers | Sim | | |
 | Pedidos de campanha | Decide os pedidos de todos os clientes | | Faz pedidos, acompanha-os e cancela os pendentes |
-| Campanhas | Vê todas, define o budget e atribui o marketeer | Cria, edita, consulta e elimina as suas | Vê as suas, o budget e o marketeer responsável |
+| Campanhas | Vê todas, define o budget e atribui o marketeer | Cria, edita, consulta e elimina as suas | Vê as suas, o budget, a despesa e o marketeer responsável |
+| Criativos | | Cria, edita, consulta e elimina os das suas campanhas, muda o estado e anexa o ficheiro | Vê os das suas campanhas, procura-os, aprova-os ou rejeita-os e descarrega os ficheiros |
 | Horários de entrada e saída dos marketeers | Sim | | |
 | Editar os meus dados | Sim | Sim | Sim |
 | Alterar a password | Sim | Sim | Sim |
@@ -99,23 +100,25 @@ O budget é sempre definido pelo Administrador.
 
 ### Campanhas (Marketeer)
 
-Mostra as campanhas de que o marketeer é responsável, com o cliente, as datas, o budget e o estado.
+Mostra as campanhas de que o marketeer é responsável, com o cliente, as datas, o budget, o estado, a despesa e o que resta do budget.
 
 ```
-N.º  Nome               Cliente        Início      Fim         Budget      Estado
----  -----------------  -------------  ----------  ----------  ----------  -----------
-1    Natal 2026         Carla Cliente  2026-12-01  2026-12-24  1 500,00 €  Por começar
-2    Regresso às aulas  José Padeiro   2026-09-01  2026-09-30  800,00 €    Terminada
+N.º  Nome               Cliente        Início      Fim         Budget      Estado       Despesa     Restante
+---  -----------------  -------------  ----------  ----------  ----------  -----------  ----------  --------
+1    Natal 2026         Carla Cliente  2026-12-01  2026-12-24  1 500,00 €  Por começar  1 300,00 €  200,00 €
+2    Regresso às aulas  José Padeiro   2026-09-01  2026-09-30  800,00 €    Terminada    300,00 €    500,00 €
 ```
 
 | Opção | O que faz |
 |---|---|
 | Criar campanha | Mostra os clientes ativos e pede o cliente, o nome, o objetivo e as datas de início e de fim. Só o cliente e o nome são obrigatórios |
 | Editar campanha | Altera o nome, o objetivo e as datas. Com Enter, o valor mantém-se; com `-`, a data é apagada |
-| Ver campanha | Mostra todos os dados da campanha, incluindo o objetivo |
-| Eliminar campanha | Pede confirmação. Uma campanha eliminada não pode ser recuperada |
+| Ver campanha | Mostra todos os dados da campanha, incluindo o objetivo, a despesa, o restante e quantos criativos há em cada estado |
+| Eliminar campanha | Pede confirmação. Uma campanha eliminada não pode ser recuperada. Só se elimina uma campanha sem criativos |
 
 O estado é calculado a partir das datas: `Por começar` antes da data de início, `Terminada` depois da data de fim e `Em curso` nos outros casos. O budget aparece como `Por definir` enquanto o Administrador não o atribuir.
+
+A **despesa** é a soma do custo estimado dos criativos da campanha, seja qual for o estado deles. O **restante** é o budget menos a despesa: fica negativo (por exemplo `-200,00 €`) quando a despesa passa o budget.
 
 ### Pedidos de campanha (Cliente)
 
@@ -156,7 +159,73 @@ Mostra as campanhas de todos os marketeers.
 
 ### Campanhas (Cliente)
 
-Mostra as campanhas do cliente, com as datas, o budget, o estado e o marketeer responsável. A opção **Ver campanha e marketeer responsável** mostra todos os dados de uma campanha e o nome, o email e o telefone do marketeer.
+Mostra as campanhas do cliente, com as datas, o budget, o estado, o marketeer responsável, a despesa e o restante. A opção **Ver campanha e marketeer responsável** mostra todos os dados de uma campanha, a parte do budget já gasta (por exemplo `Gasto:     86% do budget`) e o nome, o email e o telefone do marketeer.
+
+### Criativos (Marketeer)
+
+Um criativo é uma peça de uma campanha: uma imagem, um vídeo ou um texto a publicar. A opção **Criativos** mostra as campanhas do marketeer e pede o número de uma. Depois, mostra os criativos dessa campanha:
+
+```
+N.º  Nome             Custo     Prazo       Público-alvo               Plataforma  Estado
+---  ---------------  --------  ----------  -------------------------  ----------  -------------
+1    Banner de Natal  400,00 €  2026-11-25  Famílias da região de...   Facebook    Em preparação
+2    Vídeo da montra  900,00 €  2026-11-28  Jovens adultos, 18 a 3...  Instagram   Em preparação
+
+2 criativos.
+Custo dos criativos: 1 300,00 €. Budget da campanha: 1 500,00 €.
+```
+
+| Opção | O que faz |
+|---|---|
+| Criar criativo | Pede o nome (obrigatório), a descrição, o custo estimado em euros, o prazo (`AAAA-MM-DD`), o público-alvo e a plataforma, escolhida numa lista. O criativo fica `Em preparação` |
+| Editar criativo | Altera os mesmos dados. Com Enter, o valor mantém-se; com `-`, é apagado. Só para criativos em preparação ou rejeitados |
+| Ver criativo | Mostra todos os dados, incluindo o público-alvo completo, o motivo da rejeição e o nome do ficheiro |
+| Eliminar criativo | Pede confirmação. Um criativo publicado não pode ser eliminado |
+| Atualizar estado | Mostra só os estados para onde o criativo pode passar (ver a secção seguinte) |
+| Anexar ficheiro | Pede o caminho de um ficheiro do computador e copia-o para a aplicação. Substitui o ficheiro anterior, se houver |
+| Pré-visualizar ficheiro | Mostra o nome, o tipo e o tamanho do ficheiro e pergunta se o deve abrir no programa predefinido |
+
+O prazo não pode ser depois do fim da campanha. Quando o custo dos criativos passa o budget, aparece um aviso por baixo da lista, depois de criar ou editar um criativo, e em "Ver campanha":
+
+```
+Atenção: o custo dos criativos (1 700,00 €) ultrapassa o budget da campanha (1 500,00 €) em 200,00 €.
+```
+
+O criativo é guardado na mesma: o aviso serve para ajustar os custos ou pedir mais budget ao Administrador.
+
+### Estados de um criativo
+
+```
+Em preparação --> Em revisão --> Aprovado --> Publicado
+                       |
+                       +-------> Rejeitado --> Em preparação ou Em revisão
+```
+
+| Estado | Significado | Quem o muda |
+|---|---|---|
+| Em preparação | O marketeer está a fazer o criativo | O marketeer envia-o para revisão |
+| Em revisão | Está à espera da decisão do cliente | O cliente aprova ou rejeita; o marketeer pode retirá-lo para preparação |
+| Aprovado | O cliente aceitou-o | O marketeer marca-o como publicado |
+| Rejeitado | O cliente recusou-o, com um motivo | O marketeer põe-no em preparação ou envia-o outra vez para revisão |
+| Publicado | Já saiu na plataforma | Ninguém: é o fim do caminho |
+
+### Criativos (Cliente)
+
+A opção **Criativos** mostra os criativos de todas as campanhas do cliente, com a campanha de cada um, e diz quantos estão à espera de aprovação.
+
+| Opção | O que faz |
+|---|---|
+| Filtrar e pesquisar | Pede um texto (procurado no nome, na descrição e no público-alvo, sem distinguir acentos), uma campanha, uma plataforma e um estado. Com Enter, a pergunta não é usada |
+| Ver criativo | Mostra todos os dados de um criativo |
+| Aprovar ou rejeitar criativo | Só para criativos em revisão. Para rejeitar, o motivo é obrigatório |
+| Pré-visualizar ficheiro | Como no menu do marketeer |
+| Descarregar ficheiro | Copia o ficheiro para uma pasta à escolha (com Enter, a pasta Transferências). Nunca escreve por cima de um ficheiro que já lá esteja: a cópia fica, por exemplo, `banner-natal (1).svg` |
+
+### Ficheiros dos criativos
+
+Os ficheiros anexados são copiados para a pasta `dados/ficheiros`, com uma pasta por criativo. O original pode ser apagado ou mudado de sítio sem afetar a aplicação. No Windows, para escrever o caminho de um ficheiro, pode clicar nele com o botão direito, escolher "Copiar como caminho" e colar: as aspas são tiradas sozinhas.
+
+Para experimentar, o projeto tem o ficheiro `exemplos/banner-natal.svg`.
 
 ### Horários de entrada e saída dos marketeers
 

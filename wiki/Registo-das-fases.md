@@ -96,11 +96,43 @@ O que correu mal e como se resolveu:
 - **Issues que ficaram abertas.** Dois pull requests foram abertos sem `Closes #número`, e as issues não fecharam sozinhas. Foram fechadas à mão, com um comentário a indicar o pull request.
 - **Mensagem com o género errado.** A mensagem de atribuição de marketeer dizia "foi avisado" também para uma marketeer. Foi corrigida no ramo da release, com um commit do tipo `fix`.
 
+## Fase 4 — Criativos
+
+Release: **v0.4.0**.
+
+| Unidade | User stories | Quem fez | Quem reviu |
+|---|---|---|---|
+| 4.1 Criar, editar e eliminar criativos | M06, M07, M08 | Tomas | Ricardo |
+| 4.2 Custo, prazo, público-alvo e plataforma | M09, M10, M11, M12 | Ricardo | Fabio |
+| 4.3 Criativos do cliente, com pesquisa e filtros | C10, C11 | Fabio | Tomas |
+| 4.4 Estados do criativo e aprovação pelo cliente | M14, C13 | Tomas | Fabio |
+| 4.5 Ficheiros dos criativos | M13, C12 | Ricardo | Tomas |
+| 4.6 Despesa face ao budget e aviso de budget ultrapassado | C14, M15 | Fabio | Ricardo |
+| 4.7 Release v0.4.0 | — | Fabio | Ricardo |
+
+Resultado: 15 user stories concluídas (42 no total); 566 testes automáticos; quarta versão publicada.
+
+Decisões tomadas nesta fase:
+
+- **A ordem das unidades mudou.** A lista dos criativos do cliente passou para a unidade 4.3 e os ficheiros para a 4.5, porque a aprovação e o descarregar acontecem no menu de criativos do cliente, que tinha de existir primeiro.
+- **A tabela dos criativos nasceu completa.** Foi criada na unidade 4.1 já com todas as colunas da fase, porque o `CREATE TABLE IF NOT EXISTS` não acrescenta colunas a uma tabela que já existe nos computadores de cada um.
+- **Uma plataforma por criativo** (M12). O mesmo anúncio em duas plataformas tem formatos diferentes, por isso são dois criativos.
+- **Um só prazo** (M10): a data de entrega, que não pode passar o fim da campanha. A publicação fica registada no estado "Publicado".
+- **A rejeição tem um estado próprio** (C13). O criativo fica "Rejeitado", com o motivo à vista, e o marketeer decide quando o volta a preparar.
+- **Sem filtro por intervalo de datas** (C11) e **sem data da última alteração** (M07), para manter a fase dentro do tempo.
+- **A despesa é calculada.** A soma do custo dos criativos não é guardada, para nunca ficar desatualizada. O aviso de budget ultrapassado não impede guardar o criativo: o custo é uma estimativa.
+- **Ficheiros fora da base de dados.** São copiados para `dados/ficheiros`, e a base de dados guarda só o nome. Os testes usam sempre uma pasta de dados temporária.
+- **Partes da Fase 3 fechadas.** O budget restante e os criativos por estado (M04) e a regra "só se eliminam campanhas sem criativos" (M05).
+
+O que correu mal e como se resolveu:
+
+- **Issues que ficaram abertas.** O pull request da unidade 3.3 não fechou as issues C05, C06 e C07, e a milestone da Fase 3 não chegou aos 100%. Foram fechadas à mão.
+- **Um ramo criado antes do tempo.** O ramo da unidade 3.5 tinha sido criado num `develop` antigo, e o `copiar.py` recusou continuar; ao criar o ramo outra vez, apareceu `a branch named ... already exists`. Apagou-se o ramo antigo e criou-se de novo. O passo "Atualiza as duas pastas e cria o ramo" passou a explicar este caso.
+
 ## Fases seguintes
 
 | Fase | Tema | User stories | Release |
 |---|---|---|---|
-| 4 | Criativos | 15 | v0.4.0 |
 | 5 | Budget | 6 | v0.5.0 |
 | 6 | Comentários, notificações, monitorização e relatórios | 9 | v0.6.0 |
 | 7 | Fecho e entrega | — | v1.0.0 |

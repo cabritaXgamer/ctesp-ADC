@@ -311,7 +311,18 @@ def passo_ramo(u: dict, config: dict) -> tuple[str, str]:
         "| `git switch develop` | Muda para o ramo `develop` do repositório oficial |\n"
         "| `git pull` | Atualiza o teu `develop` com o que o grupo já juntou no GitHub |\n"
         f"| `git switch -c {ramo}` | Cria um ramo novo a partir do `develop` e muda para ele. É neste ramo que vais trabalhar |\n\n"
-        f"**Deves ver**, na última linha: `Switched to a new branch '{ramo}'`.",
+        f"**Deves ver**, na última linha: `Switched to a new branch '{ramo}'`.\n\n"
+        f"**Se em vez disso aparecer** `fatal: a branch named '{ramo}' already exists`, já tinhas criado este ramo "
+        "noutra altura (por exemplo, antes de a unidade anterior estar junta). Continuas no `develop`, já atualizado. "
+        "Vê se o ramo antigo tem commits:\n\n"
+        + bloco(f"git log --oneline develop..{ramo}", "bash")
+        + "\n\n- **Se não aparecer nenhuma linha**, o ramo antigo está vazio. Apaga-o e cria-o outra vez, a partir do "
+        "`develop` atualizado:\n\n"
+        + bloco(f"git branch -D {ramo}\ngit switch -c {ramo}", "bash")
+        + f"\n\n  **Deves ver** `Deleted branch {ramo} (was ...)` e depois `Switched to a new branch '{ramo}'`.\n"
+        "- **Se aparecerem linhas**, são commits que já gravaste. Não apagues nada: muda para o ramo com "
+        f"`git switch {ramo}` e continua no passo seguinte. Se o `copiar.py` responder com `ERRO`, avisa o grupo "
+        "antes de mexer em mais alguma coisa.",
     )
 
 

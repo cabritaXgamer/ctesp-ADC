@@ -69,9 +69,29 @@ Pendente --> Em análise --> Aprovado   (é criada a campanha)
    +--> Cancelado (pelo cliente, só enquanto está pendente)
 ```
 
+## Criativos
+
+Um criativo pertence a uma campanha e não tem marketeer nem cliente próprios: chega-se a eles através da campanha. Por isso, as funções `obter_do_marketeer` e `obter_do_cliente` dos criativos leem o criativo e confirmam que a campanha dele é de quem o pede.
+
+As passagens de estado estão todas num dicionário, `PROXIMOS_ESTADOS`, em `servicos/criativos.py`: para cada estado, os estados para onde o marketeer o pode mudar. O menu só mostra essas escolhas. Aprovar e rejeitar ficam fora do dicionário, porque são decisões do cliente, com funções próprias.
+
+```text
+Em preparação --> Em revisão --> Aprovado --> Publicado
+                       |
+                       +-------> Rejeitado --> Em preparação ou Em revisão
+```
+
+A despesa de uma campanha (a soma do custo dos criativos) não é guardada: é calculada sempre que é mostrada, com uma consulta `SUM ... GROUP BY` que soma todas as campanhas de uma vez. Assim, nunca fica desatualizada quando um criativo muda de custo ou é eliminado.
+
+## Ficheiros
+
+Os ficheiros dos criativos ficam fora da base de dados, na pasta `dados/ficheiros/<número do criativo>/`. A base de dados guarda só o nome do ficheiro. O módulo `servicos/ficheiros.py` trata de copiar, descrever (tipo e tamanho), abrir e descarregar ficheiros, e não sabe nada de criativos: recebe só caminhos e números.
+
+Os testes usam sempre uma pasta de dados temporária (a fixture `dados_temporarios`, em `tests/conftest.py`), para nunca mexerem nos ficheiros verdadeiros.
+
 ## Dinheiro
 
-Os valores em euros (o budget de uma campanha e o orçamento de um pedido) são guardados em cêntimos, como números inteiros, para as contas darem sempre certo. O módulo `dinheiro.py` converte o que o utilizador escreve em cêntimos e os cêntimos no texto que é mostrado (`1 500,50 €`).
+Os valores em euros (o budget de uma campanha, o orçamento de um pedido e o custo de um criativo) são guardados em cêntimos, como números inteiros, para as contas darem sempre certo. O módulo `dinheiro.py` converte o que o utilizador escreve em cêntimos e os cêntimos no texto que é mostrado (`1 500,50 €`, ou `-200,00 €` quando o valor é negativo).
 
 ## Validação dos dados
 
@@ -90,6 +110,7 @@ Um marketeer só pode ser desativado quando já não for responsável por campan
 | `utilizadores` | Uma linha por conta: nome, email (único), hash da password, perfil, se está ativa, telefone, empresa e NIF |
 | `sessoes` | Uma linha por entrada na aplicação: utilizador, hora de entrada, hora de saída e motivo da saída |
 | `campanhas` | Uma linha por campanha: nome, objetivo, cliente, marketeer responsável, budget em cêntimos e datas de início e de fim |
+| `criativos` | Uma linha por criativo: campanha, nome, descrição, custo em cêntimos, prazo, público-alvo, plataforma, estado, motivo da rejeição e nome do ficheiro |
 | `pedidos_campanha` | Uma linha por pedido de nova campanha: cliente, objetivo, orçamento em cêntimos, prazo, plataformas, estado, motivo da rejeição e campanha a que deu origem |
 | `recuperacoes` | Códigos de recuperação da password: utilizador, hash do código, validade e se já foi usado |
 | `configuracoes` | Definições que podem ser alteradas, como pares chave/valor |
