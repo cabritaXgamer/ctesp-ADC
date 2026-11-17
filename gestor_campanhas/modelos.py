@@ -51,6 +51,25 @@ NOMES_ESTADOS_PEDIDO = {
     CANCELADO: "Cancelado",
 }
 
+#: Estado de um criativo em que o marketeer ainda está a trabalhar. É o estado
+#: de um criativo acabado de criar.
+EM_PREPARACAO = "em_preparacao"
+#: Estado de um criativo que o marketeer enviou ao cliente para ser revisto.
+EM_REVISAO = "em_revisao"
+#: Estado de um criativo que já foi publicado na plataforma.
+PUBLICADO = "publicado"
+
+#: Todos os estados de um criativo, com o nome que é mostrado nas listas.
+#: Um criativo usa também os estados :data:`APROVADO` e :data:`REJEITADO`,
+#: quando o cliente o aprova ou rejeita.
+NOMES_ESTADOS_CRIATIVO = {
+    EM_PREPARACAO: "Em preparação",
+    EM_REVISAO: "Em revisão",
+    APROVADO: "Aprovado",
+    REJEITADO: "Rejeitado",
+    PUBLICADO: "Publicado",
+}
+
 #: Plataformas onde se pode anunciar, pela ordem em que aparecem nos menus.
 PLATAFORMAS = ("Facebook", "Instagram", "Google Ads", "LinkedIn", "TikTok", "YouTube")
 
@@ -183,3 +202,29 @@ class PedidoCampanha:
     def nome_estado(self) -> str:
         """Nome do estado tal como aparece nas listas, por exemplo ``"Em análise"``."""
         return NOMES_ESTADOS_PEDIDO[self.estado]
+
+
+@dataclass
+class Criativo:
+    """Uma peça de uma campanha: uma imagem, um vídeo ou um texto a publicar.
+
+    :param id: Identificador na base de dados.
+    :param campanha_id: Identificador da campanha a que o criativo pertence.
+    :param nome: Nome do criativo, por exemplo ``"Banner de Natal"``.
+    :param descricao: O que o criativo mostra ou diz. Pode estar vazio.
+    :param estado: :data:`EM_PREPARACAO`, :data:`EM_REVISAO`, :data:`APROVADO`,
+        :data:`REJEITADO` ou :data:`PUBLICADO`.
+    :param campanha_nome: Nome da campanha, para mostrar nas listas.
+    """
+
+    id: int
+    campanha_id: int
+    nome: str
+    descricao: str = ""
+    estado: str = EM_PREPARACAO
+    campanha_nome: str = ""
+
+    @property
+    def nome_estado(self) -> str:
+        """Nome do estado tal como aparece nas listas, por exemplo ``"Em preparação"``."""
+        return NOMES_ESTADOS_CRIATIVO[self.estado]
