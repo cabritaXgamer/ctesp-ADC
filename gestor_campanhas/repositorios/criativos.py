@@ -212,3 +212,18 @@ def contar_por_campanha(ligacao: sqlite3.Connection, campanha_id: int) -> int:
     :return: Número de criativos dessa campanha.
     """
     return ligacao.execute("SELECT COUNT(*) FROM criativos WHERE campanha_id = ?", (campanha_id,)).fetchone()[0]
+
+
+def somar_custos_por_campanha(ligacao: sqlite3.Connection) -> dict[int, int]:
+    """Soma o custo dos criativos de cada campanha.
+
+    Os criativos sem custo contam como zero.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :return: Dicionário do identificador da campanha para a soma dos custos,
+        em cêntimos. As campanhas sem criativos não aparecem.
+    """
+    linhas = ligacao.execute(
+        "SELECT campanha_id, SUM(COALESCE(custo_centimos, 0)) AS total FROM criativos GROUP BY campanha_id"
+    ).fetchall()
+    return {linha["campanha_id"]: linha["total"] for linha in linhas}

@@ -1289,3 +1289,42 @@ def test_descarregar_um_criativo_sem_ficheiro(teclado, ligacao, contas, natal, c
 
 def test_pasta_transferencias_fica_na_pasta_pessoal():
     assert menu.pasta_transferencias() == Path.home() / "Downloads"
+
+
+# --- despesa e budget --------------------------------------------------------
+
+
+def test_repositorio_soma_os_custos_de_cada_campanha(ligacao, natal, saldos):
+    repositorio.criar(ligacao, natal.id, "Banner", "", 40000)
+    repositorio.criar(ligacao, natal.id, "Vídeo", "", 90050)
+    repositorio.criar(ligacao, natal.id, "Sem custo", "")
+    repositorio.criar(ligacao, saldos.id, "Cartaz", "")
+
+    assert repositorio.somar_custos_por_campanha(ligacao) == {natal.id: 130050, saldos.id: 0}
+
+
+def test_despesa_de_uma_campanha(ligacao, contas, natal, saldos):
+    miguel = contas[modelos.MARKETEER]
+    servico.criar(ligacao, miguel, natal.id, "Banner", custo="400")
+    rejeitado = servico.criar(ligacao, miguel, natal.id, "Vídeo", custo="900")
+    com_estado(ligacao, rejeitado, modelos.REJEITADO)
+
+    assert servico.despesa(ligacao, natal) == 130000
+    assert servico.despesa(ligacao, saldos) == 0
+
+
+def test_restante_do_budget(natal, saldos):
+    assert servico.restante(natal, 130000) == 20000
+    assert servico.restante(natal, 170000) == -20000
+    assert servico.restante(saldos, 50000) is None
+
+
+def test_sem_aviso_enquanto_nao_passa_o_budget(natal, saldos):
+    assert servico.aviso_budget(natal, 150000) == ""
+    assert servico.aviso_budget(saldos, 999999) == ""
+
+
+def test_aviso_quando_passa_o_budget(natal):
+    assert servico.aviso_budget(natal, 170000) == (
+        "Atenção: o custo dos criativos (1 700,00 €) ultrapassa o budget da campanha (1 500,00 €) em 200,00 €."
+    )
