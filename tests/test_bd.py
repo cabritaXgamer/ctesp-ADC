@@ -130,3 +130,9 @@ def test_criativo_comeca_em_preparacao(ligacao, contas):
 
     linha = ligacao.execute("SELECT estado, custo_centimos, ficheiro FROM criativos").fetchone()
     assert tuple(linha) == ("em_preparacao", None, "")
+
+
+def test_pasta_dos_ficheiros_fica_na_pasta_de_dados(monkeypatch, tmp_path):
+    monkeypatch.setenv(config.VARIAVEL_PASTA_DADOS, str(tmp_path))
+
+    assert config.pasta_ficheiros() == tmp_path / "ficheiros"
