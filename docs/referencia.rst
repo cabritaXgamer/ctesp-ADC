@@ -132,6 +132,11 @@ Criativos
 
 .. automodule:: gestor_campanhas.servicos.criativos
 
+Ficheiros dos criativos
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: gestor_campanhas.servicos.ficheiros
+
 Dados de demonstração
 ---------------------
 

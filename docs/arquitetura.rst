@@ -34,9 +34,13 @@ Estrutura de pastas
        pedidos.py         pedidos de campanha, nos menus do Cliente e do Administrador
        conta.py           opções da conta, comuns a todos os perfis
        recuperacao.py     recuperação da password
+   exemplos/              ficheiros para experimentar a aplicação
    tests/                 testes automáticos (pytest)
    docs/                  esta documentação (Sphinx)
    dados/                 criada no primeiro arranque; não vai para o Git
+     app.db               base de dados
+     caixa_saida/         emails "enviados"
+     ficheiros/           ficheiros dos criativos, uma pasta por criativo
 
 Camadas
 -------
@@ -258,3 +262,22 @@ criativos em revisão.
 
 Ter as regras num dicionário, em vez de espalhadas por vários ``if``, faz com
 que acrescentar ou retirar uma mudança seja alterar uma linha.
+
+Ficheiros dos criativos
+-----------------------
+
+A tabela ``criativos`` guarda só o nome do ficheiro anexado. O ficheiro em si
+fica em ``ficheiros/<número do criativo>/``, dentro da pasta de dados (ver
+:func:`gestor_campanhas.config.pasta_ficheiros`). Guardar uma cópia, em vez
+do caminho do original, faz com que o ficheiro continue disponível mesmo que
+o original seja apagado ou mudado de sítio.
+
+O módulo :mod:`gestor_campanhas.servicos.ficheiros` trata só dos ficheiros:
+copia-os, descreve-os, abre-os e apaga-os. As regras sobre quem pode anexar e
+quando estão em :mod:`gestor_campanhas.servicos.criativos`. Quando um
+criativo é eliminado, a pasta dele também é apagada.
+
+Os testes nunca mexem na pasta ``dados`` do projeto: a *fixture*
+``dados_temporarios``, em ``tests/conftest.py``, põe a pasta de dados numa
+pasta temporária em todos os testes, e a *fixture* ``aberturas`` substitui a
+abertura de ficheiros, para não aparecerem janelas.

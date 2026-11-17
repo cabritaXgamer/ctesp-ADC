@@ -551,6 +551,39 @@ partir dele. O caminho normal de um criativo é este:
 
 Com **0. Deixar como está**, o estado não muda.
 
+Anexar ficheiro
+^^^^^^^^^^^^^^^
+
+Pede o número do criativo e o caminho de um ficheiro no computador, por
+exemplo ``C:\Users\ana\Imagens\banner.png``. No Windows, o caminho pode
+ser copiado no Explorador de Ficheiros: botão direito no ficheiro,
+**Copiar como caminho**. As aspas à volta do caminho são ignoradas.
+
+O ficheiro é copiado para a pasta ``ficheiros`` da pasta de dados, por isso
+o original pode depois ser apagado ou mudado de sítio. Cada criativo tem um
+só ficheiro: anexar outro substitui o anterior. Tal como os outros dados, o
+ficheiro só pode ser mudado enquanto o criativo está ``Em preparação`` ou
+``Rejeitado``.
+
+Para experimentar, o projeto tem o ficheiro ``exemplos/banner-natal.svg``.
+
+Pré-visualizar ficheiro
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Pede o número do criativo e mostra o nome, o tipo e o tamanho do ficheiro:
+
+.. code-block:: text
+
+   Ficheiro do criativo Banner de Natal
+     Nome:     banner-natal.svg
+     Tipo:     Imagem (image/svg+xml)
+     Tamanho:  639 bytes
+
+   Abrir o ficheiro no programa predefinido? (s/n)
+
+Com ``s``, o ficheiro abre-se no programa que o sistema usa para esse tipo
+de ficheiro (por exemplo, o browser para um ``.svg``).
+
 Cliente
 -------
 
@@ -723,3 +756,12 @@ Um criativo aprovado pode ser publicado pelo marketeer. Para rejeitar, é
 obrigatório escrever o motivo, que o marketeer vê quando atualiza o estado.
 Com **0. Decidir mais tarde**, o criativo continua em revisão. Os criativos
 noutros estados não podem ser aprovados nem rejeitados.
+
+**Pré-visualizar ficheiro** funciona como no menu do Marketeer: mostra o
+nome, o tipo e o tamanho do ficheiro e pergunta se o deve abrir.
+
+**Descarregar ficheiro** guarda uma cópia do ficheiro numa pasta à escolha.
+Com Enter, a cópia vai para a pasta ``Downloads`` (Transferências) da pasta
+pessoal. Se já houver um ficheiro com o mesmo nome, a cópia fica com um
+número entre parênteses, por exemplo ``banner-natal (1).svg``: nenhum
+ficheiro é apagado.
