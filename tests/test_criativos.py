@@ -578,3 +578,61 @@ def test_repositorio_lista_os_criativos_de_todas_as_campanhas_do_cliente(ligacao
 
     assert nomes(lista) == ["Banner", "Vídeo", "Cartaz"]
     assert [criativo.campanha_nome for criativo in lista] == ["Natal", "Natal", "Saldos"]
+
+
+def test_cliente_ve_so_os_criativos_das_suas_campanhas(ligacao, contas, natal, aulas, jose):
+    miguel = contas[modelos.MARKETEER]
+    banner = servico.criar(ligacao, miguel, natal.id, "Banner")
+    lanches = servico.criar(ligacao, miguel, aulas.id, "Lanches")
+
+    assert servico.listar_do_cliente(ligacao, contas[modelos.CLIENTE]) == [banner]
+    assert servico.listar_do_cliente(ligacao, jose) == [lanches]
+
+
+@pytest.fixture
+def varios(ligacao, contas, natal, saldos):
+    """Quatro criativos da Carla, em duas campanhas, com dados diferentes."""
+    miguel = contas[modelos.MARKETEER]
+    servico.criar(ligacao, miguel, natal.id, "Banner de Natal", "Árvore", "400", "", "Famílias", "Facebook")
+    servico.criar(ligacao, miguel, natal.id, "Vídeo da montra", "", "900", "", "Jovens adultos", "Instagram")
+    servico.criar(ligacao, miguel, saldos.id, "Cartaz dos saldos", "Preços baixos", "", "", "Famílias", "Instagram")
+    servico.criar(ligacao, miguel, saldos.id, "Texto para o site", "", "", "", "", "")
+    return servico.listar_do_cliente(ligacao, contas[modelos.CLIENTE])
+
+
+def test_sem_filtros_ficam_todos(varios):
+    assert servico.filtrar(varios) == varios
+
+
+@pytest.mark.parametrize(
+    ("pesquisa", "esperado"),
+    [
+        ("natal", ["Banner de Natal"]),
+        ("VIDEO", ["Vídeo da montra"]),
+        ("famílias", ["Banner de Natal", "Cartaz dos saldos"]),
+        ("precos", ["Cartaz dos saldos"]),
+        ("  arvore ", ["Banner de Natal"]),
+        ("carnaval", []),
+    ],
+)
+def test_pesquisa_no_nome_na_descricao_e_no_publico(varios, pesquisa, esperado):
+    assert nomes(servico.filtrar(varios, pesquisa=pesquisa)) == esperado
+
+
+def test_filtra_pela_campanha(varios, saldos):
+    assert nomes(servico.filtrar(varios, campanha_id=saldos.id)) == ["Cartaz dos saldos", "Texto para o site"]
+
+
+def test_filtra_pela_plataforma(varios):
+    assert nomes(servico.filtrar(varios, plataforma="Instagram")) == ["Vídeo da montra", "Cartaz dos saldos"]
+
+
+def test_filtra_pelo_estado(varios):
+    assert servico.filtrar(varios, estado=modelos.EM_PREPARACAO) == varios
+    assert servico.filtrar(varios, estado=modelos.APROVADO) == []
+
+
+def test_junta_varios_filtros(varios, natal):
+    escolhidos = servico.filtrar(varios, pesquisa="famílias", campanha_id=natal.id, plataforma="Facebook")
+
+    assert nomes(escolhidos) == ["Banner de Natal"]
