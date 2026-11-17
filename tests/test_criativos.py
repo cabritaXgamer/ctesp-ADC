@@ -911,3 +911,51 @@ def test_detalhes_de_um_rejeitado_mostram_o_motivo(ligacao, contas, natal, capsy
     menu.mostrar_detalhes(criativo)
 
     assert "  Motivo:      Cores escuras" in capsys.readouterr().out
+
+
+# --- aprovação pelo cliente --------------------------------------------------
+
+
+@pytest.fixture
+def em_revisao(ligacao, contas, natal):
+    """Um criativo da Carla, já enviado para revisão."""
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
+    return servico.mudar_estado(ligacao, miguel, criativo.id, modelos.EM_REVISAO)
+
+
+def test_cliente_aprova_um_criativo_em_revisao(ligacao, contas, em_revisao):
+    aprovado = servico.aprovar(ligacao, contas[modelos.CLIENTE], em_revisao.id)
+
+    assert aprovado.estado == modelos.APROVADO
+    assert servico.mudar_estado(ligacao, contas[modelos.MARKETEER], em_revisao.id, modelos.PUBLICADO).estado == (
+        modelos.PUBLICADO
+    )
+
+
+def test_cliente_rejeita_com_motivo(ligacao, contas, em_revisao):
+    rejeitado = servico.rejeitar(ligacao, contas[modelos.CLIENTE], em_revisao.id, "  Cores escuras  ")
+
+    assert rejeitado.estado == modelos.REJEITADO
+    assert rejeitado.motivo_rejeicao == "Cores escuras"
+
+
+def test_rejeitar_exige_motivo(ligacao, contas, em_revisao):
+    with pytest.raises(ErroValidacao, match="Indique o motivo da rejeição"):
+        servico.rejeitar(ligacao, contas[modelos.CLIENTE], em_revisao.id, "   ")
+
+    assert repositorio.obter_por_id(ligacao, em_revisao.id).estado == modelos.EM_REVISAO
+
+
+def test_so_decide_criativos_em_revisao(ligacao, contas, natal):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    with pytest.raises(ErroValidacao, match="Só se pode aprovar ou rejeitar um criativo em revisão."):
+        servico.aprovar(ligacao, contas[modelos.CLIENTE], criativo.id)
+    with pytest.raises(ErroValidacao, match="Este criativo está Em preparação."):
+        servico.rejeitar(ligacao, contas[modelos.CLIENTE], criativo.id, "Não gosto")
+
+
+def test_cliente_nao_decide_criativos_de_outro(ligacao, em_revisao, jose):
+    with pytest.raises(ErroValidacao, match="Não tem nenhum criativo"):
+        servico.aprovar(ligacao, jose, em_revisao.id)

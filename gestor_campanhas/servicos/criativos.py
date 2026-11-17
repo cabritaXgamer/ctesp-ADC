@@ -301,3 +301,44 @@ def mudar_estado(ligacao: sqlite3.Connection, marketeer: Utilizador, identificad
         novo = modelos.NOMES_ESTADOS_CRIATIVO.get(estado, estado)
         raise ErroValidacao(f"Um criativo {criativo.nome_estado} não pode passar a {novo}.")
     return criativos.definir_estado(ligacao, criativo.id, estado)
+
+
+def _em_revisao_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador, identificador: int) -> Criativo:
+    """Procura um criativo do cliente e confirma que está em revisão."""
+    criativo = obter_do_cliente(ligacao, cliente, identificador)
+    if criativo.estado != modelos.EM_REVISAO:
+        raise ErroValidacao(
+            f"Só se pode aprovar ou rejeitar um criativo em revisão. Este criativo está {criativo.nome_estado}."
+        )
+    return criativo
+
+
+def aprovar(ligacao: sqlite3.Connection, cliente: Utilizador, identificador: int) -> Criativo:
+    """Aprova um criativo em revisão. A partir daqui, o marketeer pode publicá-lo.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a decidir.
+    :param identificador: Número do criativo.
+    :return: O criativo, já aprovado.
+    :raises ErroValidacao: Se o criativo não for do cliente ou não estiver em revisão.
+    """
+    criativo = _em_revisao_do_cliente(ligacao, cliente, identificador)
+    return criativos.definir_estado(ligacao, criativo.id, modelos.APROVADO)
+
+
+def rejeitar(ligacao: sqlite3.Connection, cliente: Utilizador, identificador: int, motivo: str) -> Criativo:
+    """Rejeita um criativo em revisão, com o motivo, para o marketeer saber o que mudar.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a decidir.
+    :param identificador: Número do criativo.
+    :param motivo: O que o cliente quer que mude. Obrigatório.
+    :return: O criativo, já rejeitado.
+    :raises ErroValidacao: Se o criativo não for do cliente, se não estiver em
+        revisão ou se o motivo estiver vazio.
+    """
+    criativo = _em_revisao_do_cliente(ligacao, cliente, identificador)
+    motivo = motivo.strip()
+    if not motivo:
+        raise ErroValidacao("Indique o motivo da rejeição, para o marketeer saber o que mudar.")
+    return criativos.definir_estado(ligacao, criativo.id, modelos.REJEITADO, motivo)
