@@ -2,7 +2,7 @@
 
 O marketeer escolhe uma das suas campanhas e vê os criativos dela, com o
 custo, o prazo, o público-alvo e a plataforma de cada um. A partir daí pode
-criar, editar e eliminar criativos.
+criar, editar, consultar e eliminar criativos.
 """
 
 from __future__ import annotations
@@ -200,6 +200,22 @@ def editar(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanh
     comum.pausa()
 
 
+def ver(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanha) -> None:
+    """Pede o número de um criativo e mostra todos os dados dele.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param marketeer: Marketeer que está a consultar.
+    :param campanha: Campanha que está a ser vista.
+    """
+    comum.titulo("Ver criativo")
+    criativo = pedir_criativo(ligacao, marketeer, campanha)
+    if criativo is None:
+        return
+    print()
+    mostrar_detalhes(criativo)
+    comum.pausa()
+
+
 def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campanha) -> None:
     """Pede o número de um criativo e elimina-o, depois de pedir confirmação.
 
@@ -228,6 +244,7 @@ def eliminar(ligacao: sqlite3.Connection, marketeer: Utilizador, campanha: Campa
 ACOES = [
     ("Criar criativo", criar),
     ("Editar criativo", editar),
+    ("Ver criativo", ver),
     ("Eliminar criativo", eliminar),
 ]
 

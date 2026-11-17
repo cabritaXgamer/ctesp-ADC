@@ -309,7 +309,7 @@ def test_menu_nao_aceita_criativo_de_outra_campanha(teclado, ligacao, contas, na
 def test_menu_elimina_depois_de_confirmar(teclado, ligacao, contas, natal, capsys):
     miguel = contas[modelos.MARKETEER]
     criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
-    teclado("3", str(criativo.id), "s", "", "0")
+    teclado("4", str(criativo.id), "s", "", "0")
 
     menu.da_campanha(ligacao, miguel, natal)
 
@@ -322,7 +322,7 @@ def test_menu_elimina_depois_de_confirmar(teclado, ligacao, contas, natal, capsy
 def test_menu_nao_elimina_sem_confirmacao(teclado, ligacao, contas, natal, capsys):
     miguel = contas[modelos.MARKETEER]
     criativo = servico.criar(ligacao, miguel, natal.id, "Banner")
-    teclado("3", str(criativo.id), "n", "", "0")
+    teclado("4", str(criativo.id), "n", "", "0")
 
     menu.da_campanha(ligacao, miguel, natal)
 
@@ -476,3 +476,44 @@ def test_menu_editar_sem_valores_mantem_o_criativo_vazio(teclado, ligacao, conta
 def test_custo_por_palavras():
     assert menu.custo(Criativo(1, 1, "Banner")) == "Por definir"
     assert menu.custo(Criativo(1, 1, "Banner", custo_centimos=0)) == "0,00 €"
+
+
+def test_menu_mostra_os_detalhes_de_um_criativo(teclado, ligacao, contas, natal, capsys):
+    miguel = contas[modelos.MARKETEER]
+    criativo = servico.criar(
+        ligacao, miguel, natal.id, "Banner", "Árvore e presentes", "400", "2026-11-25", "Famílias", "Facebook"
+    )
+    teclado("3", str(criativo.id), "", "0")
+
+    menu.da_campanha(ligacao, miguel, natal)
+
+    saida = capsys.readouterr().out
+    assert f"Criativo n.º {criativo.id}" in saida
+    assert "  Campanha:    Natal" in saida
+    assert "  Descrição:   Árvore e presentes" in saida
+    assert "  Custo:       400,00 €" in saida
+    assert "  Prazo:       2026-11-25" in saida
+    assert "  Público:     Famílias" in saida
+    assert "  Plataforma:  Facebook" in saida
+    assert "  Estado:      Em preparação" in saida
+
+
+def test_detalhes_mostram_tracos_quando_faltam_dados(ligacao, contas, natal, capsys):
+    criativo = servico.criar(ligacao, contas[modelos.MARKETEER], natal.id, "Banner")
+
+    menu.mostrar_detalhes(criativo)
+
+    saida = capsys.readouterr().out
+    assert "  Descrição:   -" in saida
+    assert "  Custo:       Por definir" in saida
+    assert "  Prazo:       -" in saida
+    assert "  Plataforma:  -" in saida
+
+
+def test_menu_tem_as_opcoes_pela_ordem_certa():
+    assert [descricao for descricao, _ in menu.ACOES] == [
+        "Criar criativo",
+        "Editar criativo",
+        "Ver criativo",
+        "Eliminar criativo",
+    ]
