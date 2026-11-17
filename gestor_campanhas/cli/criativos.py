@@ -1,8 +1,10 @@
-"""Criativos, no menu do Marketeer.
+"""Criativos, nos menus do Marketeer e do Cliente.
 
 O marketeer escolhe uma das suas campanhas e vê os criativos dela, com o
 custo, o prazo, o público-alvo e a plataforma de cada um. A partir daí pode
 criar, editar, consultar e eliminar criativos.
+
+O cliente vê os criativos de todas as suas campanhas, numa só lista.
 """
 
 from __future__ import annotations
@@ -302,3 +304,97 @@ def do_marketeer(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
             comum.pausa()
             continue
         da_campanha(ligacao, utilizador, campanha)
+
+
+def mostrar_do_cliente(lista: list[Criativo]) -> None:
+    """Mostra uma tabela com os criativos de um cliente, com o total no fim.
+
+    Tem as mesmas colunas da lista do marketeer e mais a campanha de cada criativo.
+
+    :param lista: Criativos a mostrar.
+    """
+    comum.mostrar_tabela(
+        ["N.º", "Nome", "Campanha", "Custo", "Prazo", "Público-alvo", "Plataforma", "Estado"],
+        [
+            [
+                str(criativo.id),
+                criativo.nome,
+                criativo.campanha_nome,
+                custo(criativo),
+                menu_campanhas.data(criativo.prazo),
+                resumir(criativo.publico_alvo, LARGURA_PUBLICO) or "-",
+                criativo.plataforma or "-",
+                criativo.nome_estado,
+            ]
+            for criativo in lista
+        ],
+    )
+    print(f"\n{len(lista)} {'criativo' if len(lista) == 1 else 'criativos'}.")
+
+
+def pedir_criativo_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> Criativo | None:
+    """Pede o número de um criativo do cliente e devolve-o.
+
+    Se o número não for de um criativo dele, mostra o erro e espera por Enter.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a usar o menu.
+    :return: O criativo, ou ``None`` se o pedido foi cancelado ou o número não serve.
+    """
+    numero = comum.ler_numero("Número do criativo (Enter para cancelar)")
+    if numero is None:
+        return None
+    try:
+        return criativos.obter_do_cliente(ligacao, cliente, numero)
+    except ErroValidacao as erro:
+        print(f"\n{erro}")
+        comum.pausa()
+        return None
+
+
+def ver_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> None:
+    """Pede o número de um criativo do cliente e mostra todos os dados dele.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    """
+    comum.titulo("Ver criativo")
+    criativo = pedir_criativo_do_cliente(ligacao, cliente)
+    if criativo is None:
+        return
+    print()
+    mostrar_detalhes(criativo)
+    comum.pausa()
+
+
+#: Opções do menu de criativos do Cliente. Cada opção é um par
+#: ``(descrição, função)``; a função recebe a ligação à base de dados e o
+#: cliente.
+ACOES_DO_CLIENTE = [
+    ("Ver criativo", ver_do_cliente),
+]
+
+
+def do_cliente(ligacao: sqlite3.Connection, utilizador: Utilizador) -> None:
+    """Opção "Criativos" do menu do Cliente.
+
+    Mostra os criativos de todas as campanhas do cliente e as opções para os
+    consultar. A lista volta a aparecer depois de cada opção.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param utilizador: Cliente que está a usar o menu.
+    """
+    menu = [(str(numero), descricao) for numero, (descricao, _) in enumerate(ACOES_DO_CLIENTE, start=1)]
+    menu.append(("0", "Voltar"))
+    while True:
+        comum.titulo("Os meus criativos")
+        lista = criativos.listar_do_cliente(ligacao, utilizador)
+        if lista:
+            mostrar_do_cliente(lista)
+        else:
+            print("Ainda não há criativos nas suas campanhas.")
+        escolha = comum.escolher_opcao("Criativos", menu)
+        if escolha == "0":
+            return
+        _, funcao = ACOES_DO_CLIENTE[int(escolha) - 1]
+        funcao(ligacao, utilizador)

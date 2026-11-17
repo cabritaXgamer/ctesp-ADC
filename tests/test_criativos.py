@@ -636,3 +636,58 @@ def test_junta_varios_filtros(varios, natal):
     escolhidos = servico.filtrar(varios, pesquisa="famílias", campanha_id=natal.id, plataforma="Facebook")
 
     assert nomes(escolhidos) == ["Banner de Natal"]
+
+
+# --- menu do cliente ---------------------------------------------------------
+
+
+def test_opcao_criativos_esta_no_menu_do_cliente():
+    descricoes = [descricao for descricao, _ in perfis.OPCOES[modelos.CLIENTE]]
+
+    assert descricoes[:3] == ["Pedidos de campanha", "Campanhas", "Criativos"]
+    assert dict(perfis.OPCOES[modelos.CLIENTE])["Criativos"] is menu.do_cliente
+
+
+def test_cliente_sem_criativos(teclado, ligacao, contas, capsys):
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    assert "Ainda não há criativos nas suas campanhas." in capsys.readouterr().out
+
+
+def test_cliente_ve_a_lista_com_a_campanha(teclado, ligacao, contas, varios, aulas, capsys):
+    servico.criar(ligacao, contas[modelos.MARKETEER], aulas.id, "Lanches do José")
+    teclado("0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert "Os meus criativos" in saida
+    assert "N.º  Nome               Campanha  Custo        Prazo  Público-alvo    Plataforma  Estado" in saida
+    assert "Banner de Natal    Natal     400,00 €     -      Famílias        Facebook    Em preparação" in saida
+    assert "Texto para o site  Saldos    Por definir  -      -               -           Em preparação" in saida
+    assert "4 criativos." in saida
+    assert "Lanches do José" not in saida
+
+
+def test_cliente_ve_os_detalhes_de_um_criativo(teclado, ligacao, contas, varios, capsys):
+    banner = varios[0]
+    teclado("1", str(banner.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert f"Criativo n.º {banner.id}" in saida
+    assert "  Descrição:   Árvore" in saida
+
+
+def test_cliente_nao_ve_criativos_de_outro_cliente(teclado, ligacao, contas, aulas, jose, capsys):
+    lanches = servico.criar(ligacao, contas[modelos.MARKETEER], aulas.id, "Lanches")
+    teclado("1", str(lanches.id), "", "0")
+
+    menu.do_cliente(ligacao, contas[modelos.CLIENTE])
+
+    saida = capsys.readouterr().out
+    assert f"Não tem nenhum criativo com o número {lanches.id}." in saida
+    assert servico.obter_do_cliente(ligacao, jose, lanches.id) == lanches

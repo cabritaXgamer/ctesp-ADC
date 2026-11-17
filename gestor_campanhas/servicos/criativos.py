@@ -200,6 +200,24 @@ def listar_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador) -> list[
     return criativos.listar_por_cliente(ligacao, cliente.id)
 
 
+def obter_do_cliente(ligacao: sqlite3.Connection, cliente: Utilizador, identificador: int) -> Criativo:
+    """Procura um criativo pelo número, confirmando que é de uma campanha do cliente.
+
+    :param ligacao: Ligação aberta à base de dados.
+    :param cliente: Cliente que está a consultar.
+    :param identificador: Número do criativo, mostrado na primeira coluna da lista.
+    :return: O criativo.
+    :raises ErroValidacao: Se não houver nenhum criativo com esse número nas
+        campanhas do cliente.
+    """
+    criativo = criativos.obter_por_id(ligacao, identificador)
+    if criativo is not None:
+        campanha = campanhas.obter_por_id(ligacao, criativo.campanha_id)
+        if campanha.cliente_id == cliente.id:
+            return criativo
+    raise ErroValidacao(f"Não tem nenhum criativo com o número {identificador}.")
+
+
 def filtrar(
     lista: list[Criativo],
     pesquisa: str = "",
