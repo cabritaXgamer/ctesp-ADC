@@ -129,10 +129,33 @@ O que correu mal e como se resolveu:
 - **Issues que ficaram abertas.** O pull request da unidade 3.3 não fechou as issues C05, C06 e C07, e a milestone da Fase 3 não chegou aos 100%. Foram fechadas à mão.
 - **Um ramo criado antes do tempo.** O ramo da unidade 3.5 tinha sido criado num `develop` antigo, e o `copiar.py` recusou continuar; ao criar o ramo outra vez, apareceu `a branch named ... already exists`. Apagou-se o ramo antigo e criou-se de novo. O passo "Atualiza as duas pastas e cria o ramo" passou a explicar este caso.
 
+## Fase 5 — Budget
+
+Release: **v0.5.0**.
+
+| Unidade | User stories | Quem fez | Quem reviu |
+|---|---|---|---|
+| 5.1 Pedido de alteração de budget | C15 | Tomas | Ricardo |
+| 5.2 Parecer do marketeer | M16 | Ricardo | Fabio |
+| 5.3 Decisão dos pedidos e histórico do budget | A14, A15, C16 | Fabio | Tomas |
+| 5.4 Resumo global do budget | A16 | Tomas | Ricardo |
+| 5.5 Release v0.5.0 | — | Tomas | Fabio |
+
+Resultado: 6 user stories concluídas (48 no total); 707 testes automáticos; quinta versão publicada.
+
+Decisões tomadas nesta fase:
+
+- **Os pedidos de budget ficam ao lado dos pedidos de campanha.** O cliente vê e gere os dois tipos na mesma opção, "Pedidos de campanha", em duas listas. Como têm numerações próprias, cada tipo tem as suas opções de ver e de cancelar. Assim fica concluída a parte de C06 que faltava.
+- **Primeiro o parecer, depois a decisão.** O Administrador só decide um pedido que já tenha o parecer do marketeer (A15). O parecer ajuda, mas não obriga: um pedido "Não viável" pode ser aprovado.
+- **Aprovar é alterar.** Aprovar um pedido muda logo o budget da campanha para o valor pedido. Para outro valor, o Administrador usa "Definir budget", que passou a pedir o motivo.
+- **Um pedido por decidir de cada vez, por campanha**, para não haver dois valores pedidos ao mesmo tempo para o mesmo budget. Uma campanha terminada já não aceita pedidos.
+- **Todo o budget tem histórico** (C16). Não só os pedidos aprovados: também o budget inicial e as alterações diretas do Administrador. Todas passam pela mesma função, para o histórico nunca falhar uma.
+- **O resumo é calculado** (A16), como a despesa. O budget de cada cliente soma só as campanhas que já têm budget; a despesa soma todas.
+- **Notificações ficam para a Fase 6.** O aviso ao cliente sobre a decisão (C17) e ao marketeer sobre um pedido novo (M18) entram com as notificações. Até lá, o cliente vê a decisão na lista dos seus pedidos.
+
 ## Fases seguintes
 
 | Fase | Tema | User stories | Release |
 |---|---|---|---|
-| 5 | Budget | 6 | v0.5.0 |
 | 6 | Comentários, notificações, monitorização e relatórios | 9 | v0.6.0 |
 | 7 | Fecho e entrega | — | v1.0.0 |

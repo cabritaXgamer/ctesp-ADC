@@ -1,6 +1,6 @@
 # Guia de utilização
 
-Como usar a aplicação, na versão 0.4.0.
+Como usar a aplicação, na versão 0.5.0.
 
 ## Arrancar
 
@@ -22,7 +22,7 @@ Em todos os menus escreve-se o número da opção e prime-se Enter.
 
 ## Contas de demonstração
 
-Uma instalação nova não tem contas. Para criar as contas, as campanhas, os pedidos e os criativos de demonstração:
+Uma instalação nova não tem contas. Para criar as contas, as campanhas, os pedidos, os criativos e o pedido de budget de demonstração:
 
 ```bash
 python -m gestor_campanhas.dados_demo
@@ -39,7 +39,7 @@ python -m gestor_campanhas.dados_demo
 
 Estas passwords são públicas e servem só para demonstração.
 
-O mesmo comando cria três campanhas (`Natal 2026`, `Regresso às aulas` e `Bicicletas de primavera`) , dois pedidos de campanha pendentes e quatro criativos (três nas campanhas do Miguel e um na da Marta). Pode ser repetido: só acrescenta o que faltar.
+O mesmo comando cria três campanhas (`Natal 2026`, `Regresso às aulas` e `Bicicletas de primavera`), dois pedidos de campanha pendentes, quatro criativos (três nas campanhas do Miguel e um na da Marta) e um pedido de alteração de budget pendente, da Carla, para a campanha `Natal 2026` passar de 1500 € para 2000 €. Pode ser repetido: só acrescenta o que faltar.
 
 ## Entrar e sair
 
@@ -53,8 +53,10 @@ Ao fim de 15 minutos sem atividade, a sessão termina sozinha e é preciso entra
 |---|---|---|---|
 | Clientes | Sim | | |
 | Marketeers | Sim | | |
-| Pedidos de campanha | Decide os pedidos de todos os clientes | | Faz pedidos, acompanha-os e cancela os pendentes |
-| Campanhas | Vê todas, define o budget e atribui o marketeer | Cria, edita, consulta e elimina as suas | Vê as suas, o budget, a despesa e o marketeer responsável |
+| Pedidos de campanha | Decide os pedidos de todos os clientes | | Faz pedidos de campanha e de alteração de budget, acompanha-os e cancela os pendentes |
+| Pedidos de budget | Aprova ou rejeita os pedidos de alteração de budget que já têm parecer | Dá parecer sobre os pedidos das suas campanhas | |
+| Campanhas | Vê todas, define o budget, atribui o marketeer e vê o histórico do budget | Cria, edita, consulta e elimina as suas | Vê as suas, o budget, a despesa, o marketeer responsável e o histórico do budget |
+| Resumo do budget | Budget atribuído face à despesa, por cliente e por campanha | | |
 | Criativos | | Cria, edita, consulta e elimina os das suas campanhas, muda o estado e anexa o ficheiro | Vê os das suas campanhas, procura-os, aprova-os ou rejeita-os e descarrega os ficheiros |
 | Horários de entrada e saída dos marketeers | Sim | | |
 | Editar os meus dados | Sim | Sim | Sim |
@@ -96,7 +98,7 @@ Uma campanha pertence a um cliente e tem um marketeer responsável. Nasce de dua
 1. O **Marketeer** cria-a na sua opção Campanhas. Fica responsável por ela, e a campanha começa sem budget.
 2. O **Cliente** faz um pedido de campanha. O **Administrador** analisa-o e, se o aprovar, a campanha é criada com o budget inicial e o marketeer que escolher.
 
-O budget é sempre definido pelo Administrador.
+O budget é sempre definido pelo Administrador. Para o mudar, o cliente faz um pedido de alteração de budget (ver [Pedidos de alteração de budget](#pedidos-de-alteração-de-budget)).
 
 ### Campanhas (Marketeer)
 
@@ -122,13 +124,16 @@ A **despesa** é a soma do custo estimado dos criativos da campanha, seja qual f
 
 ### Pedidos de campanha (Cliente)
 
-Mostra os pedidos do cliente, do mais recente para o mais antigo.
+Mostra os pedidos do cliente em duas listas, cada uma do mais recente para o mais antigo: primeiro os pedidos de nova campanha, depois os pedidos de alteração de budget. Os dois tipos têm numerações próprias, por isso cada um tem as suas opções.
 
 | Opção | O que faz |
 |---|---|
-| Novo pedido | Pede o objetivo, o orçamento em euros, o prazo pretendido (`AAAA-MM-DD`) e as plataformas, escolhidas por número numa lista |
-| Ver pedido | Mostra todos os dados do pedido. Num pedido rejeitado mostra o motivo; num aprovado, o número da campanha criada |
-| Cancelar pedido | Só para pedidos pendentes, com confirmação. O pedido fica na lista, com o estado `Cancelado` |
+| Novo pedido de campanha | Pede o objetivo, o orçamento em euros, o prazo pretendido (`AAAA-MM-DD`) e as plataformas, escolhidas por número numa lista |
+| Ver pedido de campanha | Mostra todos os dados do pedido. Num pedido rejeitado mostra o motivo; num aprovado, o número da campanha criada |
+| Cancelar pedido de campanha | Só para pedidos pendentes, com confirmação. O pedido fica na lista, com o estado `Cancelado` |
+| Pedir alteração de budget | Mostra as campanhas que ainda não terminaram e pede a campanha, o budget pretendido e o motivo |
+| Ver pedido de budget | Mostra todos os dados do pedido de budget. Num pedido rejeitado mostra o motivo da rejeição |
+| Cancelar pedido de budget | Só para pedidos pendentes, com confirmação |
 
 | Estado | Significado |
 |---|---|
@@ -148,18 +153,75 @@ Mostra os pedidos de todos os clientes, com os que estão por decidir em primeir
 | Rejeitar | Pede o motivo, que é obrigatório, e uma confirmação. O cliente é avisado por email |
 | Decidir mais tarde | O pedido fica `Em análise` |
 
+### Pedidos de alteração de budget
+
+Um pedido de alteração de budget passa por três pessoas:
+
+```
+Cliente pede --> Marketeer dá parecer --> Administrador aprova ou rejeita
+   Pendente         Em análise               Aprovado / Rejeitado
+```
+
+**Cliente**, na opção Pedidos de campanha: escolhe uma campanha que ainda não terminou, escreve o budget que pretende (maior do que zero e diferente do atual) e o motivo. Cada campanha só pode ter um pedido por decidir de cada vez. Enquanto o pedido está `Pendente`, o cliente pode cancelá-lo.
+
+**Marketeer**, na opção **Pedidos de budget**: vê os pedidos das campanhas de que é responsável, com o cliente, o budget de partida (`De`), o budget pedido (`Para`), o estado e o parecer.
+
+```
+N.º  Feito em    Campanha    Cliente        De          Para        Estado    Parecer
+---  ----------  ----------  -------------  ----------  ----------  --------  -------
+1    2026-11-18  Natal 2026  Carla Cliente  1 500,00 €  2 000,00 €  Pendente  Por dar
+
+1 pedido, 1 por decidir.
+```
+
+A opção **Dar parecer** mostra o pedido, com a despesa atual da campanha, e pergunta se o pedido é viável (`s`/`n`) e porquê. A justificação é obrigatória. Com o parecer, o pedido passa a `Em análise` e o cliente já não o pode cancelar. Até o Administrador decidir, o marketeer pode dar outro parecer, que substitui o anterior.
+
+**Administrador**, na opção **Pedidos de budget**: vê os pedidos de todas as campanhas, com o parecer. A opção **Analisar pedido** mostra o pedido, o parecer e a justificação, e o budget e a despesa atuais da campanha. Só se decide um pedido que já tenha parecer:
+
+| Decisão | O que acontece |
+|---|---|
+| Aprovar e passar o budget para ... | O budget da campanha passa logo a ser o valor pedido, e a alteração fica no histórico do budget. Um parecer `Não viável` não impede aprovar |
+| Rejeitar | Pede o motivo, que é obrigatório, e uma confirmação. O budget fica como estava |
+| Decidir mais tarde | O pedido fica `Em análise` |
+
 ### Campanhas (Administrador)
 
 Mostra as campanhas de todos os marketeers.
 
 | Opção | O que faz |
 |---|---|
-| Definir budget | Atribui ou corrige o budget de uma campanha. Tem de ser maior do que zero |
+| Definir budget | Atribui ou corrige o budget de uma campanha. Tem de ser maior do que zero e diferente do atual. Quando a campanha já tem budget, pede também o motivo da alteração |
 | Atribuir marketeer | Muda o marketeer responsável, escolhido entre os que têm a conta ativa. O novo responsável é avisado por email |
+| Histórico do budget | Mostra todas as alterações do budget de uma campanha |
+
+O **histórico do budget** tem uma linha por alteração, com a data, o valor anterior, o valor novo e o motivo. Fica lá tudo: o budget inicial, as alterações feitas em Definir budget e as que vêm de pedidos aprovados.
+
+```
+Data              De           Para        Motivo
+----------------  -----------  ----------  -------------------------------------------------------------------------------------
+2026-11-18 10:00  Por definir  1 500,00 €  Budget inicial
+2026-11-18 11:30  1 500,00 €   2 000,00 €  Pedido de budget n.º 1: Reforçar os anúncios em vídeo na última semana antes do Natal
+```
+
+### Resumo do budget (Administrador)
+
+Mostra, para cada cliente com campanhas, o budget atribuído, a despesa e o restante, com os totais por baixo:
+
+```
+N.º  Cliente        Campanhas  Budget      Despesa     Restante  Sem budget  Acima do budget
+---  -------------  ---------  ----------  ----------  --------  ----------  ---------------
+6    Beatriz Lopes  1          0,00 €      0,00 €      0,00 €    1           0
+4    Carla Cliente  1          1 500,00 €  1 300,00 €  200,00 €  0           0
+5    José Padeiro   1          800,00 €    300,00 €    500,00 €  0           0
+
+Total: 3 campanhas, budget atribuído 2 300,00 €, despesa 1 600,00 €, restante 700,00 €.
+```
+
+O budget é a soma das campanhas que já têm budget; a despesa conta todas as campanhas. Por baixo aparecem, em destaque, as campanhas que gastaram mais do que o budget. A opção **Ver as campanhas de um cliente** mostra as campanhas de um cliente, uma por linha, com a situação de cada uma: `Dentro do budget`, `Acima do budget` ou `Sem budget`.
 
 ### Campanhas (Cliente)
 
-Mostra as campanhas do cliente, com as datas, o budget, o estado, o marketeer responsável, a despesa e o restante. A opção **Ver campanha e marketeer responsável** mostra todos os dados de uma campanha, a parte do budget já gasta (por exemplo `Gasto:     86% do budget`) e o nome, o email e o telefone do marketeer.
+Mostra as campanhas do cliente, com as datas, o budget, o estado, o marketeer responsável, a despesa e o restante. A opção **Ver campanha e marketeer responsável** mostra todos os dados de uma campanha, a parte do budget já gasta (por exemplo `Gasto:     86% do budget`) e o nome, o email e o telefone do marketeer. A opção **Histórico do budget** mostra as alterações do budget de uma campanha, como no menu do Administrador.
 
 ### Criativos (Marketeer)
 

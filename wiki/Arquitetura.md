@@ -83,6 +83,23 @@ Em preparação --> Em revisão --> Aprovado --> Publicado
 
 A despesa de uma campanha (a soma do custo dos criativos) não é guardada: é calculada sempre que é mostrada, com uma consulta `SUM ... GROUP BY` que soma todas as campanhas de uma vez. Assim, nunca fica desatualizada quando um criativo muda de custo ou é eliminado.
 
+## Budget
+
+Um pedido de alteração de budget usa os mesmos estados de um pedido de campanha, mas quem o faz avançar é diferente:
+
+```text
+Pendente --(parecer do marketeer)--> Em análise --(o Administrador aprova)--> Aprovado   (o budget muda)
+   |                                     |
+   |                                     +--------(o Administrador rejeita)--> Rejeitado  (com um motivo)
+   +--> Cancelado (pelo cliente, só enquanto está pendente)
+```
+
+O pedido não guarda o cliente nem o marketeer: chega-se a eles pela campanha. Assim, se a campanha mudar de marketeer, os pedidos passam a aparecer ao marketeer novo. O pedido guarda o budget que a campanha tinha quando foi feito, para se poder comparar com o valor pedido mesmo depois de o budget mudar.
+
+O budget de uma campanha está na tabela `campanhas`; o histórico, na tabela `alteracoes_budget`. Para nunca ficarem desencontrados, todas as alterações passam por uma só função, `alterar_budget`, em `servicos/campanhas.py`, que muda o budget e regista a alteração ao mesmo tempo. Usam-na a opção "Definir budget" do Administrador e a aprovação de um pedido de alteração de budget. O histórico só cresce: as linhas nunca são alteradas.
+
+O resumo global do budget não tem tabela própria: é calculado sempre que é mostrado, a partir das campanhas e da despesa de cada uma, como a despesa. A regra "acima do budget" está numa só função, `acima_do_budget`, em `servicos/budget.py`: uma campanha sem budget nunca está acima do budget.
+
 ## Ficheiros
 
 Os ficheiros dos criativos ficam fora da base de dados, na pasta `dados/ficheiros/<número do criativo>/`. A base de dados guarda só o nome do ficheiro. O módulo `servicos/ficheiros.py` trata de copiar, descrever (tipo e tamanho), abrir e descarregar ficheiros, e não sabe nada de criativos: recebe só caminhos e números.
@@ -112,8 +129,12 @@ Um marketeer só pode ser desativado quando já não for responsável por campan
 | `campanhas` | Uma linha por campanha: nome, objetivo, cliente, marketeer responsável, budget em cêntimos e datas de início e de fim |
 | `criativos` | Uma linha por criativo: campanha, nome, descrição, custo em cêntimos, prazo, público-alvo, plataforma, estado, motivo da rejeição e nome do ficheiro |
 | `pedidos_campanha` | Uma linha por pedido de nova campanha: cliente, objetivo, orçamento em cêntimos, prazo, plataformas, estado, motivo da rejeição e campanha a que deu origem |
+| `pedidos_budget` | Uma linha por pedido de alteração de budget: campanha, budget de partida e budget pedido em cêntimos, motivo, estado, parecer do marketeer e justificação, motivo da rejeição e data da decisão |
+| `alteracoes_budget` | O histórico do budget: uma linha por alteração, com a campanha, o budget anterior e o novo, o motivo, a data e o pedido que lhe deu origem, se houver |
 | `recuperacoes` | Códigos de recuperação da password: utilizador, hash do código, validade e se já foi usado |
 | `configuracoes` | Definições que podem ser alteradas, como pares chave/valor |
+
+Uma campanha com criativos não pode ser apagada. Os pedidos de alteração de budget e o histórico do budget não impedem: têm `ON DELETE CASCADE`, e são apagados com a campanha.
 
 ## Passwords
 

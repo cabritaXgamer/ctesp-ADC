@@ -2,6 +2,7 @@
 numero: 4
 titulo: Criativos
 testes: 566
+fechada: sim
 ---
 
 @@ entrega
