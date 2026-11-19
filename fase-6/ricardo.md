@@ -1210,7 +1210,7 @@ A página inicial passa a indicar a versão 0.6.0, e os perfis e as páginas diz
 
 Faz este passo no fim da fase, depois de publicares a release.
 
-**a)** Abre https://github.com/cabritaXgamer/ctesp-ADC/blob/guias/wiki/Home.md e clica no botão de copiar no canto superior direito do ficheiro (*Copy raw file*).
+**a)** Abre https://github.com/cabritaXgamer/ctesp-ADC/blob/b494328/wiki/Home.md e clica no botão de copiar no canto superior direito do ficheiro (*Copy raw file*).
 
 **b)** Abre https://github.com/Blive77/ADC-TrabGrupo/wiki e clica em **Edit**, no canto superior direito.
 
@@ -1226,7 +1226,7 @@ A página ganha a secção da Fase 6: quem fez e quem reviu cada unidade, e as d
 
 Faz este passo no fim da fase, depois de a release v0.6.0 estar publicada.
 
-**a)** Abre https://github.com/cabritaXgamer/ctesp-ADC/blob/guias/wiki/Registo-das-fases.md e clica no botão de copiar no canto superior direito do ficheiro (*Copy raw file*).
+**a)** Abre https://github.com/cabritaXgamer/ctesp-ADC/blob/b494328/wiki/Registo-das-fases.md e clica no botão de copiar no canto superior direito do ficheiro (*Copy raw file*).
 
 **b)** Abre https://github.com/Blive77/ADC-TrabGrupo/wiki, clica em **Registo das fases** na lista de páginas, à direita, e depois em **Edit**.
 

@@ -1,6 +1,6 @@
 # Arquitetura
 
-Como o código está organizado. A descrição completa, com todas as funções, está na documentação gerada pelo Sphinx (pasta `docs` do repositório).
+Como o código está organizado, na versão 1.0.0. A descrição completa, com todas as funções, está na documentação gerada pelo Sphinx (pasta `docs` do repositório). As tabelas e as relações entre elas estão em [Modelo de dados](Modelo-de-dados), e os testes em [Testes](Testes).
 
 ## Camadas
 
@@ -159,6 +159,8 @@ Um marketeer só pode ser desativado quando já não for responsável por campan
 
 Uma campanha com criativos não pode ser apagada. Os pedidos de alteração de budget e o histórico do budget não impedem: têm `ON DELETE CASCADE`, e são apagados com a campanha. Os comentários de um criativo também têm `ON DELETE CASCADE`, e são apagados com o criativo.
 
+As relações entre as tabelas, os estados e a forma como cada valor é guardado estão em [Modelo de dados](Modelo-de-dados).
+
 ## Passwords
 
 A aplicação nunca guarda passwords. Guarda um hash calculado com PBKDF2 (SHA-256) e um *salt* aleatório por conta. Para confirmar uma password, repete a conta e compara os resultados.
@@ -174,3 +176,9 @@ Não são enviados emails verdadeiros. O módulo `servicos/correio.py` escreve c
 ## Testes
 
 Os testes usam o pytest e estão na pasta `tests`. Cada teste recebe uma base de dados em memória nova, e o relógio da aplicação pode ser substituído para simular a passagem do tempo. O GitHub Actions corre os testes em cada pull request.
+
+Além dos testes de cada parte, há testes dos fluxos completos, com os três perfis, e testes que confirmam que todo o código tem docstring. Estão descritos em [Testes](Testes).
+
+## Dados de demonstração
+
+O módulo `dados_demo.py` cria as contas, as campanhas e os criativos de demonstração diretamente nos repositórios, e depois usa as regras de negócio para o que acontece a seguir: anexar o ficheiro, mudar o estado dos criativos, comentar e responder, e avisar o marketeer do pedido de budget. Assim, as notificações e a atividade de demonstração são as mesmas que a aplicação produziria. Cada parte só é criada se ainda não existir, por isso o comando pode ser repetido.

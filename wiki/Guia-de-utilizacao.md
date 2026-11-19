@@ -1,6 +1,6 @@
 # Guia de utilização
 
-Como usar a aplicação, na versão 0.6.0.
+Como usar a aplicação, na versão 1.0.0.
 
 ## Arrancar
 
@@ -10,7 +10,7 @@ python -m gestor_campanhas
 
 ```
 ============================================================
-Gestor de Campanhas v0.6.0
+Gestor de Campanhas v1.0.0
 ============================================================
   1. Entrar
   2. Recuperar a password
@@ -22,7 +22,7 @@ Em todos os menus escreve-se o número da opção e prime-se Enter.
 
 ## Contas de demonstração
 
-Uma instalação nova não tem contas. Para criar as contas, as campanhas, os pedidos, os criativos, o pedido de budget e o comentário de demonstração:
+Uma instalação nova não tem contas. Para criar as contas, as campanhas, os pedidos, os criativos, o pedido de budget e os comentários de demonstração:
 
 ```bash
 python -m gestor_campanhas.dados_demo
@@ -39,7 +39,26 @@ python -m gestor_campanhas.dados_demo
 
 Estas passwords são públicas e servem só para demonstração.
 
-O mesmo comando cria três campanhas (`Natal 2026`, `Regresso às aulas` e `Bicicletas de primavera`), dois pedidos de campanha pendentes, quatro criativos (três nas campanhas do Miguel e um na da Marta) um pedido de alteração de budget pendente, da Carla, para a campanha `Natal 2026` passar de 1500 € para 2000 €, e um comentário da Carla ao criativo `Vídeo da montra`. Pode ser repetido: só acrescenta o que faltar.
+O mesmo comando cria três campanhas (`Natal 2026`, `Regresso às aulas` e `Bicicletas de primavera`), dois pedidos de campanha pendentes e um pedido de alteração de budget pendente, da Carla, para a campanha `Natal 2026` passar de 1500 € para 2000 €.
+
+Os quatro criativos ficam em estados diferentes, para se poder experimentar cada perfil logo à primeira:
+
+| Criativo | Campanha | Estado |
+|---|---|---|
+| `Banner de Natal` | `Natal 2026` (Carla, Miguel) | Em revisão, com o ficheiro `banner-natal.svg`: a Carla pode aprová-lo ou rejeitá-lo |
+| `Vídeo da montra` | `Natal 2026` (Carla, Miguel) | Em preparação |
+| `Cartaz dos lanches` | `Regresso às aulas` (José, Miguel) | Publicado |
+| `Anúncio da bicicleta elétrica` | `Bicicletas de primavera` (Beatriz, Marta) | Em preparação, ainda sem custo nem prazo |
+
+A Carla comentou os dois criativos da campanha `Natal 2026`: o comentário ao `Banner de Natal` já tem a resposta do Miguel, e o do `Vídeo da montra` está por responder. Cada conta encontra as notificações do que lhe diz respeito: a Carla e o José, do que aconteceu aos seus criativos; o Miguel, dos comentários e do pedido de budget.
+
+Para começar, sugere-se:
+
+- entrar como **Carla** (`cliente@empresa.pt`), abrir as notificações e aprovar o `Banner de Natal`, em "Criativos";
+- entrar como **Miguel** (`marketeer@agencia.pt`) e responder ao comentário do `Vídeo da montra`, ou dar parecer sobre o pedido de budget;
+- entrar como **Administrador** (`admin@agencia.pt`) e ver o "Painel de marketeers" ou decidir os pedidos de campanha.
+
+O comando pode ser repetido: só acrescenta o que faltar, e não mexe no que já existe. Para ver os dados de demonstração como numa instalação nova, apaga-se a pasta `dados` antes (perdem-se os dados que lá estiverem) ou usa-se outra pasta de dados (ver [Instalação e configuração](Instalação-e-configuração)).
 
 ## Entrar e sair
 

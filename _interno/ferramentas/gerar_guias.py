@@ -16,9 +16,10 @@ Ficheiros lidos (todos dentro de ``_interno``):
 ``config.json``
     Endereço dos dois repositórios, nomes dos membros e quem é dono do oficial.
 ``fases/fase-N/fase.md``
-    Dados da fase. Cabeçalho: ``numero``, ``titulo``, ``testes`` e, numa fase
-    já replicada, ``fechada: sim`` (deixa de ser gerada). Secções:
-    ``entrega``, ``verificacao``, ``trello``.
+    Dados da fase. Cabeçalho: ``numero``, ``titulo``, ``testes``, na última
+    fase ``ultima: sim`` (muda o texto do fecho) e, numa fase já replicada,
+    ``fechada: sim`` (deixa de ser gerada). Secções: ``entrega``,
+    ``verificacao``, ``trello``.
 ``fases/fase-N/<id>.md``
     Uma unidade de trabalho. Cabeçalho: ``id``, ``titulo``, ``ramo``,
     ``quem``, ``revisor``, ``milestone`` e ``tipo``:
@@ -32,6 +33,8 @@ Ficheiros lidos (todos dentro de ``_interno``):
     Secções comuns: ``resumo``, ``pr``, ``testar``, ``verificar``, ``explicacao``.
 ``fases/fase-N/extra-<pessoa>.md``
     Passos adicionais de uma pessoa. Cada secção ``passo: Título`` é um passo.
+    O cabeçalho pode ter ``quando``, o texto da coluna "Quando" da tabela dos
+    passos (por omissão, "Em qualquer altura durante a fase").
 ``modelos/*.md``
     Páginas soltas com marcadores ``{{REPO_A}}``, ``{{REPO_B}}``, etc.
 
@@ -849,7 +852,16 @@ def planear_vezes(fase: dict, config: dict) -> list[dict]:
     for pessoa in config["membros"]:
         extras = fase["extras"].get(sem_acentos(pessoa), [])
         if extras:
-            vezes.append({"pessoa": pessoa, "papel": "extra", "passos": extras, "primeiro": 0, "ultimo": 0})
+            vezes.append(
+                {
+                    "pessoa": pessoa,
+                    "papel": "extra",
+                    "passos": extras,
+                    "quando_extra": fase["extras_quando"].get(sem_acentos(pessoa)),
+                    "primeiro": 0,
+                    "ultimo": 0,
+                }
+            )
 
     for _ in range(2):
         proximo = {pessoa: 1 for pessoa in config["membros"]}
@@ -866,7 +878,7 @@ def planear_vezes(fase: dict, config: dict) -> list[dict]:
             vez["ultimo"] = vez["primeiro"] + len(vez["lista"]) - 1
             proximo[vez["pessoa"]] = vez["ultimo"] + 1
             if vez["papel"] == "extra":
-                vez["quando"] = "Em qualquer altura durante a fase"
+                vez["quando"] = vez["quando_extra"] or "Em qualquer altura durante a fase"
             elif ctx["anterior"] is None:
                 vez["quando"] = "No início da fase"
             elif ctx["anterior"]["pessoa"] == vez["pessoa"]:
@@ -884,16 +896,17 @@ def planear_vezes(fase: dict, config: dict) -> list[dict]:
 def carregar_fase(pasta: Path) -> dict:
     """Lê os ficheiros de uma fase e junta-lhes os dados do Git."""
     cabecalho, seccoes = ler_ficheiro(pasta / "fase.md")
-    fase = {**cabecalho, **dict(seccoes), "pasta": pasta.name, "unidades": [], "extras": {}}
+    fase = {**cabecalho, **dict(seccoes), "pasta": pasta.name, "unidades": [], "extras": {}, "extras_quando": {}}
     for ficheiro in sorted(pasta.glob("[0-9]*.md")):
         cabecalho, seccoes = ler_ficheiro(ficheiro)
         unidade = {"tipo": "tarefa", **cabecalho, **dict(seccoes), "fase": fase["numero"], "nome_fase": fase["titulo"]}
         unidade["commits"] = commits_do_ramo(unidade["ramo"])
         fase["unidades"].append(unidade)
     for ficheiro in sorted(pasta.glob("extra-*.md")):
-        _, seccoes = ler_ficheiro(ficheiro)
+        cabecalho_extra, seccoes = ler_ficheiro(ficheiro)
         pessoa = ficheiro.stem.removeprefix("extra-")
         fase["extras"][pessoa] = [(nome.removeprefix("passo:").strip(), texto) for nome, texto in seccoes]
+        fase["extras_quando"][pessoa] = cabecalho_extra.get("quando")
     return fase
 
 
@@ -1069,10 +1082,17 @@ def gerar_pagina_fase(fase: dict, vezes: list[dict], config: dict) -> str:
         "Testes a passar e documentação gerada sem avisos",
     ]
     partes.append("\n".join(f"- [ ] {item}" for item in lista) + "\n")
-    partes.append(
-        f"Quando estiver tudo, Fabio diz ao Claude **\"avança para a Fase {int(fase['numero']) + 1}\"** e conta os "
-        "problemas que o grupo teve.\n"
-    )
+    if fase.get("ultima") == "sim":
+        partes.append(
+            "Quando estiver tudo, o trabalho está pronto para entregar. Fabio avisa o Claude, que confirma pela "
+            "última vez que o repositório oficial ficou igual ao original, e conta os problemas que o grupo teve, "
+            "para ficarem no registo das fases.\n"
+        )
+    else:
+        partes.append(
+            f"Quando estiver tudo, Fabio diz ao Claude **\"avança para a Fase {int(fase['numero']) + 1}\"** e conta os "
+            "problemas que o grupo teve.\n"
+        )
     if fase.get("trello"):
         partes.append("## Trello\n\n" + fase["trello"] + "\n")
     partes.append(

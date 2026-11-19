@@ -583,7 +583,7 @@ A página ganha as secções `Comentários`, `Notificações`, `Painel de market
 
 Faz este passo depois de a unidade 6.4 estar junta ao `develop`, para a wiki não falar de coisas que ainda não existem.
 
-**a)** Abre https://github.com/cabritaXgamer/ctesp-ADC/blob/guias/wiki/Arquitetura.md e clica no botão de copiar no canto superior direito do ficheiro (*Copy raw file*).
+**a)** Abre https://github.com/cabritaXgamer/ctesp-ADC/blob/b494328/wiki/Arquitetura.md e clica no botão de copiar no canto superior direito do ficheiro (*Copy raw file*).
 
 **b)** Abre https://github.com/Blive77/ADC-TrabGrupo/wiki/Arquitetura e clica em **Edit**, no canto superior direito.
 

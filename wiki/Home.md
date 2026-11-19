@@ -24,16 +24,21 @@ Uma agência usa-a para organizar o trabalho com os seus clientes: os clientes p
 
 | Página | Conteúdo |
 |---|---|
-| [Guia de utilização](Guia-de-utilizacao) | Como usar a aplicação: entrar, menus de cada perfil, gestão de clientes e marketeers, campanhas, pedidos de campanha, pedidos de alteração de budget, histórico e resumo do budget, criativos e comentários, notificações, painel de marketeers, relatório das campanhas, recuperar a password |
+| [Instalação e configuração](Instalação-e-configuração) | Requisitos, arrancar a aplicação, dados de demonstração, pasta de dados, definições e ambiente de desenvolvimento |
+| [Guia de utilização](Guia-de-utilização) | Como usar a aplicação: entrar, menus de cada perfil, gestão de clientes e marketeers, campanhas, pedidos de campanha, pedidos de alteração de budget, histórico e resumo do budget, criativos e comentários, notificações, painel de marketeers, relatório das campanhas, recuperar a password |
 | [Arquitetura](Arquitetura) | Camadas do código, tabelas, campanhas e pedidos, budget e histórico, criativos e ficheiros, comentários, notificações, painel de marketeers, relatório, dinheiro, passwords, sessões, emails e contas desativadas |
+| [Modelo de dados](Modelo-de-dados) | Tabelas, relações, estados, como cada valor é guardado e o que acontece quando se apaga |
+| [Testes](Testes) | Como correr os testes, os fluxos completos, os ficheiros de testes e a integração contínua |
+| [Backlog e user stories](Backlog-e-user-stories) | As 57 user stories, por perfil e por fase, com a unidade e quem a fez |
 | [Fluxo Git](Fluxo-Git) | Ramos, commits, pull requests e releases |
-| [Registo das fases](Registo-das-fases) | O que foi feito em cada fase, por quem, e as decisões tomadas |
+| [Registo das fases](Registo-das-fases) | O que foi feito em cada fase, por quem, as decisões tomadas e o que correu mal |
+| [Changelog](Changelog) | As alterações de cada versão, da v0.1.0 à v1.0.0 |
 
-Versão atual: **v0.6.0** (Fase 6 — Comentários, notificações, painel e relatório).
+Versão atual: **v1.0.0** (Fase 7 — Fecho e entrega). As 57 user stories estão implementadas.
 
 ## Plano de desenvolvimento
 
-O trabalho está dividido em fases. Cada fase corresponde a uma milestone do repositório e termina com uma release.
+O trabalho foi dividido em fases. Cada fase corresponde a uma milestone do repositório e terminou com uma release. Estão todas concluídas.
 
 | Fase | Tema | User stories | Release |
 |---|---|---|---|
@@ -45,6 +50,8 @@ O trabalho está dividido em fases. Cada fase corresponde a uma milestone do rep
 | 5 | Budget | 6 | v0.5.0 |
 | 6 | Comentários, notificações, monitorização e relatórios | 9 | v0.6.0 |
 | 7 | Fecho e entrega | — | v1.0.0 |
+
+O detalhe de cada fase (quem fez e quem reviu cada unidade, e as decisões) está no [Registo das fases](Registo-das-fases).
 
 ## Tecnologias
 
@@ -62,7 +69,8 @@ O trabalho está dividido em fases. Cada fase corresponde a uma milestone do rep
 ```bash
 git clone https://github.com/Blive77/ADC-TrabGrupo
 cd ADC-TrabGrupo
+python -m gestor_campanhas.dados_demo
 python -m gestor_campanhas
 ```
 
-O README do repositório explica a configuração e o ambiente de desenvolvimento.
+O segundo comando cria as contas de demonstração e mostra as passwords. A página [Instalação e configuração](Instalação-e-configuração) explica o resto.

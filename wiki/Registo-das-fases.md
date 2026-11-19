@@ -182,8 +182,39 @@ Decisões tomadas nesta fase:
 - **O relatório é em CSV** (C20), preparado para abrir no Excel em português.
 - **Partes da Fase 5 fechadas.** Os avisos sobre os pedidos de budget (C17 e M18).
 
-## Fases seguintes
+O que correu mal e como se resolveu:
 
-| Fase | Tema | User stories | Release |
+- **`copiar.py` corrido duas vezes antes de gravar o commit.** O `copiar.py` respondeu `ERRO: Tens alterações por gravar nesta pasta`. Os ficheiros já estavam copiados e certos: faltava só o `git add -A` e o `git commit` do commit anterior. A página da Fase 7 lembra que cada commit se faz em três passos, sempre pela mesma ordem.
+- **`verificar.py` com o número de outra fase.** Correr `verificar.py 5.5` no fim da Fase 6 compara o `develop` com o fim da Fase 5, e por isso mostra como diferentes todos os ficheiros da Fase 6. Nada estava mal: com o número da unidade em causa (`6.4`), a resposta foi `Tudo certo`.
+- **A página inicial da wiki ficou com o texto do registo.** Ao atualizar a wiki no fim da Fase 6, o texto do "Registo das fases" foi colado na página inicial, e a página "Registo das fases" ficou com uma versão antiga, só com as Fases 0 e 1. As duas páginas foram corrigidas no fim da Fase 7, quando voltaram a ser substituídas por inteiro. Antes de colar, confirma-se o título da página que está aberta.
+- **Duas indicações diferentes sobre quando atualizar a wiki.** A tabela dos passos dizia "em qualquer altura", e o próprio passo dizia para esperar pela última unidade. A tabela passou a dizer o mesmo que o passo.
+
+## Fase 7 — Fecho e entrega
+
+Release: **v1.0.0**.
+
+| Unidade | O que fez | Quem fez | Quem reviu |
 |---|---|---|---|
-| 7 | Fecho e entrega | — | v1.0.0 |
+| 7.1 Testes dos fluxos completos e dados de demonstração finais | Testes com os três perfis, de uma ponta à outra; criativos de demonstração em vários estados, com ficheiro, comentários e notificações | Fabio | Tomas |
+| 7.2 Docstrings, Sphinx e README final | Revisão dos docstrings, com um teste que os confirma; página do modelo de dados; arquitetura, configuração e README revistos | Tomas | Ricardo |
+| 7.3 Release v1.0.0 | Versão 1.0.0, registo de alterações e README | Ricardo | Fabio |
+
+A wiki ficou completa nesta fase, com as páginas novas Instalação e configuração e Modelo de dados (Tomas), Testes (Fabio), Backlog e user stories e Changelog (Ricardo).
+
+Resultado: 987 testes automáticos; documentação gerada sem avisos; primeira versão completa.
+
+Decisões tomadas nesta fase:
+
+- **Os testes dos fluxos usam as regras de negócio, e não os menus.** Os menus já têm os seus testes; os fluxos confirmam que o que um perfil faz chega aos outros, com as notificações e os emails certos.
+- **Os dados de demonstração passam pelas regras de negócio** para o que acontece aos criativos depois de criados e para os comentários. Assim, as notificações e a atividade de demonstração são as mesmas que a aplicação produziria. O que já existia numa base de dados fica como estava.
+- **A documentação é confirmada por testes.** Um módulo, classe ou função sem docstring, ou um módulo que falte na referência, faz falhar os testes.
+
+## Resumo do projeto
+
+| | |
+|---|---|
+| User stories | 57 (19 do Administrador, 18 do Marketeer, 20 do Cliente) |
+| Fases | 8 (Fase 0 a Fase 7) |
+| Releases | 7 (v0.1.0 a v0.6.0 e v1.0.0) |
+| Testes automáticos | 987 |
+| Unidades de trabalho | Cada membro fez as suas e reviu as de outro, em rotação: Tomas revisto por Ricardo, Ricardo por Fabio, Fabio por Tomas |

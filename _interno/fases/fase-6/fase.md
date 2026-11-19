@@ -2,6 +2,7 @@
 numero: 6
 titulo: Comentários, notificações, painel e relatório
 testes: 863
+fechada: sim
 ---
 
 @@ entrega

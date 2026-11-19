@@ -15,7 +15,7 @@ Aqui nunca se altera nada: só se lê e se copia.
 |---|---|---|---|
 | 1 | [O que é o quê](conceitos.md) | Os três | 5 minutos |
 | 2 | [Preparação](preparacao.md) | Os três, uma só vez | 20 a 30 minutos |
-| 3 | A página da fase em curso: [Fase 6](fase-6/README.md) | Os três | 5 minutos |
+| 3 | A página da fase em curso: [Fase 7](fase-7/README.md) | Os três | 5 minutos |
 | 4 | A tua página da fase | Cada um a sua | Segue-se passo a passo |
 
 ## Fases
@@ -28,8 +28,8 @@ Aqui nunca se altera nada: só se lê e se copia.
 | 3 — Campanhas e pedidos | [fase-3](fase-3/README.md) | [passos](fase-3/fabio.md) | [passos](fase-3/tomas.md) | [passos](fase-3/ricardo.md) | Concluída |
 | 4 — Criativos | [fase-4](fase-4/README.md) | [passos](fase-4/fabio.md) | [passos](fase-4/tomas.md) | [passos](fase-4/ricardo.md) | Concluída |
 | 5 — Budget | [fase-5](fase-5/README.md) | [passos](fase-5/fabio.md) | [passos](fase-5/tomas.md) | [passos](fase-5/ricardo.md) | Concluída |
-| 6 — Comentários, notificações, painel, relatório | [fase-6](fase-6/README.md) | [passos](fase-6/fabio.md) | [passos](fase-6/tomas.md) | [passos](fase-6/ricardo.md) | Entregue a 19/11/2026 |
-| 7 — Fecho e entrega | — | — | — | — | |
+| 6 — Comentários, notificações, painel, relatório | [fase-6](fase-6/README.md) | [passos](fase-6/fabio.md) | [passos](fase-6/tomas.md) | [passos](fase-6/ricardo.md) | Concluída |
+| 7 — Fecho e entrega | [fase-7](fase-7/README.md) | [passos](fase-7/fabio.md) | [passos](fase-7/tomas.md) | [passos](fase-7/ricardo.md) | Entregue a 19/11/2026 |
 
 Cada fase nova traz uma pasta `fase-N` com o mesmo conteúdo.
 

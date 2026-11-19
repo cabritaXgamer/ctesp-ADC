@@ -906,7 +906,7 @@ A página passa a explicar os comentários, as notificações, o painel de marke
 
 Faz este passo depois de a unidade 6.4 estar junta ao `develop`, para a wiki não falar de coisas que ainda não existem.
 
-**a)** Abre https://github.com/cabritaXgamer/ctesp-ADC/blob/guias/wiki/Guia-de-utilizacao.md e clica no botão de copiar no canto superior direito do ficheiro (*Copy raw file*).
+**a)** Abre https://github.com/cabritaXgamer/ctesp-ADC/blob/b494328/wiki/Guia-de-utilizacao.md e clica no botão de copiar no canto superior direito do ficheiro (*Copy raw file*).
 
 **b)** Abre https://github.com/Blive77/ADC-TrabGrupo/wiki, clica em **Guia de utilização** na lista de páginas, à direita, e depois em **Edit**, no canto superior direito.
 
