@@ -16,20 +16,20 @@ Uma agência usa-a para organizar o trabalho com os seus clientes: os clientes p
 
 | Perfil | O que faz | User stories |
 |---|---|---|
-| Administrador | Gere clientes e marketeers, aprova pedidos de campanha, define e altera budgets | 19 |
-| Marketeer | Cria campanhas e criativos, define custos e prazos, dá parecer sobre pedidos de budget | 18 |
-| Cliente | Pede campanhas e alterações de budget, acompanha, comenta e aprova os criativos | 20 |
+| Administrador | Gere clientes e marketeers, aprova pedidos de campanha, define e altera budgets, acompanha a carga de trabalho dos marketeers | 19 |
+| Marketeer | Cria campanhas e criativos, define custos e prazos, dá parecer sobre pedidos de budget, responde aos comentários do cliente | 18 |
+| Cliente | Pede campanhas e alterações de budget, acompanha, comenta e aprova os criativos, exporta um relatório das campanhas | 20 |
 
 ## Páginas desta wiki
 
 | Página | Conteúdo |
 |---|---|
-| [Guia de utilização](Guia-de-utilizacao) | Como usar a aplicação: entrar, menus de cada perfil, gestão de clientes e marketeers, campanhas, pedidos de campanha, pedidos de alteração de budget, histórico e resumo do budget, criativos, recuperar a password |
-| [Arquitetura](Arquitetura) | Camadas do código, tabelas, campanhas e pedidos, budget e histórico, criativos e ficheiros, dinheiro, passwords, sessões, emails e contas desativadas |
+| [Guia de utilização](Guia-de-utilizacao) | Como usar a aplicação: entrar, menus de cada perfil, gestão de clientes e marketeers, campanhas, pedidos de campanha, pedidos de alteração de budget, histórico e resumo do budget, criativos e comentários, notificações, painel de marketeers, relatório das campanhas, recuperar a password |
+| [Arquitetura](Arquitetura) | Camadas do código, tabelas, campanhas e pedidos, budget e histórico, criativos e ficheiros, comentários, notificações, painel de marketeers, relatório, dinheiro, passwords, sessões, emails e contas desativadas |
 | [Fluxo Git](Fluxo-Git) | Ramos, commits, pull requests e releases |
 | [Registo das fases](Registo-das-fases) | O que foi feito em cada fase, por quem, e as decisões tomadas |
 
-Versão atual: **v0.5.0** (Fase 5 — Budget).
+Versão atual: **v0.6.0** (Fase 6 — Comentários, notificações, painel e relatório).
 
 ## Plano de desenvolvimento
 

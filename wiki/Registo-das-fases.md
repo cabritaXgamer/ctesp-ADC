@@ -153,9 +153,37 @@ Decisões tomadas nesta fase:
 - **O resumo é calculado** (A16), como a despesa. O budget de cada cliente soma só as campanhas que já têm budget; a despesa soma todas.
 - **Notificações ficam para a Fase 6.** O aviso ao cliente sobre a decisão (C17) e ao marketeer sobre um pedido novo (M18) entram com as notificações. Até lá, o cliente vê a decisão na lista dos seus pedidos.
 
+O que correu mal e como se resolveu:
+
+- **Issues que ficaram abertas.** Os pull requests das unidades 5.1 e 5.4 foram juntos sem a linha `Closes #` com o número verdadeiro, e as issues C15 e A16 não fecharam sozinhas. Foram fechadas à mão, com um comentário a indicar o pull request. A página da Fase 6 lembra que quem revê tem de confirmar esta linha antes de juntar.
+- **`No module named pytest` depois de reinstalar o Python.** Um Python novo vem sem as ferramentas de desenvolvimento. Resolveu-se com `python -m pip install -r requirements-dev.txt`, como no passo de preparação.
+
+## Fase 6 — Comentários, notificações, painel e relatório
+
+Release: **v0.6.0**.
+
+| Unidade | User stories | Quem fez | Quem reviu |
+|---|---|---|---|
+| 6.1 Comentários dos criativos e respostas | C18, M17 | Ricardo | Fabio |
+| 6.2 Notificações na aplicação e por email | C17, C19, M18 | Fabio | Tomas |
+| 6.3 Painel de marketeers | A17, A18, A19 | Tomas | Ricardo |
+| 6.4 Relatório das campanhas em CSV | C20 | Ricardo | Fabio |
+| 6.5 Release v0.6.0 | — | Ricardo | Fabio |
+
+Resultado: 9 user stories concluídas (as 57 do projeto); 863 testes automáticos; sexta versão publicada.
+
+Decisões tomadas nesta fase:
+
+- **Só o cliente comenta; o marketeer responde** (C18, M17). Os comentários e as respostas ficam na mesma tabela; não se responde a uma resposta, e os comentários não se editam nem se apagam.
+- **Notificações na aplicação e por email** (C17, C19, M18). As duas, e não uma ou outra. Abrir uma notificação mostra logo o item a que se refere.
+- **O cliente sabe tudo o que acontece aos seus criativos** (C19), incluindo as respostas aos comentários. O Administrador não recebe notificações.
+- **A carga de trabalho conta os criativos pelo prazo** (A18). Concluídos são os aprovados e os publicados; em atraso, os que ainda têm trabalho por fazer com o prazo já passado.
+- **"Sem atividade" tem duas causas** (A19): não ter criativos ativos, ou não mexer nos criativos há 7 dias ou mais (o número muda-se no painel). A atividade só começou a ser registada nesta fase, numa tabela própria; os criativos anteriores contam pela data de criação.
+- **O relatório é em CSV** (C20), preparado para abrir no Excel em português.
+- **Partes da Fase 5 fechadas.** Os avisos sobre os pedidos de budget (C17 e M18).
+
 ## Fases seguintes
 
 | Fase | Tema | User stories | Release |
 |---|---|---|---|
-| 6 | Comentários, notificações, monitorização e relatórios | 9 | v0.6.0 |
 | 7 | Fecho e entrega | — | v1.0.0 |

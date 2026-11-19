@@ -1,6 +1,6 @@
 # Guia de utilização
 
-Como usar a aplicação, na versão 0.5.0.
+Como usar a aplicação, na versão 0.6.0.
 
 ## Arrancar
 
@@ -10,7 +10,7 @@ python -m gestor_campanhas
 
 ```
 ============================================================
-Gestor de Campanhas v0.4.0
+Gestor de Campanhas v0.6.0
 ============================================================
   1. Entrar
   2. Recuperar a password
@@ -22,7 +22,7 @@ Em todos os menus escreve-se o número da opção e prime-se Enter.
 
 ## Contas de demonstração
 
-Uma instalação nova não tem contas. Para criar as contas, as campanhas, os pedidos, os criativos e o pedido de budget de demonstração:
+Uma instalação nova não tem contas. Para criar as contas, as campanhas, os pedidos, os criativos, o pedido de budget e o comentário de demonstração:
 
 ```bash
 python -m gestor_campanhas.dados_demo
@@ -39,13 +39,39 @@ python -m gestor_campanhas.dados_demo
 
 Estas passwords são públicas e servem só para demonstração.
 
-O mesmo comando cria três campanhas (`Natal 2026`, `Regresso às aulas` e `Bicicletas de primavera`), dois pedidos de campanha pendentes, quatro criativos (três nas campanhas do Miguel e um na da Marta) e um pedido de alteração de budget pendente, da Carla, para a campanha `Natal 2026` passar de 1500 € para 2000 €. Pode ser repetido: só acrescenta o que faltar.
+O mesmo comando cria três campanhas (`Natal 2026`, `Regresso às aulas` e `Bicicletas de primavera`), dois pedidos de campanha pendentes, quatro criativos (três nas campanhas do Miguel e um na da Marta) um pedido de alteração de budget pendente, da Carla, para a campanha `Natal 2026` passar de 1500 € para 2000 €, e um comentário da Carla ao criativo `Vídeo da montra`. Pode ser repetido: só acrescenta o que faltar.
 
 ## Entrar e sair
 
 A opção **Entrar** pede o email e a password. A password não aparece no ecrã enquanto é escrita (exceto no terminal Git Bash). Com as credenciais certas abre-se o menu do perfil; a opção **0. Terminar sessão** volta ao menu inicial.
 
 Ao fim de 15 minutos sem atividade, a sessão termina sozinha e é preciso entrar de novo.
+
+## Notificações
+
+O Marketeer e o Cliente recebem notificações do que lhes diz respeito, na opção **Notificações** do menu e por email:
+
+| Quem recebe | Quando | Abrir mostra |
+|---|---|---|
+| Marketeer | Passa a ser responsável por uma campanha | A campanha |
+| Marketeer | Um cliente pede a alteração do budget de uma campanha dele | O pedido de budget |
+| Marketeer | Um cliente comenta um criativo dele | O criativo, com os comentários |
+| Cliente | Um pedido de alteração de budget é aprovado (com o budget novo) ou rejeitado (com o motivo) | O pedido de budget |
+| Cliente | O marketeer cria, edita, muda o estado ou anexa um ficheiro a um criativo, ou responde a um comentário | O criativo |
+| Cliente | O marketeer elimina um criativo | A campanha |
+
+Enquanto houver notificações por ler, aparece por cima do menu, por exemplo `Tem 2 notificações por ler, na opção "Notificações".`
+
+```
+N.º  Data              Estado   Sobre           Mensagem
+---  ----------------  -------  --------------  ------------------------------------------------------------
+2    2026-11-19 11:06  Por ler  Criativo n.º 2  Miguel Marketeer respondeu ao seu comentário sobre o cria...
+1    2026-11-19 10:58  Lida     Criativo n.º 5  Foi criado o criativo Teste das notificações, da campanha...
+
+2 notificações, 1 por ler.
+```
+
+**Abrir notificação** mostra o texto completo e, logo a seguir, o item; a notificação passa a `Lida`. Se o item já não existir, ou já não for do utilizador, aparece uma mensagem a dizê-lo. **Marcar todas como lidas** marca as que faltam. O Administrador não recebe notificações.
 
 ## O que cada perfil pode fazer
 
@@ -55,10 +81,12 @@ Ao fim de 15 minutos sem atividade, a sessão termina sozinha e é preciso entra
 | Marketeers | Sim | | |
 | Pedidos de campanha | Decide os pedidos de todos os clientes | | Faz pedidos de campanha e de alteração de budget, acompanha-os e cancela os pendentes |
 | Pedidos de budget | Aprova ou rejeita os pedidos de alteração de budget que já têm parecer | Dá parecer sobre os pedidos das suas campanhas | |
-| Campanhas | Vê todas, define o budget, atribui o marketeer e vê o histórico do budget | Cria, edita, consulta e elimina as suas | Vê as suas, o budget, a despesa, o marketeer responsável e o histórico do budget |
+| Campanhas | Vê todas, define o budget, atribui o marketeer e vê o histórico do budget | Cria, edita, consulta e elimina as suas | Vê as suas, o budget, a despesa, o marketeer responsável e o histórico do budget, e exporta o relatório |
 | Resumo do budget | Budget atribuído face à despesa, por cliente e por campanha | | |
-| Criativos | | Cria, edita, consulta e elimina os das suas campanhas, muda o estado e anexa o ficheiro | Vê os das suas campanhas, procura-os, aprova-os ou rejeita-os e descarrega os ficheiros |
+| Criativos | | Cria, edita, consulta e elimina os das suas campanhas, muda o estado, anexa o ficheiro e responde aos comentários | Vê os das suas campanhas, procura-os, aprova-os ou rejeita-os, descarrega os ficheiros e comenta-os |
+| Notificações | | Campanha atribuída, pedido de budget, comentário | Decisão de um pedido de budget, criativos criados ou alterados, respostas |
 | Horários de entrada e saída dos marketeers | Sim | | |
+| Painel de marketeers | Carga de trabalho e inatividade de cada marketeer | | |
 | Editar os meus dados | Sim | Sim | Sim |
 | Alterar a password | Sim | Sim | Sim |
 
@@ -221,7 +249,7 @@ O budget é a soma das campanhas que já têm budget; a despesa conta todas as c
 
 ### Campanhas (Cliente)
 
-Mostra as campanhas do cliente, com as datas, o budget, o estado, o marketeer responsável, a despesa e o restante. A opção **Ver campanha e marketeer responsável** mostra todos os dados de uma campanha, a parte do budget já gasta (por exemplo `Gasto:     86% do budget`) e o nome, o email e o telefone do marketeer. A opção **Histórico do budget** mostra as alterações do budget de uma campanha, como no menu do Administrador.
+Mostra as campanhas do cliente, com as datas, o budget, o estado, o marketeer responsável, a despesa e o restante. A opção **Ver campanha e marketeer responsável** mostra todos os dados de uma campanha, a parte do budget já gasta (por exemplo `Gasto:     86% do budget`) e o nome, o email e o telefone do marketeer. A opção **Histórico do budget** mostra as alterações do budget de uma campanha, como no menu do Administrador. A opção **Exportar relatório** está explicada mais abaixo, em `Relatório das campanhas (Cliente)`.
 
 ### Criativos (Marketeer)
 
@@ -235,17 +263,19 @@ N.º  Nome             Custo     Prazo       Público-alvo               Platafo
 
 2 criativos.
 Custo dos criativos: 1 300,00 €. Budget da campanha: 1 500,00 €.
+Há 1 comentário do cliente por responder (criativo n.º 2).
 ```
 
 | Opção | O que faz |
 |---|---|
 | Criar criativo | Pede o nome (obrigatório), a descrição, o custo estimado em euros, o prazo (`AAAA-MM-DD`), o público-alvo e a plataforma, escolhida numa lista. O criativo fica `Em preparação` |
 | Editar criativo | Altera os mesmos dados. Com Enter, o valor mantém-se; com `-`, é apagado. Só para criativos em preparação ou rejeitados |
-| Ver criativo | Mostra todos os dados, incluindo o público-alvo completo, o motivo da rejeição e o nome do ficheiro |
+| Ver criativo | Mostra todos os dados, incluindo o público-alvo completo, o motivo da rejeição e o nome do ficheiro, e os comentários do cliente com as respostas |
 | Eliminar criativo | Pede confirmação. Um criativo publicado não pode ser eliminado |
 | Atualizar estado | Mostra só os estados para onde o criativo pode passar (ver a secção seguinte) |
 | Anexar ficheiro | Pede o caminho de um ficheiro do computador e copia-o para a aplicação. Substitui o ficheiro anterior, se houver |
 | Pré-visualizar ficheiro | Mostra o nome, o tipo e o tamanho do ficheiro e pergunta se o deve abrir no programa predefinido |
+| Responder a comentário | Mostra os comentários de um criativo e pede o número do comentário e a resposta (ver `Comentários dos criativos`) |
 
 O prazo não pode ser depois do fim da campanha. Quando o custo dos criativos passa o budget, aparece um aviso por baixo da lista, depois de criar ou editar um criativo, e em "Ver campanha":
 
@@ -278,10 +308,28 @@ A opção **Criativos** mostra os criativos de todas as campanhas do cliente, co
 | Opção | O que faz |
 |---|---|
 | Filtrar e pesquisar | Pede um texto (procurado no nome, na descrição e no público-alvo, sem distinguir acentos), uma campanha, uma plataforma e um estado. Com Enter, a pergunta não é usada |
-| Ver criativo | Mostra todos os dados de um criativo |
+| Ver criativo | Mostra todos os dados de um criativo e os comentários, com as respostas do marketeer |
 | Aprovar ou rejeitar criativo | Só para criativos em revisão. Para rejeitar, o motivo é obrigatório |
 | Pré-visualizar ficheiro | Como no menu do marketeer |
 | Descarregar ficheiro | Copia o ficheiro para uma pasta à escolha (com Enter, a pasta Transferências). Nunca escreve por cima de um ficheiro que já lá esteja: a cópia fica, por exemplo, `banner-natal (1).svg` |
+| Comentar criativo | Mostra os comentários de um criativo e pede um comentário ou uma sugestão (ver a secção seguinte) |
+
+### Comentários dos criativos
+
+O cliente comenta os criativos das suas campanhas, em qualquer estado, para dizer ao marketeer o que quer que mude. O marketeer vê os comentários em "Ver criativo" e responde a cada um. Cada comentário e cada resposta ficam com o nome de quem escreveu e a data:
+
+```
+Comentários
+  N.º 1, de Carla Cliente, em 2026-11-19 11:03:
+    Gostava que o vídeo mostrasse a montra à noite, com as luzes acesas.
+    Resposta de Miguel Marketeer, em 2026-11-19 11:10:
+      Vou gravar o vídeo ao fim da tarde, com as luzes acesas
+  N.º 2, de Carla Cliente, em 2026-11-19 11:12:
+    O vídeo devia ter música de Natal
+    (ainda sem resposta)
+```
+
+Um comentário pode ter várias respostas. Não se responde a uma resposta: para continuar a conversa, o cliente escreve um comentário novo. Os comentários não se editam nem se apagam; desaparecem só se o criativo for eliminado.
 
 ### Ficheiros dos criativos
 
@@ -300,6 +348,38 @@ Miguel Marketeer  2026-11-11 14:00  2026-11-11 14:15  0h15     Inatividade
 Miguel Marketeer  2026-11-10 09:00  2026-11-10 12:30  3h30     Terminou a sessão
 ```
 
+### Painel de marketeers (Administrador)
+
+Compara o trabalho dos marketeers com a conta ativa:
+
+```
+N.º  Marketeer         Campanhas ativas  Ativos  Em atraso  Concluídos  Última atividade  Situação
+---  ----------------  ----------------  ------  ---------  ----------  ----------------  ----------------
+3    Marta Marques     1                 1       0          0           2026-11-10        Parado há 9 dias
+2    Miguel Marketeer  1                 2       1          1           2026-11-19
+```
+
+| Coluna | O que conta |
+|---|---|
+| Campanhas ativas | Campanhas que ainda não terminaram |
+| Ativos | Criativos em preparação, em revisão ou rejeitados |
+| Em atraso | Criativos ativos com o prazo já passado |
+| Concluídos | Criativos aprovados ou publicados |
+| Última atividade | Última vez que o marketeer criou, editou ou eliminou um criativo, lhe mudou o estado, lhe anexou um ficheiro ou respondeu a um comentário |
+| Situação | `Sem criativos ativos` ou `Parado há N dias` (7 dias ou mais, de início) |
+
+| Opção | O que faz |
+|---|---|
+| Ver o trabalho de um marketeer | As campanhas dele, com os criativos de cada uma e os que estão em atraso, e as cinco últimas atividades |
+| Comparar num período | Conta só os criativos com o prazo entre as duas datas (cada uma pode ficar vazia) |
+| Mudar os dias sem atividade | Muda o número de dias (pelo menos 1) ao fim dos quais um marketeer aparece como parado |
+
+### Relatório das campanhas (Cliente)
+
+Em **Campanhas**, a opção **Exportar relatório** grava um ficheiro CSV com uma linha por criativo: a campanha (nome, estado, datas, marketeer, budget, despesa e restante) e o criativo (nome, estado, plataforma, prazo e custo). Uma campanha sem criativos tem uma linha só com os dados da campanha.
+
+O ficheiro chama-se `relatorio-campanhas-AAAA-MM-DD.csv` e vai para a pasta indicada ou, com Enter, para a pasta Transferências. Abre-se diretamente no Excel: as colunas são separadas por `;` e os euros usam a vírgula, sem o símbolo `€`, para serem lidos como números.
+
 ### Editar os meus dados
 
 Mostra cada dado com o valor atual entre parênteses retos. Com Enter, o valor mantém-se. O email não pode ser alterado. A empresa e o NIF só são pedidos aos clientes.
@@ -314,4 +394,4 @@ No menu inicial, a opção **Recuperar a password** envia um código de 6 algari
 
 ## Emails
 
-Os emails são simulados: cada mensagem é um ficheiro de texto na pasta `dados/caixa_saida`. Para ver o código de recuperação, as credenciais de uma conta nova ou o aviso de que um pedido foi decidido, abre-se o ficheiro mais recente dessa pasta.
+Os emails são simulados: cada mensagem é um ficheiro de texto na pasta `dados/caixa_saida`. Para ver o código de recuperação, as credenciais de uma conta nova, o aviso de que um pedido foi decidido ou uma notificação, abre-se o ficheiro mais recente dessa pasta.

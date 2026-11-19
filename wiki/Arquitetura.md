@@ -100,6 +100,26 @@ O budget de uma campanha está na tabela `campanhas`; o histórico, na tabela `a
 
 O resumo global do budget não tem tabela própria: é calculado sempre que é mostrado, a partir das campanhas e da despesa de cada uma, como a despesa. A regra "acima do budget" está numa só função, `acima_do_budget`, em `servicos/budget.py`: uma campanha sem budget nunca está acima do budget.
 
+## Comentários
+
+Os comentários do cliente e as respostas do marketeer ficam na mesma tabela, `comentarios`. Uma resposta é um comentário com a coluna `resposta_a` preenchida, com o número do comentário a que responde. Assim, uma só consulta traz a conversa toda de um criativo, pela ordem em que foi escrita, e a função `conversa`, em `servicos/comentarios.py`, arruma-a em pares (comentário, respostas). Não se responde a uma resposta, por isso a conversa tem só dois níveis.
+
+## Notificações
+
+Todas as notificações passam por uma só função, `notificar`, em `servicos/notificacoes.py`: guarda a notificação na tabela `notificacoes` e envia o mesmo texto por email. Quem decide quem é notificado são as regras de cada assunto, no fim de cada operação que corre bem (`servicos/campanhas.py`, `budget.py`, `criativos.py` e `comentarios.py`). Como a notificação é a última coisa a acontecer, uma operação recusada não notifica ninguém.
+
+Cada notificação guarda o tipo do item (`campanha`, `pedido_budget` ou `criativo`) e o número dele. Esse número não é uma chave estrangeira, porque aponta para tabelas diferentes conforme o tipo. Ao abrir a notificação, o item é procurado com as mesmas funções dos menus (por exemplo `obter_do_cliente`), por isso ninguém vê, por uma notificação antiga, um item a que já não tem acesso.
+
+## Painel de marketeers
+
+Os indicadores do painel (criativos ativos, em atraso e concluídos) não são guardados: são calculados sempre que o painel é mostrado, em `servicos/painel.py`. Os estados que contam em cada grupo estão nas constantes `ATIVOS` e `CONCLUIDOS`.
+
+A tabela `criativos` não guarda a data da última alteração, e o `CREATE TABLE IF NOT EXISTS` não acrescenta colunas a uma tabela que já existe. Por isso a atividade dos marketeers tem uma tabela própria, `atividades`, onde ficam registadas as alterações aos criativos e as respostas a comentários. Para os criativos que já existiam, conta a data de criação. O número de dias sem atividade (7, de início) fica na tabela `configuracoes`, como o limite de inatividade das sessões.
+
+## Relatório
+
+O relatório do cliente é montado em `servicos/relatorios.py`, com as mesmas funções que mostram as campanhas e a despesa no ecrã, e gravado com o módulo `csv` da biblioteca padrão. O formato pensa no Excel em português: colunas separadas por `;` (a vírgula é a das casas decimais), euros sem `€` e sem o espaço dos milhares, e o ficheiro em UTF-8 com a marca inicial, sem a qual o Excel troca os acentos. O nome do ficheiro é escolhido pela mesma função que escolhe o nome de um ficheiro descarregado, `caminho_livre`, por isso nenhum ficheiro é apagado.
+
 ## Ficheiros
 
 Os ficheiros dos criativos ficam fora da base de dados, na pasta `dados/ficheiros/<número do criativo>/`. A base de dados guarda só o nome do ficheiro. O módulo `servicos/ficheiros.py` trata de copiar, descrever (tipo e tamanho), abrir e descarregar ficheiros, e não sabe nada de criativos: recebe só caminhos e números.
@@ -131,10 +151,13 @@ Um marketeer só pode ser desativado quando já não for responsável por campan
 | `pedidos_campanha` | Uma linha por pedido de nova campanha: cliente, objetivo, orçamento em cêntimos, prazo, plataformas, estado, motivo da rejeição e campanha a que deu origem |
 | `pedidos_budget` | Uma linha por pedido de alteração de budget: campanha, budget de partida e budget pedido em cêntimos, motivo, estado, parecer do marketeer e justificação, motivo da rejeição e data da decisão |
 | `alteracoes_budget` | O histórico do budget: uma linha por alteração, com a campanha, o budget anterior e o novo, o motivo, a data e o pedido que lhe deu origem, se houver |
+| `comentarios` | Uma linha por comentário ou resposta: criativo, autor, texto, data e, numa resposta, o comentário a que responde |
+| `notificacoes` | Uma linha por notificação: quem a recebe, o texto, o tipo e o número do item, se já foi lida e a data |
+| `atividades` | A atividade dos marketeers: uma linha por alteração, com o marketeer, a descrição e a data |
 | `recuperacoes` | Códigos de recuperação da password: utilizador, hash do código, validade e se já foi usado |
 | `configuracoes` | Definições que podem ser alteradas, como pares chave/valor |
 
-Uma campanha com criativos não pode ser apagada. Os pedidos de alteração de budget e o histórico do budget não impedem: têm `ON DELETE CASCADE`, e são apagados com a campanha.
+Uma campanha com criativos não pode ser apagada. Os pedidos de alteração de budget e o histórico do budget não impedem: têm `ON DELETE CASCADE`, e são apagados com a campanha. Os comentários de um criativo também têm `ON DELETE CASCADE`, e são apagados com o criativo.
 
 ## Passwords
 
