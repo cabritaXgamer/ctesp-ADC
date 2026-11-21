@@ -209,6 +209,12 @@ Decisões tomadas nesta fase:
 - **Os dados de demonstração passam pelas regras de negócio** para o que acontece aos criativos depois de criados e para os comentários. Assim, as notificações e a atividade de demonstração são as mesmas que a aplicação produziria. O que já existia numa base de dados fica como estava.
 - **A documentação é confirmada por testes.** Um módulo, classe ou função sem docstring, ou um módulo que falte na referência, faz falhar os testes.
 
+O que correu mal e como se resolveu:
+
+- **Um pull request junto sem o último commit.** O pull request #118, da unidade 7.2, foi junto só com 4 dos 5 commits: faltou o do README final. O `verificar.py 7.2` mostrou o `README.md` como diferente e disse qual era o commit seguinte. O Tomas gravou o commit 5 no mesmo ramo e abriu o pull request #119, que o Ricardo juntou. Antes de juntar, quem revê confirma que o pull request tem todos os commits da unidade.
+- **`Closes ##115`.** A descrição do pull request #116, da unidade 7.1, tinha dois `#`, e a issue #115 não fechou sozinha. Foi fechada à mão, com um comentário a indicar o pull request.
+- **O registo foi outra vez para a página inicial.** Ao registar a Fase 7, o texto foi colado de novo na página inicial, em vez da página "Registo das fases". A página inicial foi reposta logo a seguir, e o registo foi colado na página certa abrindo-a pelo endereço direto (`wiki/Registo-das-fases`).
+
 ## Resumo do projeto
 
 | | |
